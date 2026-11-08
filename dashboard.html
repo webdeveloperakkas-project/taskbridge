@@ -984,126 +984,320 @@
 
 
 
-                <!-- =================================
-                     FIND A JOB SECTION
-                ================================== -->
 
-                <section id="findJobSection" class="page-section">
+<!-- =================================
+     FIND A JOB SECTION
+================================== -->
 
-                    <div class="section-heading">
+<section id="findJobSection" class="page-section">
 
-                        <div>
-                            <span>WORKER AREA</span>
-                            <h1>Find a Job</h1>
-                            <p>Discover available tasks and earn rewards.</p>
-                        </div>
+    <!-- SECTION HEADING -->
 
-                    </div>
-
-
-                    <!-- JOB STATISTICS -->
-
-                    <div class="stats-grid">
-
-                        <div class="stat-card">
-                            <p>Available Jobs</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Completed Jobs</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Total Jobs</p>
-                            <h3>0</h3>
-                        </div>
-
-                    </div>
+    <div class="section-heading">
+        <div>
+            <span>WORKER AREA</span>
+            <h1>Find a Job</h1>
+            <p>Discover available tasks and earn rewards.</p>
+        </div>
+    </div>
 
 
-                    <!-- JOB SEARCH -->
+    <!-- JOB STATISTICS -->
 
-                    <section class="content-panel job-search-panel">
+    <div class="stats-grid">
 
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Search Jobs</h2>
-                                <p>Find tasks that match your interests.</p>
-                            </div>
-                        </div>
+        <div class="stat-card">
+            <p>Available Jobs</p>
+            <h3 id="availableJobsCount">0</h3>
+        </div>
 
-                        <div class="job-filter-grid">
+        <div class="stat-card">
+            <p>Completed Jobs</p>
+            <h3 id="completedJobsCount">0</h3>
+        </div>
 
-                            <div class="form-group">
-                                <label for="jobSearchInput">Search by Keyword</label>
-                                <input type="search"
-                                    id="jobSearchInput"
-                                    placeholder="Enter job title or keyword">
-                            </div>
+        <div class="stat-card">
+            <p>Total Jobs</p>
+            <h3 id="totalJobsCount">0</h3>
+        </div>
 
-                            <div class="form-group">
-                                <label for="jobCategoryFilter">Category</label>
-
-                                <select id="jobCategoryFilter">
-                                    <option value="all">All Categories</option>
-                                    <option value="facebook">Facebook</option>
-                                    <option value="youtube">YouTube</option>
-                                    <option value="instagram">Instagram</option>
-                                    <option value="tiktok">TikTok</option>
-                                    <option value="twitter">Twitter / X</option>
-                                    <option value="website">Website</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="jobSortFilter">Sort By</label>
-
-                                <select id="jobSortFilter">
-                                    <option value="newest">Newest First</option>
-                                    <option value="highest">Highest Reward</option>
-                                    <option value="lowest">Lowest Reward</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                    </section>
+    </div>
 
 
-                    <!-- AVAILABLE JOB LIST -->
+    <!-- JOB SEARCH PANEL -->
 
-                    <section class="content-panel available-jobs-panel">
+    <section class="content-panel job-search-panel">
 
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Available Jobs</h2>
-                                <p>Jobs approved and published by advertisers.</p>
-                            </div>
-                        </div>
+        <div class="panel-heading">
+            <div>
+                <h2>Search Jobs</h2>
+                <p>Search for tasks using keywords.</p>
+            </div>
+        </div>
 
-                        <div class="empty-state">
+        <!-- SEARCH BAR -->
 
-                            <div class="empty-state-icon">
-                                <svg class="icon">
-                                    <use href="#icon-search"></use>
-                                </svg>
-                            </div>
+        <div class="job-search-bar">
 
-                            <h3>No Jobs Available Yet</h3>
+            <div class="job-search-input">
+                <svg class="icon">
+                    <use href="#icon-search"></use>
+                </svg>
 
-                            <p>
-                                There are currently no approved jobs available.
-                                Please check back later.
-                            </p>
+                <input
+                    type="search"
+                    id="jobSearchInput"
+                    placeholder="Search jobs by title or keyword..."
+                >
+            </div>
 
-                        </div>
+            <button
+                type="button"
+                id="jobSearchButton"
+                class="btn-primary">
 
-                    </section>
+                <svg class="icon">
+                    <use href="#icon-search"></use>
+                </svg>
 
-                </section>
+                <span>Search</span>
+
+            </button>
+
+        </div>
+
+
+        <!-- CATEGORY FILTER -->
+
+        <div class="job-category-area">
+
+            <div class="category-heading">
+                <h3>Browse by Category</h3>
+                <p>Select a category to explore available jobs.</p>
+            </div>
+
+
+            <div class="job-category-grid">
+
+                <!-- ALL CATEGORIES -->
+
+                <button type="button"
+                    class="job-category-item active"
+                    data-category="all">
+
+                    <span class="category-icon">
+                        <svg class="icon">
+                            <use href="#icon-grid"></use>
+                        </svg>
+                    </span>
+
+                    <span>All Jobs</span>
+
+                </button>
+
+
+                <!-- FACEBOOK -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="facebook">
+
+                    <span class="category-icon facebook-icon">
+                        <svg class="icon">
+                            <use href="#icon-facebook"></use>
+                        </svg>
+                    </span>
+
+                    <span>Facebook</span>
+
+                </button>
+
+
+                <!-- YOUTUBE -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="youtube">
+
+                    <span class="category-icon youtube-icon">
+                        <svg class="icon">
+                            <use href="#icon-youtube"></use>
+                        </svg>
+                    </span>
+
+                    <span>YouTube</span>
+
+                </button>
+
+
+                <!-- INSTAGRAM -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="instagram">
+
+                    <span class="category-icon instagram-icon">
+                        <svg class="icon">
+                            <use href="#icon-instagram"></use>
+                        </svg>
+                    </span>
+
+                    <span>Instagram</span>
+
+                </button>
+
+
+                <!-- TIKTOK -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="tiktok">
+
+                    <span class="category-icon tiktok-icon">
+                        <svg class="icon">
+                            <use href="#icon-music"></use>
+                        </svg>
+                    </span>
+
+                    <span>TikTok</span>
+
+                </button>
+
+
+                <!-- TWITTER / X -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="twitter">
+
+                    <span class="category-icon twitter-icon">
+                        <svg class="icon">
+                            <use href="#icon-twitter"></use>
+                        </svg>
+                    </span>
+
+                    <span>Twitter / X</span>
+
+                </button>
+
+
+                <!-- WEBSITE -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="website">
+
+                    <span class="category-icon website-icon">
+                        <svg class="icon">
+                            <use href="#icon-globe"></use>
+                        </svg>
+                    </span>
+
+                    <span>Website</span>
+
+                </button>
+
+
+                <!-- OTHER -->
+
+                <button type="button"
+                    class="job-category-item"
+                    data-category="other">
+
+                    <span class="category-icon other-icon">
+                        <svg class="icon">
+                            <use href="#icon-more-horizontal"></use>
+                        </svg>
+                    </span>
+
+                    <span>Other</span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- SORT FILTER -->
+
+        <div class="job-sort-area">
+
+            <label for="jobSortFilter">
+                <svg class="icon">
+                    <use href="#icon-filter"></use>
+                </svg>
+
+                Sort By
+            </label>
+
+            <select id="jobSortFilter">
+
+                <option value="newest">Newest First</option>
+
+                <option value="highest">Highest Reward</option>
+
+                <option value="lowest">Lowest Reward</option>
+
+            </select>
+
+        </div>
+
+    </section>
+
+
+    <!-- AVAILABLE JOB LIST -->
+
+    <section class="content-panel available-jobs-panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <h2>Available Jobs</h2>
+                <p id="jobResultsDescription">
+                    Jobs approved and published by advertisers.
+                </p>
+            </div>
+
+            <span id="jobResultsCount" class="job-results-count">
+                0 Jobs
+            </span>
+
+        </div>
+
+
+        <!-- JOB LIST CONTAINER -->
+
+        <div class="job-list" id="jobList">
+
+            <!-- Approved jobs will appear here dynamically -->
+
+        </div>
+
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state" id="jobEmptyState">
+
+            <div class="empty-state-icon">
+                <svg class="icon">
+                    <use href="#icon-search"></use>
+                </svg>
+            </div>
+
+            <h3>No Jobs Available Yet</h3>
+
+            <p>
+                There are currently no approved jobs available
+                in this category. Please check back later.
+            </p>
+
+        </div>
+
+    </section>
+
+</section>
+
 
 
 
