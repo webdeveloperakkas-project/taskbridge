@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - TaskBridge</title>
+
+    <meta
+        name="description"
+        content="Log in to your TaskBridge account and access global micro job opportunities."
+    >
+
+    <!-- Login CSS will be connected here -->
+    <link rel="stylesheet" href="./login.css">
+</head>
+
+<body>
+
+    <!-- Login Page -->
+    <main class="login-page">
+
+        <div class="login-container">
+
+            <!-- Brand -->
+            <div class="login-brand">
+
+                <a href="index.html" class="logo">
+                    Task<span>Bridge</span>
+                </a>
+
+                <p>Your Global Micro Jobs Marketplace</p>
+
+            </div>
+
+            <!-- Login Card -->
+            <div class="login-card">
+
+                <!-- Heading -->
+                <div class="login-heading">
+
+                    <h1>Welcome Back!</h1>
+
+                    <p>
+                        Log in to your TaskBridge account
+                        and continue your journey.
+                    </p>
+
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm">
+
+                    <!-- Email or Username -->
+                    <div class="form-group">
+
+                        <label for="loginIdentity">
+                            Email Address or Username
+                        </label>
+
+                        <input
+                            type="text"
+                            id="loginIdentity"
+                            name="loginIdentity"
+                            placeholder="Enter your email or username"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+
+                        <label for="loginPassword">
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                    </div>
+
+                    <!-- Remember Me and Forgot Password -->
+                    <div class="login-options">
+
+                        <div class="remember-me">
+
+                            <input
+                                type="checkbox"
+                                id="rememberMe"
+                                name="rememberMe"
+                            >
+
+                            <label for="rememberMe">
+                                Remember Me
+                            </label>
+
+                        </div>
+
+                        <a href="forgot-password.html">
+                            Forgot Password?
+                        </a>
+
+                    </div>
+
+                    <!-- Login Button -->
+                    <button
+                        type="submit"
+                        class="login-button"
+                    >
+                        Log In
+                    </button>
+
+                </form>
+
+                <!-- Registration Link -->
+                <div class="register-link">
+
+                    <p>
+                        Don't have an account?
+
+                        <a href="register.html">
+                            Create an Account
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="login-footer">
+
+                <p>
+                    &copy; <span id="current-year">2026</span>
+                    TaskBridge. All Rights Reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Login JavaScript will be connected here -->
+    <script src="./login.js"></script>
+
+</body>
+</html>
