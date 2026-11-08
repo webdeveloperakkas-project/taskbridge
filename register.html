@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account - TaskBridge</title>
+
+    <meta name="description" content="Create your free TaskBridge account and discover global micro job opportunities.">
+
+    <link rel="stylesheet" href="./register.css">
+</head>
+
+<body>
+
+    <main class="register-page">
+
+        <div class="register-container">
+
+            <!-- Brand -->
+            <div class="register-brand">
+                <a href="index.html" class="logo">
+                    Task<span>Bridge</span>
+                </a>
+
+                <p>Your Global Micro Jobs Marketplace</p>
+            </div>
+
+            <div class="register-card">
+
+                <!-- STEP 1: REGISTRATION FORM -->
+                <section id="registrationStep">
+
+                    <div class="register-heading">
+                        <h1>Create Your Account</h1>
+
+                        <p>
+                            Join TaskBridge and explore opportunities
+                            from around the world.
+                        </p>
+                    </div>
+
+                    <form id="registerForm">
+
+                        <!-- Full Name -->
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label for="username">Username</label>
+
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                placeholder="Choose a username"
+                                autocomplete="username"
+                                minlength="3"
+                                required
+                            >
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="Enter your email address"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+
+                        <!-- Country -->
+                        <div class="form-group">
+                            <label for="country">Country</label>
+
+                            <select
+                                id="country"
+                                name="country"
+                                autocomplete="country-name"
+                                required
+                            >
+                                <option value="">Select your country</option>
+                                <option value="Bangladesh">Bangladesh</option>
+                                <option value="United States">United States</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Germany">Germany</option>
+                                <option value="France">France</option>
+                                <option value="Pakistan">Pakistan</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Account Type -->
+                        <div class="form-group">
+                            <label for="accountType">
+                                What best describes you?
+                            </label>
+
+                            <select
+                                id="accountType"
+                                name="accountType"
+                                required
+                            >
+                                <option value="">Select an option</option>
+
+                                <option value="worker">
+                                    Worker - I want to complete tasks
+                                </option>
+
+                                <option value="advertiser">
+                                    Advertiser - I want to post tasks
+                                </option>
+
+                                <option value="both">
+                                    Both - I want to do both
+                                </option>
+                            </select>
+
+                            <small>
+                                You can find jobs and post jobs using
+                                the same account.
+                            </small>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label for="password">Password</label>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group">
+                            <label for="confirmPassword">
+                                Confirm Password
+                            </label>
+
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                placeholder="Enter your password again"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="form-checkbox">
+                            <input
+                                type="checkbox"
+                                id="terms"
+                                name="terms"
+                                required
+                            >
+
+                            <label for="terms">
+                                I agree to the
+                                <a href="terms.html">
+                                    Terms & Conditions
+                                </a>
+                                and
+                                <a href="privacy.html">
+                                    Privacy Policy
+                                </a>.
+                            </label>
+                        </div>
+
+                        <!-- Registration Message -->
+                        <div
+                            id="registerMessage"
+                            class="form-message"
+                            role="alert"
+                            aria-live="polite"
+                        ></div>
+
+                        <!-- Submit -->
+                        <button
+                            type="submit"
+                            id="registerButton"
+                            class="register-button"
+                        >
+                            Create Account
+                        </button>
+
+                    </form>
+
+                    <!-- Login Link -->
+                    <div class="login-link">
+                        <p>
+                            Already have an account?
+                            <a href="login.html">Log In</a>
+                        </p>
+                    </div>
+
+                </section>
+
+
+                <!-- STEP 2: EMAIL OTP VERIFICATION -->
+                <section id="otpStep" hidden>
+
+                    <div class="register-heading">
+
+                        <div class="otp-icon">
+                            <span aria-hidden="true">✉</span>
+                        </div>
+
+                        <h1>Verify Your Email</h1>
+
+                        <p>
+                            We have sent a 6-digit verification code
+                            to your email address.
+                        </p>
+
+                        <p>
+                            <strong id="otpEmail"></strong>
+                        </p>
+
+                    </div>
+
+                    <form id="otpForm">
+
+                        <!-- OTP Input -->
+                        <div class="form-group otp-form-group">
+
+                            <label for="otpCode">
+                                Enter Verification Code
+                            </label>
+
+                            <input
+                                type="text"
+                                id="otpCode"
+                                name="otpCode"
+                                placeholder="Enter 6-digit OTP"
+                                inputmode="numeric"
+                                autocomplete="one-time-code"
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                required
+                            >
+
+                            <small>
+                                Enter the 6-digit code sent to your email.
+                            </small>
+
+                        </div>
+
+                        <!-- OTP Message -->
+                        <div
+                            id="otpMessage"
+                            class="form-message"
+                            role="alert"
+                            aria-live="polite"
+                        ></div>
+
+                        <!-- Confirm OTP -->
+                        <button
+                            type="submit"
+                            id="verifyOtpButton"
+                            class="register-button"
+                        >
+                            Confirm & Verify
+                        </button>
+
+                    </form>
+
+                    <!-- Resend OTP -->
+                    <div class="otp-resend-section">
+
+                        <p>
+                            Didn't receive the code?
+                        </p>
+
+                        <button
+                            type="button"
+                            id="resendOtpButton"
+                            class="resend-otp-button"
+                        >
+                            Resend OTP
+                        </button>
+
+                    </div>
+
+                    <!-- Back to Registration -->
+                    <div class="login-link">
+
+                        <button
+                            type="button"
+                            id="backToRegisterButton"
+                            class="back-register-button"
+                        >
+                            Back to Registration
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+                <!-- STEP 3: REGISTRATION SUCCESS -->
+                <section id="successStep" hidden>
+
+                    <div class="success-content">
+
+                        <div class="success-icon">
+                            <span aria-hidden="true">✓</span>
+                        </div>
+
+                        <h1>Registration Successful!</h1>
+
+                        <p>
+                            Your TaskBridge account has been created
+                            and your email has been verified successfully.
+                        </p>
+
+                        <div class="success-status">
+                            <span>Email Status:</span>
+                            <strong>Verified</strong>
+                        </div>
+
+                        <div class="success-status">
+                            <span>Identity Verification:</span>
+                            <strong>Unverified</strong>
+                        </div>
+
+                        <div
+                            id="redirectMessage"
+                            class="redirect-message"
+                            aria-live="polite"
+                        >
+                            Redirecting to your dashboard...
+                        </div>
+
+                        <div class="redirect-loader">
+                            <span></span>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="register-footer">
+
+                <p>
+                    &copy;
+                    <span id="current-year">2026</span>
+                    TaskBridge. All Rights Reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="./register.js"></script>
+
+</body>
+</html>
