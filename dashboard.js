@@ -221,14 +221,23 @@ document.addEventListener("DOMContentLoaded", function () {
        DASHBOARD SECTION CONFIGURATION
     ====================================== */
 
-    const pageSections = [
-        const pageSections = [
+    
+/* =====================================
+   DASHBOARD SECTION CONFIGURATION
+====================================== */
+
+const pageSections = [
     "dashboardSection",
     "findJobSection",
     "postJobSection",
     "myPostedJobsSection",
     "mySubmittedJobsSection",
 
+    // FINANCE SECTIONS
+    "walletSection",
+    "depositSection",
+    "withdrawSection",
+    "transactionsSection"
 ];
 
 
