@@ -174,40 +174,41 @@
             <nav class="sidebar-navigation">
 
 
+
 <!-- Main Menu -->
 <div class="nav-section">
 
     <p class="nav-section-title">MAIN MENU</p>
 
-    <a href="#dashboardContent" class="nav-link active" data-section="dashboardContent">
+    <a href="./dashboard.html" class="nav-link active">
         <svg class="icon">
             <use href="#icon-dashboard"></use>
         </svg>
         <span>Dashboard</span>
     </a>
 
-    <a href="#findJobSection" class="nav-link" data-section="findJobSection">
+    <a href="./find-job.html" class="nav-link">
         <svg class="icon">
             <use href="#icon-search"></use>
         </svg>
         <span>Find a Job</span>
     </a>
 
-    <a href="#postJobSection" class="nav-link" data-section="postJobSection">
+    <a href="./post-job.html" class="nav-link">
         <svg class="icon">
             <use href="#icon-plus"></use>
         </svg>
         <span>Post a Job</span>
     </a>
 
-    <a href="#myPostedJobsSection" class="nav-link" data-section="myPostedJobsSection">
+    <a href="./my-posted-jobs.html" class="nav-link">
         <svg class="icon">
             <use href="#icon-briefcase"></use>
         </svg>
         <span>My Posted Jobs</span>
     </a>
 
-    <a href="#mySubmittedJobsSection" class="nav-link" data-section="mySubmittedJobsSection">
+    <a href="./my-submitted-jobs.html" class="nav-link">
         <svg class="icon">
             <use href="#icon-clipboard"></use>
         </svg>
@@ -215,6 +216,7 @@
     </a>
 
 </div>
+
 
 
 
@@ -518,153 +520,7 @@
 
             </header>
 
-            <!-- ================= FIND A JOB SECTION ================= -->
-
-<section class="find-job-section" id="findJobSection">
-
-    <!-- Page Heading -->
-    <div class="find-job-heading">
-        <div>
-            <span class="section-label">JOB MARKETPLACE</span>
-            <h2>Find a Job</h2>
-            <p>Discover available tasks and earn by completing them.</p>
-        </div>
-    </div>
-
-    <!-- Job Statistics -->
-    <div class="job-statistics">
-
-        <div class="job-stat-card">
-            <div class="job-stat-icon available-icon">
-                <svg class="icon"><use href="#icon-briefcase"></use></svg>
-            </div>
-            <div>
-                <p>Available Jobs</p>
-                <h3 id="availableJobsCount">0</h3>
-            </div>
-        </div>
-
-        <div class="job-stat-card">
-            <div class="job-stat-icon completed-icon">
-                <svg class="icon"><use href="#icon-check"></use></svg>
-            </div>
-            <div>
-                <p>Completed Jobs</p>
-                <h3 id="completedJobsCount">0</h3>
-            </div>
-        </div>
-
-        <div class="job-stat-card">
-            <div class="job-stat-icon total-icon">
-                <svg class="icon"><use href="#icon-trending"></use></svg>
-            </div>
-            <div>
-                <p>Total Jobs</p>
-                <h3 id="totalJobsCount">0</h3>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Search and Filter -->
-    <div class="job-search-panel">
-
-        <div class="job-search-heading">
-            <h3>Search Jobs</h3>
-            <p>Find tasks that match your interests.</p>
-        </div>
-
-        <div class="job-search-controls">
-
-            <div class="job-search-input">
-                <svg class="icon"><use href="#icon-search"></use></svg>
-                <input
-                    type="search"
-                    id="jobSearchInput"
-                    placeholder="Search by job title or keyword..."
-                >
-            </div>
-
-            <button type="button" id="jobSearchButton" class="job-search-btn">
-                Search Jobs
-            </button>
-
-        </div>
-
-        <div class="job-filter-controls">
-
-            <div class="job-filter-group">
-                <label for="jobCategoryFilter">Category</label>
-                <select id="jobCategoryFilter">
-                    <option value="all">All Categories</option>
-                    <option value="facebook">Facebook</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="tiktok">TikTok</option>
-                    <option value="twitter">Twitter / X</option>
-                    <option value="website">Website</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
-            <div class="job-filter-group">
-                <label for="jobSortFilter">Sort By</label>
-                <select id="jobSortFilter">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="highest">Highest Reward</option>
-                    <option value="lowest">Lowest Reward</option>
-                </select>
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Job Listings -->
-    <div class="job-listings-section">
-
-        <div class="job-listings-heading">
-            <div>
-                <h3>Available Tasks</h3>
-                <p>Browse tasks posted by advertisers.</p>
-            </div>
-
-            <span class="job-results-count" id="jobResultsCount">
-                0 Jobs Found
-            </span>
-        </div>
-
-        <!-- Job Cards will be loaded here by JavaScript -->
-        <div class="job-listings-container" id="jobListingsContainer">
-
-            <!-- Empty State -->
-            <div class="job-empty-state" id="jobEmptyState">
-
-                <div class="empty-state-icon">
-                    <svg class="icon">
-                        <use href="#icon-briefcase"></use>
-                    </svg>
-                </div>
-
-                <h3>No Jobs Available Yet</h3>
-
-                <p>
-                    There are currently no approved jobs available.
-                    Please check back later for new opportunities.
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================= END FIND A JOB SECTION ================= -->
-
-
+           
 
             <!-- =================================
                  DASHBOARD CONTENT
