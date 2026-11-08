@@ -303,3 +303,100 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("TaskBridge Dashboard initialized successfully.");
 
 });
+
+
+/* =====================================
+   DASHBOARD PAGE SECTION SWITCHING
+===================================== */
+
+const pageSections = [
+    "dashboardContent",
+    "findJobSection",
+    "postJobSection",
+    "myPostedJobsSection",
+    "mySubmittedJobsSection"
+];
+
+const sectionLinks = document.querySelectorAll(
+    ".sidebar-navigation .nav-link[data-section]"
+);
+
+
+function showPageSection(sectionId) {
+
+    const targetSection = document.getElementById(sectionId);
+
+    // Section না থাকলে পরিবর্তন করবে না
+    if (!targetSection) {
+        console.warn("Section not found:", sectionId);
+        return;
+    }
+
+    // সব Section hide করবে
+    pageSections.forEach(function (id) {
+
+        const section = document.getElementById(id);
+
+        if (section) {
+            section.classList.remove("active");
+            section.hidden = true;
+        }
+
+    });
+
+    // নির্বাচিত Section show করবে
+    targetSection.hidden = false;
+    targetSection.classList.add("active");
+
+    // Sidebar active menu পরিবর্তন
+    sectionLinks.forEach(function (link) {
+
+        link.classList.toggle(
+            "active",
+            link.dataset.section === sectionId
+        );
+
+    });
+
+    // URL hash আপডেট
+    history.replaceState(null, "", "#" + sectionId);
+
+    // Content-এর শুরুতে নিয়ে যাবে
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+// Sidebar menu click
+sectionLinks.forEach(function (link) {
+
+    link.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        const sectionId = this.dataset.section;
+
+        showPageSection(sectionId);
+
+    });
+
+});
+
+
+// Initial page load
+const initialSection = window.location.hash.replace("#", "");
+
+if (pageSections.includes(initialSection) &&
+    document.getElementById(initialSection)) {
+
+    showPageSection(initialSection);
+
+} else {
+
+    showPageSection("dashboardContent");
+
+}
+
