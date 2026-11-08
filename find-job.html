@@ -1,145 +1,162 @@
- <!-- ================= FIND A JOB SECTION ================= -->
 
-<section class="find-job-section" id="findJobSection">
+<!-- =================================
+     FIND A JOB CONTENT
+================================== -->
 
-    <!-- Page Heading -->
-    <div class="find-job-heading">
-        <div>
-            <span class="section-label">JOB MARKETPLACE</span>
-            <h2>Find a Job</h2>
-            <p>Discover available tasks and earn by completing them.</p>
-        </div>
-    </div>
+<main class="dashboard-content">
 
-    <!-- Job Statistics -->
-    <div class="job-statistics">
+    <section class="find-job-section" id="findJobSection">
 
-        <div class="job-stat-card">
-            <div class="job-stat-icon available-icon">
-                <svg class="icon"><use href="#icon-briefcase"></use></svg>
-            </div>
+        <!-- Page Heading -->
+        <div class="find-job-heading">
             <div>
-                <p>Available Jobs</p>
+                <span class="section-label">JOB MARKETPLACE</span>
+                <h1>Find a Job</h1>
+                <p>
+                    Discover available micro jobs and start earning.
+                </p>
+            </div>
+        </div>
+
+        <!-- Job Statistics -->
+        <section class="job-statistics">
+
+            <article class="job-stat-card">
+                <span>Available Jobs</span>
                 <h3 id="availableJobsCount">0</h3>
-            </div>
-        </div>
+            </article>
 
-        <div class="job-stat-card">
-            <div class="job-stat-icon completed-icon">
-                <svg class="icon"><use href="#icon-check"></use></svg>
-            </div>
-            <div>
-                <p>Completed Jobs</p>
+            <article class="job-stat-card">
+                <span>Completed Jobs</span>
                 <h3 id="completedJobsCount">0</h3>
-            </div>
-        </div>
+            </article>
 
-        <div class="job-stat-card">
-            <div class="job-stat-icon total-icon">
-                <svg class="icon"><use href="#icon-trending"></use></svg>
-            </div>
-            <div>
-                <p>Total Jobs</p>
+            <article class="job-stat-card">
+                <span>Total Jobs</span>
                 <h3 id="totalJobsCount">0</h3>
+            </article>
+
+        </section>
+
+        <!-- Search and Filters -->
+        <section class="job-search-panel">
+
+            <div class="job-search-heading">
+                <h2>Search Available Jobs</h2>
+                <p>Find tasks that match your interests.</p>
             </div>
-        </div>
 
-    </div>
+            <div class="job-search-controls">
 
-    <!-- Search and Filter -->
-    <div class="job-search-panel">
+                <div class="job-search-input">
+                    <input
+                        type="search"
+                        id="jobSearchInput"
+                        placeholder="Search by job title or keyword..."
+                    >
+                </div>
 
-        <div class="job-search-heading">
-            <h3>Search Jobs</h3>
-            <p>Find tasks that match your interests.</p>
-        </div>
-
-        <div class="job-search-controls">
-
-            <div class="job-search-input">
-                <svg class="icon"><use href="#icon-search"></use></svg>
-                <input
-                    type="search"
-                    id="jobSearchInput"
-                    placeholder="Search by job title or keyword..."
+                <button
+                    type="button"
+                    id="jobSearchButton"
+                    class="button button-primary"
                 >
+                    Search Jobs
+                </button>
+
             </div>
 
-            <button type="button" id="jobSearchButton" class="job-search-btn">
-                Search Jobs
-            </button>
+            <div class="job-filter-controls">
 
-        </div>
+                <div class="filter-group">
+                    <label for="jobCategoryFilter">
+                        Job Category
+                    </label>
 
-        <div class="job-filter-controls">
+                    <select id="jobCategoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="youtube">YouTube</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="twitter">Twitter / X</option>
+                        <option value="website">Website</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
 
-            <div class="job-filter-group">
-                <label for="jobCategoryFilter">Category</label>
-                <select id="jobCategoryFilter">
-                    <option value="all">All Categories</option>
-                    <option value="facebook">Facebook</option>
-                    <option value="youtube">YouTube</option>
-                    <option value="instagram">Instagram</option>
-                    <option value="tiktok">TikTok</option>
-                    <option value="twitter">Twitter / X</option>
-                    <option value="website">Website</option>
-                    <option value="other">Other</option>
-                </select>
+                <div class="filter-group">
+                    <label for="jobSortFilter">
+                        Sort Jobs
+                    </label>
+
+                    <select id="jobSortFilter">
+                        <option value="newest">Newest First</option>
+                        <option value="highest">Highest Reward</option>
+                        <option value="lowest">Lowest Reward</option>
+                    </select>
+                </div>
+
             </div>
 
-            <div class="job-filter-group">
-                <label for="jobSortFilter">Sort By</label>
-                <select id="jobSortFilter">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="highest">Highest Reward</option>
-                    <option value="lowest">Lowest Reward</option>
-                </select>
+        </section>
+
+        <!-- Job Listings -->
+        <section class="job-listings-section">
+
+            <div class="job-listings-heading">
+                <div>
+                    <h2>Available Jobs</h2>
+                    <p>
+                        Browse jobs currently available on TaskBridge.
+                    </p>
+                </div>
+
+                <span id="jobResultsCount">0 Jobs</span>
             </div>
 
-        </div>
+            <div id="jobListingsContainer">
 
-    </div>
+                <!-- Job cards will load here from the database -->
 
-    <!-- Job Listings -->
-    <div class="job-listings-section">
-
-        <div class="job-listings-heading">
-            <div>
-                <h3>Available Tasks</h3>
-                <p>Browse tasks posted by advertisers.</p>
             </div>
-
-            <span class="job-results-count" id="jobResultsCount">
-                0 Jobs Found
-            </span>
-        </div>
-
-        <!-- Job Cards will be loaded here by JavaScript -->
-        <div class="job-listings-container" id="jobListingsContainer">
 
             <!-- Empty State -->
             <div class="job-empty-state" id="jobEmptyState">
 
                 <div class="empty-state-icon">
                     <svg class="icon">
-                        <use href="#icon-briefcase"></use>
+                        <use href="#icon-search"></use>
                     </svg>
                 </div>
 
                 <h3>No Jobs Available Yet</h3>
 
                 <p>
-                    There are currently no approved jobs available.
-                    Please check back later for new opportunities.
+                    There are currently no available jobs.
+                    Please check again later.
                 </p>
 
             </div>
 
+        </section>
+
+    </section>
+
+    <!-- Dashboard Footer -->
+    <footer class="dashboard-footer">
+
+        <p>
+            &copy; <span id="current-year">2026</span>
+            TaskBridge. All Rights Reserved.
+        </p>
+
+        <div class="footer-links">
+            <a href="./privacy.html">Privacy Policy</a>
+            <a href="./terms.html">Terms & Conditions</a>
+            <a href="./support.html">Help Center</a>
         </div>
 
-    </div>
+    </footer>
 
-</section>
-
-<!-- ================= END FIND A JOB SECTION ================= -->
+</main>
