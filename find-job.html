@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find and complete micro jobs on TaskBridge.">
+    <title>Find a Job - TaskBridge</title>
+
+    <link rel="stylesheet" href="./dashboard.css">
+    <link rel="stylesheet" href="./find-job.css">
+</head>
+
+<body>
+
+    <!-- DASHBOARD LAYOUT -->
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <!-- LOGO -->
+            <div class="sidebar-logo">
+                <a href="./dashboard.html">TaskBridge</a>
+            </div>
+
+            <!-- SIDEBAR NAVIGATION -->
+            <nav class="sidebar-navigation">
+
+                <!-- MAIN MENU -->
+                <div class="nav-section">
+
+                    <p class="nav-section-title">MAIN MENU</p>
+
+                    <a href="./dashboard.html" class="nav-link">
+                        <svg class="icon">
+                            <use href="#icon-dashboard"></use>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+
+                    <a href="./find-job.html" class="nav-link active">
+                        <svg class="icon">
+                            <use href="#icon-search"></use>
+                        </svg>
+                        <span>Find a Job</span>
+                    </a>
+
+                    <a href="./post-job.html" class="nav-link">
+                        <svg class="icon">
+                            <use href="#icon-plus"></use>
+                        </svg>
+                        <span>Post a Job</span>
+                    </a>
+
+                    <a href="./my-posted-jobs.html" class="nav-link">
+                        <svg class="icon">
+                            <use href="#icon-briefcase"></use>
+                        </svg>
+                        <span>My Posted Jobs</span>
+                    </a>
+
+                    <a href="./my-submitted-jobs.html" class="nav-link">
+                        <svg class="icon">
+                            <use href="#icon-clipboard"></use>
+                        </svg>
+                        <span>My Submitted Jobs</span>
+                    </a>
+
+                </div>
+
+                <!-- FINANCE MENU -->
+                <div class="nav-section">
+                    <p class="nav-section-title">FINANCE</p>
+
+                    <a href="./finance.html" class="nav-link">
+                        <span>Finance</span>
+                    </a>
+                </div>
+
+                <!-- ACCOUNT MENU -->
+                <div class="nav-section">
+                    <p class="nav-section-title">ACCOUNT</p>
+
+                    <a href="./account-support.html" class="nav-link">
+                        <span>Account &amp; Support</span>
+                    </a>
+                </div>
+
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-main">
+
+            <!-- HEADER -->
+            <header class="dashboard-header">
+
+                <div class="header-left">
+                    <button type="button" class="sidebar-toggle" id="sidebarToggle">
+                        ☰
+                    </button>
+
+                    <div>
+                        <h1>Find a Job</h1>
+                        <p>Discover available micro jobs and start earning.</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button type="button" class="notification-button">
+                        Notifications
+                    </button>
+
+                    <div class="header-profile">
+                        <span class="profile-avatar">U</span>
+                        <span class="profile-name">My Account</span>
+                    </div>
+                </div>
+
+            </header>
+
+            <!-- PAGE CONTENT -->
+            <div class="dashboard-content">
+
+                <!-- PAGE INTRO -->
+                <section class="page-intro">
+                    <h2>Explore Available Jobs</h2>
+                    <p>
+                        Find suitable tasks, complete them and earn rewards.
+                    </p>
+                </section>
+
+                <!-- JOB STATISTICS -->
+                <section class="job-statistics">
+
+                    <div class="stat-card">
+                        <span>Available Jobs</span>
+                        <h3 id="availableJobs">0</h3>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Completed Jobs</span>
+                        <h3 id="completedJobs">0</h3>
+                    </div>
+
+                    <div class="stat-card">
+                        <span>Total Jobs</span>
+                        <h3 id="totalJobs">0</h3>
+                    </div>
+
+                </section>
+
+                <!-- JOB SEARCH SECTION -->
+                <section class="job-search-section">
+
+                    <div class="section-heading">
+                        <h2>Search Jobs</h2>
+                        <p>Search for jobs by title or keyword.</p>
+                    </div>
+
+                    <form id="jobSearchForm">
+
+                        <div class="search-input-group">
+
+                            <input
+                                type="search"
+                                id="jobSearchInput"
+                                placeholder="Search jobs by title or keyword..."
+                            >
+
+                            <button type="submit">
+                                Search
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </section>
+
+                <!-- JOB EXPLORER -->
+                <section class="job-explorer">
+
+                    <!-- CATEGORY SIDEBAR -->
+                    <aside class="job-category-sidebar">
+
+                        <div class="category-heading">
+                            <h3>Categories</h3>
+                        </div>
+
+                        <div class="category-list" id="categoryList">
+
+                            <button class="category-button active"
+                                type="button" data-category="all">
+                                All Categories
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="facebook">
+                                Facebook
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="youtube">
+                                YouTube
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="instagram">
+                                Instagram
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="tiktok">
+                                TikTok
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="twitter">
+                                Twitter / X
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="website">
+                                Website
+                            </button>
+
+                            <button class="category-button"
+                                type="button" data-category="other">
+                                Other
+                            </button>
+
+                        </div>
+
+                    </aside>
+
+                    <!-- JOB LISTINGS -->
+                    <div class="job-listing-area">
+
+                        <div class="job-listing-header">
+
+                            <div>
+                                <h2>Available Jobs</h2>
+                                <p id="jobResultCount">0 jobs found</p>
+                            </div>
+
+                            <div class="job-sort">
+                                <label for="jobSort">Sort by:</label>
+
+                                <select id="jobSort">
+                                    <option value="newest">Newest First</option>
+                                    <option value="reward-high">
+                                        Highest Reward
+                                    </option>
+                                    <option value="reward-low">
+                                        Lowest Reward
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <!-- JOB CARDS -->
+                        <div class="job-list" id="jobList">
+
+                            <!-- Job cards will be rendered by JavaScript -->
+
+                        </div>
+
+                        <!-- EMPTY STATE -->
+                        <div class="job-empty-state" id="jobEmptyState">
+                            <h3>No Jobs Available</h3>
+                            <p>
+                                There are currently no jobs matching your search.
+                                Please check again later.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- JOB DETAILS MODAL -->
+    <div class="job-modal" id="jobDetailsModal" hidden>
+
+        <div class="job-modal-content">
+
+            <button type="button" id="closeJobModal">
+                &times;
+            </button>
+
+            <h2 id="modalJobTitle">Job Details</h2>
+
+            <p id="modalJobCategory"></p>
+
+            <div class="modal-job-information">
+                <p>
+                    <strong>Reward:</strong>
+                    <span id="modalJobReward"></span>
+                </p>
+
+                <p>
+                    <strong>Available Slots:</strong>
+                    <span id="modalJobSlots"></span>
+                </p>
+
+                <p>
+                    <strong>Completed Slots:</strong>
+                    <span id="modalJobCompleted"></span>
+                </p>
+            </div>
+
+            <div class="modal-job-description">
+                <h3>Job Instructions</h3>
+                <p id="modalJobDescription"></p>
+            </div>
+
+            <a
+                href="#"
+                id="modalJobTarget"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Open Target Link
+            </a>
+
+            <button type="button" id="applyJobButton">
+                Apply for This Job
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="./find-job.js"></script>
+
+</body>
+</html>
