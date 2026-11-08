@@ -222,12 +222,19 @@ document.addEventListener("DOMContentLoaded", function () {
     ====================================== */
 
     const pageSections = [
-        "dashboardSection",
-        "findJobSection",
-        "postJobSection",
-        "myPostedJobsSection",
-        "mySubmittedJobsSection"
-    ];
+        const pageSections = [
+    "dashboardSection",
+    "findJobSection",
+    "postJobSection",
+    "myPostedJobsSection",
+    "mySubmittedJobsSection",
+
+    // FINANCE SECTIONS
+    "walletSection",
+    "depositSection",
+    "withdrawSection",
+    "transactionsSection"
+];
 
 
     const sectionTitles = {
