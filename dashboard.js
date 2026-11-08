@@ -760,3 +760,46 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
 });
+
+
+/* =========================================
+   FINANCE SECTION SWITCHING
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const financeSections = [
+        "walletSection",
+        "depositSection",
+        "withdrawSection",
+        "transactionsSection"
+    ];
+
+    const financeLinks = document.querySelectorAll(
+        '.sidebar-navigation .nav-link[data-section]'
+    );
+
+    financeLinks.forEach(function (link) {
+
+        link.addEventListener("click", function (event) {
+
+            const sectionId = this.dataset.section;
+
+            if (!financeSections.includes(sectionId)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (typeof showPageSection === "function") {
+                showPageSection(sectionId);
+            } else {
+                console.warn("Section switching function not found.");
+            }
+
+        });
+
+    });
+
+});
+
