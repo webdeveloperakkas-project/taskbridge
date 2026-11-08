@@ -1032,13 +1032,12 @@
 
 
 
+
 <!-- =================================
      FIND A JOB SECTION
 ================================== -->
 
 <section id="findJobSection" class="page-section">
-
-    <!-- SECTION HEADING -->
 
     <div class="section-heading">
         <div>
@@ -1047,7 +1046,6 @@
             <p>Discover available tasks and earn rewards.</p>
         </div>
     </div>
-
 
     <!-- JOB STATISTICS -->
 
@@ -1082,11 +1080,10 @@
             </div>
         </div>
 
-        <!-- SEARCH BAR -->
-
         <div class="job-search-bar">
 
             <div class="job-search-input">
+
                 <svg class="icon">
                     <use href="#icon-search"></use>
                 </svg>
@@ -1096,6 +1093,7 @@
                     id="jobSearchInput"
                     placeholder="Search jobs by title or keyword..."
                 >
+
             </div>
 
             <button
@@ -1123,10 +1121,7 @@
                 <p>Select a category to explore available jobs.</p>
             </div>
 
-
             <div class="job-category-grid">
-
-                <!-- ALL CATEGORIES -->
 
                 <button type="button"
                     class="job-category-item active"
@@ -1143,8 +1138,6 @@
                 </button>
 
 
-                <!-- FACEBOOK -->
-
                 <button type="button"
                     class="job-category-item"
                     data-category="facebook">
@@ -1159,8 +1152,6 @@
 
                 </button>
 
-
-                <!-- YOUTUBE -->
 
                 <button type="button"
                     class="job-category-item"
@@ -1177,8 +1168,6 @@
                 </button>
 
 
-                <!-- INSTAGRAM -->
-
                 <button type="button"
                     class="job-category-item"
                     data-category="instagram">
@@ -1193,8 +1182,6 @@
 
                 </button>
 
-
-                <!-- TIKTOK -->
 
                 <button type="button"
                     class="job-category-item"
@@ -1211,8 +1198,6 @@
                 </button>
 
 
-                <!-- TWITTER / X -->
-
                 <button type="button"
                     class="job-category-item"
                     data-category="twitter">
@@ -1228,8 +1213,6 @@
                 </button>
 
 
-                <!-- WEBSITE -->
-
                 <button type="button"
                     class="job-category-item"
                     data-category="website">
@@ -1244,8 +1227,6 @@
 
                 </button>
 
-
-                <!-- OTHER -->
 
                 <button type="button"
                     class="job-category-item"
@@ -1274,23 +1255,518 @@
                 <svg class="icon">
                     <use href="#icon-filter"></use>
                 </svg>
-
                 Sort By
             </label>
 
             <select id="jobSortFilter">
-
                 <option value="newest">Newest First</option>
-
                 <option value="highest">Highest Reward</option>
-
                 <option value="lowest">Lowest Reward</option>
-
             </select>
 
         </div>
 
     </section>
+
+
+    <!-- AVAILABLE JOBS -->
+
+    <section class="content-panel available-jobs-panel">
+
+        <div class="panel-heading">
+
+            <div>
+                <h2>Available Jobs</h2>
+                <p id="jobResultsDescription">
+                    Jobs approved and published by advertisers.
+                </p>
+            </div>
+
+            <span id="jobResultsCount" class="job-results-count">
+                3 Demo Jobs
+            </span>
+
+        </div>
+
+
+        <!-- JOB CARDS -->
+
+        <div class="job-list" id="jobList">
+
+
+            <!-- FACEBOOK JOB 01 -->
+
+            <article
+                class="job-card job-list-item"
+                data-job-id="fb-like-001"
+                data-title="Facebook Page Review"
+                data-category="facebook"
+                data-reward="0.10"
+                data-date="2026-11-08"
+                data-status="active">
+
+                <div class="job-card-main">
+
+                    <div class="job-card-top">
+
+                        <div class="job-card-category">
+                            <svg class="icon">
+                                <use href="#icon-facebook"></use>
+                            </svg>
+                            <span>Facebook</span>
+                        </div>
+
+                        <span class="job-status active">
+                            Active
+                        </span>
+
+                    </div>
+
+                    <h3>Facebook Page Review</h3>
+
+                    <p class="job-card-description">
+                        Visit the provided public Facebook page,
+                        review its information and submit your feedback.
+                    </p>
+
+                    <div class="job-card-meta">
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-users"></use>
+                            </svg>
+                            2 / 10 Completed
+                        </span>
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-clock"></use>
+                            </svg>
+                            Recently Posted
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="job-card-side">
+
+                    <div class="job-reward">
+                        <small>Reward</small>
+                        <strong>$0.10</strong>
+                        <small>Per Worker</small>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary job-details-button"
+                        data-job-details="fb-like-001">
+
+                        View Details
+
+                        <svg class="icon">
+                            <use href="#icon-arrow-right"></use>
+                        </svg>
+
+                    </button>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- FACEBOOK JOB 02 -->
+
+            <article
+                class="job-card job-list-item"
+                data-job-id="fb-share-002"
+                data-title="Facebook Public Post Sharing"
+                data-category="facebook"
+                data-reward="0.15"
+                data-date="2026-11-07"
+                data-status="active">
+
+                <div class="job-card-main">
+
+                    <div class="job-card-top">
+
+                        <div class="job-card-category">
+                            <svg class="icon">
+                                <use href="#icon-facebook"></use>
+                            </svg>
+                            <span>Facebook</span>
+                        </div>
+
+                        <span class="job-status active">
+                            Active
+                        </span>
+
+                    </div>
+
+                    <h3>Facebook Public Post Sharing</h3>
+
+                    <p class="job-card-description">
+                        Review an approved public announcement and
+                        share it only where platform rules permit.
+                    </p>
+
+                    <div class="job-card-meta">
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-users"></use>
+                            </svg>
+                            3 / 10 Completed
+                        </span>
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-clock"></use>
+                            </svg>
+                            1 Day Ago
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="job-card-side">
+
+                    <div class="job-reward">
+                        <small>Reward</small>
+                        <strong>$0.15</strong>
+                        <small>Per Worker</small>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary job-details-button"
+                        data-job-details="fb-share-002">
+
+                        View Details
+
+                        <svg class="icon">
+                            <use href="#icon-arrow-right"></use>
+                        </svg>
+
+                    </button>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- FACEBOOK JOB 03 -->
+
+            <article
+                class="job-card job-list-item"
+                data-job-id="fb-feedback-003"
+                data-title="Facebook Page Feedback"
+                data-category="facebook"
+                data-reward="0.20"
+                data-date="2026-11-06"
+                data-status="active">
+
+                <div class="job-card-main">
+
+                    <div class="job-card-top">
+
+                        <div class="job-card-category">
+                            <svg class="icon">
+                                <use href="#icon-facebook"></use>
+                            </svg>
+                            <span>Facebook</span>
+                        </div>
+
+                        <span class="job-status active">
+                            Active
+                        </span>
+
+                    </div>
+
+                    <h3>Facebook Page Feedback</h3>
+
+                    <p class="job-card-description">
+                        Review the public page information and provide
+                        genuine feedback about its clarity.
+                    </p>
+
+                    <div class="job-card-meta">
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-users"></use>
+                            </svg>
+                            0 / 10 Completed
+                        </span>
+
+                        <span>
+                            <svg class="icon">
+                                <use href="#icon-clock"></use>
+                            </svg>
+                            2 Days Ago
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="job-card-side">
+
+                    <div class="job-reward">
+                        <small>Reward</small>
+                        <strong>$0.20</strong>
+                        <small>Per Worker</small>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-primary job-details-button"
+                        data-job-details="fb-feedback-003">
+
+                        View Details
+
+                        <svg class="icon">
+                            <use href="#icon-arrow-right"></use>
+                        </svg>
+
+                    </button>
+
+                </div>
+
+            </article>
+
+
+        </div>
+
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state" id="jobEmptyState" hidden>
+
+            <div class="empty-state-icon">
+                <svg class="icon">
+                    <use href="#icon-search"></use>
+                </svg>
+            </div>
+
+            <h3>No Jobs Available</h3>
+
+            <p>
+                No jobs match your current search or category.
+                Try another keyword or category.
+            </p>
+
+        </div>
+
+    </section>
+
+</section>
+
+
+
+<!-- =================================
+     JOB DETAILS SECTION
+================================== -->
+
+<section id="jobDetailsSection" class="page-section" hidden>
+
+    <div class="section-heading">
+
+        <div>
+            <span>WORKER AREA</span>
+            <h1>Job Details</h1>
+            <p>Review the complete task information before starting.</p>
+        </div>
+
+    </div>
+
+
+    <div class="content-panel job-details-panel">
+
+        <!-- BACK BUTTON -->
+
+        <button
+            type="button"
+            class="job-back-button"
+            id="backToJobsButton">
+
+            <svg class="icon">
+                <use href="#icon-arrow-left"></use>
+            </svg>
+
+            Back to Available Jobs
+
+        </button>
+
+
+        <!-- JOB DETAILS HEADER -->
+
+        <div class="job-details-header">
+
+            <div>
+
+                <div class="job-card-category">
+                    <svg class="icon">
+                        <use href="#icon-facebook"></use>
+                    </svg>
+
+                    <span id="detailJobCategory">Facebook</span>
+
+                </div>
+
+                <h2 id="detailJobTitle">Facebook Page Review</h2>
+
+                <p id="detailJobSubtitle">
+                    Review a public Facebook page and submit genuine feedback.
+                </p>
+
+            </div>
+
+            <span class="job-status active">Active</span>
+
+        </div>
+
+
+        <!-- REWARD AND PROGRESS -->
+
+        <div class="job-details-stats">
+
+            <div class="job-detail-stat">
+                <span>Reward Per Worker</span>
+                <strong id="detailJobReward">$0.10</strong>
+            </div>
+
+            <div class="job-detail-stat">
+                <span>Total Workers</span>
+                <strong id="detailTotalWorkers">10</strong>
+            </div>
+
+            <div class="job-detail-stat">
+                <span>Completed</span>
+                <strong id="detailCompletedWorkers">2</strong>
+            </div>
+
+            <div class="job-detail-stat">
+                <span>Available Slots</span>
+                <strong id="detailAvailableSlots">8</strong>
+            </div>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="job-details-content">
+
+            <h3>Job Description</h3>
+
+            <p id="detailJobDescription">
+                Visit the provided public Facebook page, review its
+                information and submit genuine feedback about the page.
+            </p>
+
+
+            <h3>Task Instructions</h3>
+
+            <ol id="detailJobInstructions">
+
+                <li>Open the provided Facebook page.</li>
+
+                <li>Review the public page information carefully.</li>
+
+                <li>Complete the requested review task honestly.</li>
+
+                <li>Prepare the required proof of completion.</li>
+
+                <li>Submit your proof for advertiser review.</li>
+
+            </ol>
+
+
+            <h3>Target URL</h3>
+
+            <a
+                href="https://www.facebook.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                id="detailJobTargetLink"
+                class="job-target-link">
+
+                Open Facebook Target Page
+
+                <svg class="icon">
+                    <use href="#icon-external-link"></use>
+                </svg>
+
+            </a>
+
+
+            <h3>Proof Requirements</h3>
+
+            <div class="job-proof-box">
+
+                <svg class="icon">
+                    <use href="#icon-image"></use>
+                </svg>
+
+                <div>
+                    <strong>Screenshot Required</strong>
+
+                    <p>
+                        Upload a screenshot showing the completed task.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <h3>Additional Instructions</h3>
+
+            <p id="detailJobExtraInstructions">
+                Submit clear and genuine proof. Duplicate or misleading
+                submissions may be rejected.
+            </p>
+
+        </div>
+
+
+        <!-- JOB ACTIONS -->
+
+        <div class="job-details-actions">
+
+            <button
+                type="button"
+                class="btn-secondary"
+                id="detailsBackButton">
+
+                Back to Jobs
+
+            </button>
+
+            <button
+                type="button"
+                class="btn-primary"
+                id="startJobButton">
+
+                Start Job
+
+                <svg class="icon">
+                    <use href="#icon-arrow-right"></use>
+                </svg>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
 
 
     <!-- AVAILABLE JOB LIST -->
