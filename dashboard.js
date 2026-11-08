@@ -262,6 +262,11 @@ const pageSections = [
             subtitle: "Manage your job listings and submissions."
         },
 
+       jobDetailsSection: {
+    title: "Job Details",
+    subtitle: "Review the complete task information before starting."
+}
+
         mySubmittedJobsSection: {
             title: "My Submitted Jobs",
             subtitle: "Track your submitted work and rewards."
