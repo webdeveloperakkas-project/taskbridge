@@ -6,249 +6,267 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard - TaskBridge</title>
+    <title>TaskBridge - User Dashboard</title>
 
-    <meta
-        name="description"
-        content="Manage your jobs, earnings, wallet, and account on TaskBridge."
-    >
-
-    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./dashboard.css">
-    <link rel="stylesheet" href="./find-job.css">
+
 </head>
 
 <body>
 
-    <!-- SVG ICON LIBRARY -->
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <!-- =================================
+         SVG ICON LIBRARY
+    ================================== -->
 
-        <symbol id="icon-dashboard" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="9" rx="1"/>
-            <rect x="14" y="3" width="7" height="5" rx="1"/>
-            <rect x="14" y="12" width="7" height="9" rx="1"/>
-            <rect x="3" y="16" width="7" height="5" rx="1"/>
-        </symbol>
-
-        <symbol id="icon-search" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="m20 20-4-4"/>
-        </symbol>
-
-        <symbol id="icon-plus" viewBox="0 0 24 24">
-            <path d="M12 5v14M5 12h14"/>
-        </symbol>
-
-        <symbol id="icon-briefcase" viewBox="0 0 24 24">
-            <rect x="3" y="7" width="18" height="14" rx="2"/>
-            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/>
-        </symbol>
-
-        <symbol id="icon-clipboard" viewBox="0 0 24 24">
-            <rect x="5" y="4" width="14" height="17" rx="2"/>
-            <path d="M9 4V3h6v1M9 11h6M9 15h6"/>
-        </symbol>
-
-        <symbol id="icon-wallet" viewBox="0 0 24 24">
-            <path d="M20 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-3"/>
-            <path d="M3 7h15a2 2 0 0 1 2 2v7h-5a3 3 0 0 1 0-6h5"/>
-            <path d="M15 13h.01"/>
-        </symbol>
-
-        <symbol id="icon-arrow-down" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 7v10m-4-4 4 4 4-4"/>
-        </symbol>
-
-        <symbol id="icon-arrow-up" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 17V7m-4 4 4-4 4 4"/>
-        </symbol>
-
-        <symbol id="icon-history" viewBox="0 0 24 24">
-            <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
-            <path d="M3 3v5h5m4-1v5l3 2"/>
-        </symbol>
-
-        <symbol id="icon-bell" viewBox="0 0 24 24">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
-            <path d="M10 21h4"/>
-        </symbol>
-
-        <symbol id="icon-user" viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4"/>
-            <path d="M4 21a8 8 0 0 1 16 0"/>
-        </symbol>
-
-        <symbol id="icon-settings" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-2 .9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-2-.9l-1.7.7-1.4-2.4 1.4-1.1a8 8 0 0 1 0-2.1l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 2-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 2 .9l1.7-.7 1.4 2.4-1.4 1.1a8 8 0 0 1 0 2.1z"/>
-        </symbol>
-
-        <symbol id="icon-support" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M9.5 9a2.5 2.5 0 1 1 4.3 1.7c-1.1 1.1-1.8 1.3-1.8 3.3M12 17h.01"/>
-        </symbol>
-
-        <symbol id="icon-logout" viewBox="0 0 24 24">
-            <path d="M10 17l5-5-5-5m5 5H3"/>
-            <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
-        </symbol>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
 
         <symbol id="icon-menu" viewBox="0 0 24 24">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
+            <path d="M4 6h16M4 12h16M4 18h16"
+                fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
         </symbol>
 
         <symbol id="icon-close" viewBox="0 0 24 24">
-            <path d="m18 6-12 12M6 6l12 12"/>
+            <path d="M18 6 6 18M6 6l12 12"
+                fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
+        </symbol>
+
+        <symbol id="icon-dashboard" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="8" height="8" rx="1"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="13" y="3" width="8" height="5" rx="1"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="13" y="10" width="8" height="11" rx="1"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <rect x="3" y="13" width="8" height="8" rx="1"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+
+        <symbol id="icon-search" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="m16 16 5 5"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+
+        <symbol id="icon-plus" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"
+                fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
+        </symbol>
+
+        <symbol id="icon-briefcase" viewBox="0 0 24 24">
+            <rect x="3" y="7" width="18" height="14" rx="2"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+
+        <symbol id="icon-clipboard" viewBox="0 0 24 24">
+            <rect x="5" y="4" width="14" height="17" rx="2"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h4"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+
+        <symbol id="icon-wallet" viewBox="0 0 24 24">
+            <path d="M4 6h16v15H4zM4 6l2-3h14v3"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M20 11h-5a2 2 0 0 0 0 4h5"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="15" cy="13" r=".5" fill="currentColor"/>
+        </symbol>
+
+        <symbol id="icon-bell" viewBox="0 0 24 24">
+            <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round"/>
+        </symbol>
+
+        <symbol id="icon-user" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M4 21a8 8 0 0 1 16 0"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+        </symbol>
+
+        <symbol id="icon-settings" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.7 1l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.7-1l-1.7.7-1.4-2.4L5.3 15a8 8 0 0 1 0-2l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.7-1L9 7.4h2.8l.3 1.8a8 8 0 0 1 1.7 1l1.7-.7 1.4 2.4-1.4 1.1a8 8 0 0 1 0 2z"
+                fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </symbol>
+
+        <symbol id="icon-help" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"
+                fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M9.5 9a2.5 2.5 0 1 1 4.5 1.5c-1.2 1-2 1.5-2 3M12 17h.01"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round"/>
+        </symbol>
+
+        <symbol id="icon-logout" viewBox="0 0 24 24">
+            <path d="M10 17l5-5-5-5M15 12H3M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"
+                fill="none" stroke="currentColor" stroke-width="2"/>
         </symbol>
 
         <symbol id="icon-chevron" viewBox="0 0 24 24">
-            <path d="m9 18 6-6-6-6"/>
-        </symbol>
-
-        <symbol id="icon-more" viewBox="0 0 24 24">
-            <circle cx="5" cy="12" r="1"/>
-            <circle cx="12" cy="12" r="1"/>
-            <circle cx="19" cy="12" r="1"/>
-        </symbol>
-
-        <symbol id="icon-clock" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M12 7v5l3 2"/>
-        </symbol>
-
-        <symbol id="icon-check" viewBox="0 0 24 24">
-            <path d="m5 12 4 4L19 6"/>
-        </symbol>
-
-        <symbol id="icon-trending" viewBox="0 0 24 24">
-            <path d="m3 17 6-6 4 4 8-9"/>
-            <path d="M15 6h6v6"/>
-        </symbol>
-
-        <symbol id="icon-globe" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="9"/>
-            <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+            <path d="m6 9 6 6 6-6"
+                fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round"/>
         </symbol>
 
     </svg>
 
 
-    <!-- MOBILE SIDEBAR OVERLAY -->
+    <!-- =================================
+         SIDEBAR OVERLAY
+    ================================== -->
+
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
-    <!-- DASHBOARD LAYOUT -->
+    <!-- =================================
+         DASHBOARD LAYOUT
+    ================================== -->
+
     <div class="dashboard-layout">
 
 
-        <!-- =====================================
-             LEFT SIDEBAR
-        ====================================== -->
+        <!-- =================================
+             SIDEBAR
+        ================================== -->
 
         <aside class="sidebar" id="sidebar">
 
-            <!-- Sidebar Brand -->
-            <div class="sidebar-brand">
+            <div class="sidebar-header">
 
-                <a href="index.html" class="brand-logo">
-                    Task<span>Bridge</span>
+                <a href="./index.html" class="sidebar-brand">
+                    <span class="brand-icon">TB</span>
+                    <span>TaskBridge</span>
                 </a>
 
-                <button
-                    type="button"
+                <button type="button"
                     class="sidebar-close"
                     id="sidebarClose"
-                    aria-label="Close navigation menu"
-                >
+                    aria-label="Close sidebar">
+
                     <svg class="icon">
                         <use href="#icon-close"></use>
                     </svg>
+
                 </button>
 
             </div>
 
 
-            <!-- Sidebar Navigation -->
             <nav class="sidebar-navigation">
 
+                <!-- MAIN MENU -->
+
+                <div class="nav-section">
+
+                    <p class="nav-section-title">MAIN MENU</p>
+
+                    <a href="#dashboardSection"
+                        class="nav-link active"
+                        data-section="dashboardSection">
+
+                        <svg class="icon">
+                            <use href="#icon-dashboard"></use>
+                        </svg>
+
+                        <span>Dashboard</span>
+
+                    </a>
 
 
-<!-- Main Menu -->
-<div class="nav-section">
+                    <a href="#findJobSection"
+                        class="nav-link"
+                        data-section="findJobSection">
 
-    <p class="nav-section-title">MAIN MENU</p>
+                        <svg class="icon">
+                            <use href="#icon-search"></use>
+                        </svg>
 
-    <a href="./dashboard.html" class="nav-link active">
-        <svg class="icon">
-            <use href="#icon-dashboard"></use>
-        </svg>
-        <span>Dashboard</span>
-    </a>
+                        <span>Find a Job</span>
 
-    <a href="./find-job.html" class="nav-link">
-        <svg class="icon">
-            <use href="#icon-search"></use>
-        </svg>
-        <span>Find a Job</span>
-    </a>
-
-    <a href="./post-job.html" class="nav-link">
-        <svg class="icon">
-            <use href="#icon-plus"></use>
-        </svg>
-        <span>Post a Job</span>
-    </a>
-
-    <a href="./my-posted-jobs.html" class="nav-link">
-        <svg class="icon">
-            <use href="#icon-briefcase"></use>
-        </svg>
-        <span>My Posted Jobs</span>
-    </a>
-
-    <a href="./my-submitted-jobs.html" class="nav-link">
-        <svg class="icon">
-            <use href="#icon-clipboard"></use>
-        </svg>
-        <span>My Submitted Jobs</span>
-    </a>
-
-</div>
+                    </a>
 
 
+                    <a href="#postJobSection"
+                        class="nav-link"
+                        data-section="postJobSection">
+
+                        <svg class="icon">
+                            <use href="#icon-plus"></use>
+                        </svg>
+
+                        <span>Post a Job</span>
+
+                    </a>
 
 
-                <!-- Finance Menu -->
+                    <a href="#myPostedJobsSection"
+                        class="nav-link"
+                        data-section="myPostedJobsSection">
+
+                        <svg class="icon">
+                            <use href="#icon-briefcase"></use>
+                        </svg>
+
+                        <span>My Posted Jobs</span>
+
+                    </a>
+
+
+                    <a href="#mySubmittedJobsSection"
+                        class="nav-link"
+                        data-section="mySubmittedJobsSection">
+
+                        <svg class="icon">
+                            <use href="#icon-clipboard"></use>
+                        </svg>
+
+                        <span>My Submitted Jobs</span>
+
+                    </a>
+
+                </div>
+
+
+                <!-- FINANCE MENU -->
+
                 <div class="nav-section">
 
                     <p class="nav-section-title">FINANCE</p>
 
-                    <a href="wallet.html" class="nav-link">
+                    <a href="./wallet.html" class="nav-link">
                         <svg class="icon">
                             <use href="#icon-wallet"></use>
                         </svg>
                         <span>My Wallet</span>
                     </a>
 
-                    <a href="deposit.html" class="nav-link">
+                    <a href="./deposit.html" class="nav-link">
                         <svg class="icon">
-                            <use href="#icon-arrow-down"></use>
+                            <use href="#icon-plus"></use>
                         </svg>
                         <span>Deposit</span>
                     </a>
 
-                    <a href="withdraw.html" class="nav-link">
+                    <a href="./withdraw.html" class="nav-link">
                         <svg class="icon">
-                            <use href="#icon-arrow-up"></use>
+                            <use href="#icon-wallet"></use>
                         </svg>
                         <span>Withdraw</span>
                     </a>
 
-                    <a href="transactions.html" class="nav-link">
+                    <a href="./transactions.html" class="nav-link">
                         <svg class="icon">
-                            <use href="#icon-history"></use>
+                            <use href="#icon-clipboard"></use>
                         </svg>
                         <span>Transaction History</span>
                     </a>
@@ -256,12 +274,13 @@
                 </div>
 
 
-                <!-- Account Menu -->
+                <!-- ACCOUNT & SUPPORT -->
+
                 <div class="nav-section">
 
                     <p class="nav-section-title">ACCOUNT & SUPPORT</p>
 
-                    <a href="notifications.html" class="nav-link">
+                    <a href="#notifications" class="nav-link">
                         <svg class="icon">
                             <use href="#icon-bell"></use>
                         </svg>
@@ -269,23 +288,23 @@
                         <span class="nav-badge">3</span>
                     </a>
 
-                    <a href="profile.html" class="nav-link">
+                    <a href="./profile.html" class="nav-link">
                         <svg class="icon">
                             <use href="#icon-user"></use>
                         </svg>
                         <span>My Profile</span>
                     </a>
 
-                    <a href="settings.html" class="nav-link">
+                    <a href="./settings.html" class="nav-link">
                         <svg class="icon">
                             <use href="#icon-settings"></use>
                         </svg>
                         <span>Settings</span>
                     </a>
 
-                    <a href="support.html" class="nav-link">
+                    <a href="./support.html" class="nav-link">
                         <svg class="icon">
-                            <use href="#icon-support"></use>
+                            <use href="#icon-help"></use>
                         </svg>
                         <span>Support / Help Center</span>
                     </a>
@@ -295,78 +314,77 @@
             </nav>
 
 
-            <!-- Sidebar Bottom -->
+            <!-- SIDEBAR BOTTOM -->
+
             <div class="sidebar-bottom">
 
                 <div class="sidebar-help-card">
 
                     <div class="help-icon">
                         <svg class="icon">
-                            <use href="#icon-support"></use>
+                            <use href="#icon-help"></use>
                         </svg>
                     </div>
 
                     <h4>Need Help?</h4>
 
-                    <p>
-                        Our support team is here to help you.
-                    </p>
+                    <p>Our support team is here to help you.</p>
 
-                    <a href="support.html">
-                        Get Support
-                        <svg class="icon">
-                            <use href="#icon-chevron"></use>
-                        </svg>
-                    </a>
+                    <a href="./support.html">Get Support</a>
 
                 </div>
 
-                <a href="logout.html" class="nav-link logout-link">
+
+                <a href="./login.html" class="nav-link logout-link">
+
                     <svg class="icon">
                         <use href="#icon-logout"></use>
                     </svg>
+
                     <span>Log Out</span>
+
                 </a>
 
             </div>
 
         </aside>
 
-        
 
 
-
-
-        <!-- =====================================
+        <!-- =================================
              MAIN AREA
-        ====================================== -->
+        ================================== -->
 
         <div class="main-area">
 
 
             <!-- =================================
-                 TOP HEADER
+                 HEADER
             ================================== -->
 
             <header class="top-header">
 
                 <div class="header-left">
 
-                    <button
-                        type="button"
+                    <button type="button"
                         class="menu-toggle"
                         id="menuToggle"
                         aria-label="Open navigation menu"
-                        aria-expanded="false"
-                    >
+                        aria-expanded="false">
+
                         <svg class="icon">
                             <use href="#icon-menu"></use>
                         </svg>
+
                     </button>
 
+
                     <div class="header-welcome">
+
                         <h2>Dashboard</h2>
+
                         <p>Welcome back! Here's your overview.</p>
+
                     </div>
 
                 </div>
@@ -374,80 +392,67 @@
 
                 <div class="header-right">
 
-                    <!-- Wallet Balance -->
-                    <a href="wallet.html" class="header-balance">
+                    <!-- WALLET BALANCE -->
 
-                        <span class="balance-icon">
+                    <a href="./wallet.html" class="header-balance">
+
+                        <div class="balance-icon">
                             <svg class="icon">
                                 <use href="#icon-wallet"></use>
                             </svg>
-                        </span>
+                        </div>
 
-                        <span class="balance-details">
+                        <div>
                             <small>Available Balance</small>
                             <strong>$25.50</strong>
-                        </span>
+                        </div>
 
                     </a>
 
 
-                    <!-- Notifications -->
+                    <!-- NOTIFICATION DROPDOWN -->
+
                     <div class="header-dropdown notification-dropdown">
 
-                        <button
-                            type="button"
-                            class="header-icon-button"
+                        <button type="button"
+                            class="dropdown-toggle notification-toggle"
                             id="notificationToggle"
                             aria-label="Notifications"
-                            aria-expanded="false"
-                        >
+                            aria-expanded="false">
+
                             <svg class="icon">
                                 <use href="#icon-bell"></use>
                             </svg>
 
-                            <span class="notification-dot"></span>
+                            <span class="notification-indicator">3</span>
+
                         </button>
 
-                        <div
-                            class="dropdown-menu notification-menu"
-                            id="notificationMenu"
-                        >
+
+                        <div class="dropdown-menu notification-menu"
+                            id="notificationMenu">
 
                             <div class="dropdown-heading">
                                 <h3>Notifications</h3>
-                                <a href="notifications.html">
-                                    View All
-                                </a>
+                                <a href="#notifications">View All</a>
                             </div>
 
                             <div class="notification-item">
-                                <span class="notification-status success"></span>
-
-                                <div>
-                                    <strong>Welcome to TaskBridge</strong>
-                                    <p>Your account dashboard is ready.</p>
-                                    <small>Example notification</small>
-                                </div>
+                                <strong>Welcome to TaskBridge</strong>
+                                <p>Your account dashboard is ready.</p>
+                                <small>Welcome message</small>
                             </div>
 
                             <div class="notification-item">
-                                <span class="notification-status info"></span>
-
-                                <div>
-                                    <strong>Explore New Jobs</strong>
-                                    <p>Discover tasks that match your interests.</p>
-                                    <small>Example notification</small>
-                                </div>
+                                <strong>Profile Reminder</strong>
+                                <p>Complete your profile information.</p>
+                                <small>Account update</small>
                             </div>
 
                             <div class="notification-item">
-                                <span class="notification-status warning"></span>
-
-                                <div>
-                                    <strong>Complete Your Profile</strong>
-                                    <p>Add your information to your profile.</p>
-                                    <small>Example notification</small>
-                                </div>
+                                <strong>Stay Updated</strong>
+                                <p>Check your dashboard for new activities.</p>
+                                <small>Platform update</small>
                             </div>
 
                         </div>
@@ -455,57 +460,47 @@
                     </div>
 
 
-                    <!-- Profile Dropdown -->
+                    <!-- PROFILE DROPDOWN -->
+
                     <div class="header-dropdown profile-dropdown">
 
-                        <button
-                            type="button"
+                        <button type="button"
                             class="profile-toggle"
                             id="profileToggle"
-                            aria-expanded="false"
-                        >
+                            aria-expanded="false">
 
-                            <span class="profile-avatar">AM</span>
+                            <span class="profile-avatar">A</span>
 
-                            <span class="profile-details">
+                            <span class="profile-info">
                                 <strong>Alex Morgan</strong>
                                 <small>Member</small>
                             </span>
 
-                            <svg class="icon profile-chevron">
+                            <svg class="icon">
                                 <use href="#icon-chevron"></use>
                             </svg>
 
                         </button>
 
 
-                        <div
-                            class="dropdown-menu profile-menu"
-                            id="profileMenu"
-                        >
+                        <div class="dropdown-menu profile-menu"
+                            id="profileMenu">
 
-                            <a href="profile.html">
+                            <a href="./profile.html">
                                 <svg class="icon">
                                     <use href="#icon-user"></use>
                                 </svg>
                                 My Profile
                             </a>
 
-                            <a href="settings.html">
+                            <a href="./settings.html">
                                 <svg class="icon">
                                     <use href="#icon-settings"></use>
                                 </svg>
                                 Settings
                             </a>
 
-                            <a href="support.html">
-                                <svg class="icon">
-                                    <use href="#icon-support"></use>
-                                </svg>
-                                Help Center
-                            </a>
-
-                            <a href="logout.html" class="dropdown-logout">
+                            <a href="./login.html">
                                 <svg class="icon">
                                     <use href="#icon-logout"></use>
                                 </svg>
@@ -520,729 +515,1059 @@
 
             </header>
 
-           
+
 
             <!-- =================================
-                 DASHBOARD CONTENT
+                 MAIN CONTENT
+                 ONLY THIS AREA WILL SWITCH
             ================================== -->
 
             <main class="dashboard-content">
 
 
-                <!-- Demo Data Notice -->
-                <div class="demo-notice">
-                    <strong>Preview Mode:</strong>
-                    The figures and account information on this page
-                    are sample data for design purposes.
-                </div>
-
-
-                <!-- Welcome Section -->
-                <section class="welcome-section">
-
-                    <div class="welcome-text">
-                        <h1>Hello, Alex! <span>Welcome Back</span></h1>
-
-                        <p>
-                            Manage your jobs, track your earnings,
-                            and explore new opportunities.
-                        </p>
-                    </div>
-
-                    <div class="welcome-actions">
-
-                        <a href="find-job.html" class="button button-outline">
-                            <svg class="icon">
-                                <use href="#icon-search"></use>
-                            </svg>
-                            Find a Job
-                        </a>
-
-                        <a href="post-job.html" class="button button-primary">
-                            <svg class="icon">
-                                <use href="#icon-plus"></use>
-                            </svg>
-                            Post a Job
-                        </a>
-
-                    </div>
-
-                </section>
-
-
-
                 <!-- =================================
-                     STATISTICS CARDS
+                     DASHBOARD SECTION
                 ================================== -->
 
-                <section class="statistics-grid">
+                <section id="dashboardSection"
+                    class="page-section active">
 
-                    <!-- Balance Card -->
-                    <article class="stat-card balance-card">
 
-                        <div class="stat-card-top">
-                            <span class="stat-icon green-icon">
+                    <!-- DEMO NOTICE -->
+
+                    <div class="demo-notice">
+
+                        <strong>Dashboard Preview</strong>
+
+                        <p>
+                            The information displayed here is sample data.
+                            Your real account information will appear after
+                            backend integration.
+                        </p>
+
+                    </div>
+
+
+                    <!-- WELCOME SECTION -->
+
+                    <section class="welcome-section">
+
+                        <div class="welcome-content">
+
+                            <span>YOUR WORKSPACE</span>
+
+                            <h1>Welcome to TaskBridge!</h1>
+
+                            <p>
+                                Find opportunities, complete tasks,
+                                or create your own jobs.
+                            </p>
+
+                            <div class="welcome-actions">
+
+                                <a href="#findJobSection"
+                                    class="primary-button"
+                                    data-open-section="findJobSection">
+                                    Find a Job
+                                </a>
+
+                                <a href="#postJobSection"
+                                    class="secondary-button"
+                                    data-open-section="postJobSection">
+                                    Post a Job
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- STATISTICS CARDS -->
+
+                    <section class="stats-grid">
+
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
                                 <svg class="icon">
                                     <use href="#icon-wallet"></use>
                                 </svg>
-                            </span>
-
-                            <span class="stat-label">Wallet</span>
+                            </div>
+                            <p>Wallet Balance</p>
+                            <h3>$25.50</h3>
                         </div>
 
-                        <h3>$25.50</h3>
-
-                        <p>Available Balance</p>
-
-                        <a href="wallet.html" class="stat-link">
-                            View Wallet
-                            <svg class="icon">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-                        </a>
-
-                    </article>
-
-
-                    <!-- Completed Jobs -->
-                    <article class="stat-card">
-
-                        <div class="stat-card-top">
-                            <span class="stat-icon yellow-icon">
-                                <svg class="icon">
-                                    <use href="#icon-check"></use>
-                                </svg>
-                            </span>
-
-                            <span class="stat-label">Worker Activity</span>
-                        </div>
-
-                        <h3>12</h3>
-
-                        <p>Jobs Completed</p>
-
-                        <a href="my-submitted-jobs.html" class="stat-link">
-                            View Submitted Jobs
-                            <svg class="icon">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-                        </a>
-
-                    </article>
-
-
-                    <!-- Submitted Jobs -->
-                    <article class="stat-card">
-
-                        <div class="stat-card-top">
-                            <span class="stat-icon blue-icon">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
                                 <svg class="icon">
                                     <use href="#icon-clipboard"></use>
                                 </svg>
-                            </span>
-
-                            <span class="stat-label">Submissions</span>
+                            </div>
+                            <p>Jobs Completed</p>
+                            <h3>12</h3>
                         </div>
 
-                        <h3>5</h3>
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
+                                <svg class="icon">
+                                    <use href="#icon-clipboard"></use>
+                                </svg>
+                            </div>
+                            <p>Jobs Submitted</p>
+                            <h3>8</h3>
+                        </div>
 
-                        <p>Jobs Submitted</p>
-
-                        <a href="my-submitted-jobs.html" class="stat-link">
-                            View Submissions
-                            <svg class="icon">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-                        </a>
-
-                    </article>
-
-
-                    <!-- Posted Jobs -->
-                    <article class="stat-card">
-
-                        <div class="stat-card-top">
-                            <span class="stat-icon purple-icon">
+                        <div class="stat-card">
+                            <div class="stat-card-icon">
                                 <svg class="icon">
                                     <use href="#icon-briefcase"></use>
                                 </svg>
-                            </span>
-
-                            <span class="stat-label">Advertiser Activity</span>
+                            </div>
+                            <p>Active Posted Jobs</p>
+                            <h3>2</h3>
                         </div>
 
-                        <h3>8</h3>
-
-                        <p>Active Posted Jobs</p>
-
-                        <a href="my-posted-jobs.html" class="stat-link">
-                            Manage Posted Jobs
-                            <svg class="icon">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-                        </a>
-
-                    </article>
-
-                </section>
+                    </section>
 
 
+                    <!-- QUICK ACTIONS -->
 
-                <!-- =================================
-                     QUICK ACTIONS
-                ================================== -->
+                    <section class="content-panel quick-actions-panel">
 
-                <section class="quick-actions-section">
-
-                    <div class="section-heading">
-                        <div>
-                            <h2>Quick Actions</h2>
-                            <p>Get started with your next activity.</p>
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Quick Actions</h2>
+                                <p>Choose what you want to do next.</p>
+                            </div>
                         </div>
-                    </div>
 
+                        <div class="quick-actions-grid">
 
-                    <div class="quick-actions-grid">
+                            <a href="#findJobSection"
+                                class="quick-action-card"
+                                data-open-section="findJobSection">
 
-                        <a href="find-job.html" class="quick-action-card">
-
-                            <span class="quick-action-icon green-icon">
                                 <svg class="icon">
                                     <use href="#icon-search"></use>
                                 </svg>
-                            </span>
 
-                            <span>
                                 <strong>Find a Job</strong>
-                                <small>Explore available tasks</small>
-                            </span>
+                                <span>Explore available tasks</span>
 
-                            <svg class="icon action-arrow">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-
-                        </a>
+                            </a>
 
 
-                        <a href="post-job.html" class="quick-action-card">
+                            <a href="#postJobSection"
+                                class="quick-action-card"
+                                data-open-section="postJobSection">
 
-                            <span class="quick-action-icon yellow-icon">
                                 <svg class="icon">
                                     <use href="#icon-plus"></use>
                                 </svg>
-                            </span>
 
-                            <span>
                                 <strong>Post a Job</strong>
-                                <small>Create a new task</small>
-                            </span>
+                                <span>Create a new task</span>
 
-                            <svg class="icon action-arrow">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-
-                        </a>
+                            </a>
 
 
-                        <a href="deposit.html" class="quick-action-card">
+                            <a href="./deposit.html"
+                                class="quick-action-card">
 
-                            <span class="quick-action-icon blue-icon">
                                 <svg class="icon">
-                                    <use href="#icon-arrow-down"></use>
+                                    <use href="#icon-wallet"></use>
                                 </svg>
-                            </span>
 
-                            <span>
-                                <strong>Deposit Funds</strong>
-                                <small>Add money to your wallet</small>
-                            </span>
+                                <strong>Deposit</strong>
+                                <span>Add funds to your wallet</span>
 
-                            <svg class="icon action-arrow">
-                                <use href="#icon-chevron"></use>
-                            </svg>
-
-                        </a>
+                            </a>
 
 
-                        <a href="withdraw.html" class="quick-action-card">
+                            <a href="./withdraw.html"
+                                class="quick-action-card">
 
-                            <span class="quick-action-icon purple-icon">
                                 <svg class="icon">
-                                    <use href="#icon-arrow-up"></use>
+                                    <use href="#icon-wallet"></use>
                                 </svg>
-                            </span>
 
-                            <span>
-                                <strong>Withdraw Funds</strong>
-                                <small>Request a withdrawal</small>
-                            </span>
+                                <strong>Withdraw</strong>
+                                <span>Request a withdrawal</span>
 
-                            <svg class="icon action-arrow">
-                                <use href="#icon-chevron"></use>
-                            </svg>
+                            </a>
 
-                        </a>
+                        </div>
 
-                    </div>
-
-                </section>
+                    </section>
 
 
+                    <!-- RECENT ACTIVITY -->
 
-                <!-- =================================
-                     RECENT ACTIVITY + WALLET
-                ================================== -->
+                    <section class="content-panel activity-panel">
 
-                <section class="dashboard-two-column">
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Recent Activity</h2>
+                                <p>Your latest example account activities.</p>
+                            </div>
+                        </div>
 
-                    <!-- Recent Activity -->
-                    <div class="content-panel activity-panel">
+                        <div class="activity-list">
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <svg class="icon">
+                                        <use href="#icon-clipboard"></use>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <strong>Job submission example</strong>
+                                    <p>Your task submission was received.</p>
+                                    <small>Example activity</small>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <svg class="icon">
+                                        <use href="#icon-wallet"></use>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <strong>Wallet transaction example</strong>
+                                    <p>A sample wallet transaction is displayed.</p>
+                                    <small>Example activity</small>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <svg class="icon">
+                                        <use href="#icon-briefcase"></use>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <strong>Job listing example</strong>
+                                    <p>Your example job listing is available.</p>
+                                    <small>Example activity</small>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- WALLET SUMMARY -->
+
+                    <section class="content-panel wallet-summary-panel">
+
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Wallet Summary</h2>
+                                <p>Your example wallet overview.</p>
+                            </div>
+
+                            <a href="./wallet.html" class="view-all-link">
+                                View Wallet
+                            </a>
+                        </div>
+
+                        <div class="wallet-summary-grid">
+
+                            <div>
+                                <small>Available Balance</small>
+                                <h3>$25.50</h3>
+                            </div>
+
+                            <div>
+                                <small>Total Earnings</small>
+                                <h3>$15.50</h3>
+                            </div>
+
+                            <div>
+                                <small>Total Deposits</small>
+                                <h3>$10.00</h3>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- MY RECENT POSTED JOBS -->
+
+                    <section class="content-panel posted-jobs-panel">
 
                         <div class="panel-heading">
 
                             <div>
-                                <h2>Recent Activity</h2>
-                                <p>Your latest account activities.</p>
+                                <h2>My Recent Posted Jobs</h2>
+                                <p>Keep track of your example job listings.</p>
                             </div>
 
-                            <a href="notifications.html" class="view-all-link">
+                            <a href="#myPostedJobsSection"
+                                class="view-all-link"
+                                data-open-section="myPostedJobsSection">
                                 View All
                             </a>
 
                         </div>
 
 
-                        <div class="activity-list">
+                        <div class="table-responsive">
 
-                            <div class="activity-item">
+                            <table class="dashboard-table">
 
-                                <span class="activity-icon green-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-check"></use>
-                                    </svg>
-                                </span>
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Workers Needed</th>
+                                        <th>Completed</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
 
-                                <div class="activity-details">
-                                    <strong>Task Completed</strong>
-                                    <p>Social Media Engagement</p>
-                                    <small>Example activity</small>
-                                </div>
+                                <tbody>
 
-                                <span class="activity-amount positive">
-                                    +$0.50
-                                </span>
+                                    <tr>
+                                        <td>
+                                            <div class="job-title-cell">
+                                                <strong>Product Review Task</strong>
+                                                <small>Example Listing</small>
+                                            </div>
+                                        </td>
 
+                                        <td>20</td>
+                                        <td>12</td>
+
+                                        <td>
+                                            <span class="status-badge active-status">
+                                                Active
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <a href="#myPostedJobsSection"
+                                                class="table-action-link"
+                                                data-open-section="myPostedJobsSection">
+                                                Manage
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <div class="job-title-cell">
+                                                <strong>Website Feedback</strong>
+                                                <small>Example Listing</small>
+                                            </div>
+                                        </td>
+
+                                        <td>15</td>
+                                        <td>8</td>
+
+                                        <td>
+                                            <span class="status-badge pending-status">
+                                                Pending
+                                            </span>
+                                        </td>
+
+                                        <td>
+                                            <a href="#myPostedJobsSection"
+                                                class="table-action-link"
+                                                data-open-section="myPostedJobsSection">
+                                                Manage
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- RECENT TRANSACTIONS -->
+
+                    <section class="content-panel transactions-panel">
+
+                        <div class="panel-heading">
+
+                            <div>
+                                <h2>Recent Transactions</h2>
+                                <p>Your latest example wallet transactions.</p>
                             </div>
 
+                            <a href="./transactions.html" class="view-all-link">
+                                View History
+                            </a>
 
-                            <div class="activity-item">
-
-                                <span class="activity-icon yellow-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-arrow-down"></use>
-                                    </svg>
-                                </span>
-
-                                <div class="activity-details">
-                                    <strong>Wallet Deposit</strong>
-                                    <p>Funds added to wallet</p>
-                                    <small>Example activity</small>
-                                </div>
-
-                                <span class="activity-amount positive">
-                                    +$10.00
-                                </span>
-
-                            </div>
+                        </div>
 
 
-                            <div class="activity-item">
+                        <div class="table-responsive">
 
-                                <span class="activity-icon blue-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-clipboard"></use>
-                                    </svg>
-                                </span>
+                            <table class="dashboard-table">
 
-                                <div class="activity-details">
-                                    <strong>Job Submitted</strong>
-                                    <p>Website Testing Task</p>
-                                    <small>Example activity</small>
-                                </div>
+                                <thead>
+                                    <tr>
+                                        <th>Transaction</th>
+                                        <th>Type</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
 
-                                <span class="activity-status pending">
-                                    Pending
-                                </span>
+                                <tbody>
 
-                            </div>
+                                    <tr>
+                                        <td>TXN-DEMO-001</td>
+                                        <td>Job Earnings</td>
+                                        <td>Example Date</td>
+                                        <td class="payment-cell">+$0.50</td>
+                                        <td>
+                                            <span class="status-badge active-status">
+                                                Completed
+                                            </span>
+                                        </td>
+                                    </tr>
 
+                                    <tr>
+                                        <td>TXN-DEMO-002</td>
+                                        <td>Deposit</td>
+                                        <td>Example Date</td>
+                                        <td class="payment-cell">+$10.00</td>
+                                        <td>
+                                            <span class="status-badge active-status">
+                                                Completed
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>TXN-DEMO-003</td>
+                                        <td>Withdrawal</td>
+                                        <td>Example Date</td>
+                                        <td class="payment-cell">-$5.00</td>
+                                        <td>
+                                            <span class="status-badge pending-status">
+                                                Pending
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </section>
+
+                </section>
+
+
+
+                <!-- =================================
+                     FIND A JOB SECTION
+                ================================== -->
+
+                <section id="findJobSection" class="page-section">
+
+                    <div class="section-heading">
+
+                        <div>
+                            <span>WORKER AREA</span>
+                            <h1>Find a Job</h1>
+                            <p>Discover available tasks and earn rewards.</p>
                         </div>
 
                     </div>
 
 
+                    <!-- JOB STATISTICS -->
 
-                    <!-- Wallet Summary -->
-                    <div class="content-panel wallet-panel">
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+                            <p>Available Jobs</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Completed Jobs</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Total Jobs</p>
+                            <h3>0</h3>
+                        </div>
+
+                    </div>
+
+
+                    <!-- JOB SEARCH -->
+
+                    <section class="content-panel job-search-panel">
 
                         <div class="panel-heading">
                             <div>
-                                <h2>Wallet Summary</h2>
-                                <p>Your sample wallet overview.</p>
+                                <h2>Search Jobs</h2>
+                                <p>Find tasks that match your interests.</p>
                             </div>
-
-                            <svg class="icon panel-heading-icon">
-                                <use href="#icon-wallet"></use>
-                            </svg>
                         </div>
 
+                        <div class="job-filter-grid">
 
-                        <div class="wallet-total">
-                            <small>Total Available Balance</small>
-                            <h3>$25.50</h3>
-                            <span>Demo balance only</span>
+                            <div class="form-group">
+                                <label for="jobSearchInput">Search by Keyword</label>
+                                <input type="search"
+                                    id="jobSearchInput"
+                                    placeholder="Enter job title or keyword">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jobCategoryFilter">Category</label>
+
+                                <select id="jobCategoryFilter">
+                                    <option value="all">All Categories</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="twitter">Twitter / X</option>
+                                    <option value="website">Website</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="jobSortFilter">Sort By</label>
+
+                                <select id="jobSortFilter">
+                                    <option value="newest">Newest First</option>
+                                    <option value="highest">Highest Reward</option>
+                                    <option value="lowest">Lowest Reward</option>
+                                </select>
+                            </div>
+
                         </div>
 
+                    </section>
 
-                        <div class="wallet-breakdown">
 
-                            <div class="wallet-row">
-                                <span>Available Balance</span>
-                                <strong>$25.50</strong>
+                    <!-- AVAILABLE JOB LIST -->
+
+                    <section class="content-panel available-jobs-panel">
+
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Available Jobs</h2>
+                                <p>Jobs approved and published by advertisers.</p>
+                            </div>
+                        </div>
+
+                        <div class="empty-state">
+
+                            <div class="empty-state-icon">
+                                <svg class="icon">
+                                    <use href="#icon-search"></use>
+                                </svg>
                             </div>
 
-                            <div class="wallet-row">
-                                <span>Pending Earnings</span>
-                                <strong>$5.00</strong>
-                            </div>
+                            <h3>No Jobs Available Yet</h3>
 
-                            <div class="wallet-row">
-                                <span>Total Withdrawn</span>
-                                <strong>$40.00</strong>
-                            </div>
+                            <p>
+                                There are currently no approved jobs available.
+                                Please check back later.
+                            </p>
 
                         </div>
 
-
-                        <a href="wallet.html" class="button button-primary wallet-button">
-                            Manage Wallet
-                        </a>
-
-                    </div>
+                    </section>
 
                 </section>
 
 
 
                 <!-- =================================
-                     LATEST AVAILABLE JOBS
+                     POST A JOB SECTION
                 ================================== -->
 
-                <section class="content-panel jobs-panel" id="latest-jobs">
+                <section id="postJobSection" class="page-section">
 
-                    <div class="panel-heading">
+                    <div class="section-heading">
 
                         <div>
-                            <h2>Latest Available Jobs</h2>
-                            <p>Explore some example opportunities.</p>
+                            <span>ADVERTISER AREA</span>
+                            <h1>Post a Job</h1>
+                            <p>Create a task and invite workers to complete it.</p>
                         </div>
 
-                        <a href="find-job.html" class="view-all-link">
-                            Browse All Jobs
-                        </a>
-
                     </div>
 
 
-                    <div class="table-responsive">
+                    <section class="content-panel post-job-panel">
 
-                        <table class="dashboard-table">
-
-                            <thead>
-                                <tr>
-                                    <th>Job Details</th>
-                                    <th>Category</th>
-                                    <th>Country</th>
-                                    <th>Payment</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <tr>
-                                    <td>
-                                        <div class="job-title-cell">
-                                            <strong>Social Media Engagement</strong>
-                                            <small>Example Listing</small>
-                                        </div>
-                                    </td>
-
-                                    <td>Social Media</td>
-                                    <td>Worldwide</td>
-                                    <td class="payment-cell">$0.50</td>
-
-                                    <td>
-                                        <a href="find-job.html" class="small-action-button">
-                                            View Job
-                                        </a>
-                                    </td>
-                                </tr>
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Create a New Job</h2>
+                                <p>Provide clear instructions for your workers.</p>
+                            </div>
+                        </div>
 
 
-                                <tr>
-                                    <td>
-                                        <div class="job-title-cell">
-                                            <strong>Simple Data Entry</strong>
-                                            <small>Example Listing</small>
-                                        </div>
-                                    </td>
-
-                                    <td>Data Entry</td>
-                                    <td>United States</td>
-                                    <td class="payment-cell">$1.00</td>
-
-                                    <td>
-                                        <a href="find-job.html" class="small-action-button">
-                                            View Job
-                                        </a>
-                                    </td>
-                                </tr>
+                        <form id="postJobForm">
 
 
-                                <tr>
-                                    <td>
-                                        <div class="job-title-cell">
-                                            <strong>Website Testing</strong>
-                                            <small>Example Listing</small>
-                                        </div>
-                                    </td>
+                            <div class="form-group">
 
-                                    <td>Website Testing</td>
-                                    <td>United Kingdom</td>
-                                    <td class="payment-cell">$2.00</td>
+                                <label for="jobTitle">Job Title</label>
 
-                                    <td>
-                                        <a href="find-job.html" class="small-action-button">
-                                            View Job
-                                        </a>
-                                    </td>
-                                </tr>
+                                <input type="text"
+                                    id="jobTitle"
+                                    name="jobTitle"
+                                    placeholder="Enter a clear job title"
+                                    required>
 
-                            </tbody>
+                            </div>
 
-                        </table>
 
-                    </div>
+                            <div class="form-group">
+
+                                <label for="postJobCategory">Job Category</label>
+
+                                <select id="postJobCategory"
+                                    name="category"
+                                    required>
+
+                                    <option value="">Select Category</option>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="twitter">Twitter / X</option>
+                                    <option value="website">Website</option>
+                                    <option value="other">Other</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="jobDescription">
+                                    Job Description & Instructions
+                                </label>
+
+                                <textarea id="jobDescription"
+                                    name="description"
+                                    rows="6"
+                                    placeholder="Explain exactly what workers need to do..."
+                                    required></textarea>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="targetUrl">Target URL</label>
+
+                                <input type="url"
+                                    id="targetUrl"
+                                    name="targetUrl"
+                                    placeholder="https://example.com">
+
+                            </div>
+
+
+                            <div class="form-row">
+
+                                <div class="form-group">
+
+                                    <label for="workerReward">
+                                        Reward Per Worker ($)
+                                    </label>
+
+                                    <input type="number"
+                                        id="workerReward"
+                                        name="workerReward"
+                                        min="0.01"
+                                        step="0.01"
+                                        placeholder="0.50"
+                                        required>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="workersRequired">
+                                        Total Workers Required
+                                    </label>
+
+                                    <input type="number"
+                                        id="workersRequired"
+                                        name="workersRequired"
+                                        min="1"
+                                        step="1"
+                                        placeholder="10"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="budget-summary">
+
+                                <span>Estimated Total Budget</span>
+
+                                <strong id="totalJobBudget">$0.00</strong>
+
+                                <small>
+                                    Reward per worker × Total workers.
+                                    Platform fees may apply.
+                                </small>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="proofType">
+                                    Required Proof Type
+                                </label>
+
+                                <select id="proofType"
+                                    name="proofType"
+                                    required>
+
+                                    <option value="">Select Proof Type</option>
+                                    <option value="screenshot">Screenshot</option>
+                                    <option value="text">Text Answer</option>
+                                    <option value="url">URL / Link</option>
+                                    <option value="multiple">Multiple Proofs</option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="proofInstructions">
+                                    Additional Proof Instructions
+                                </label>
+
+                                <textarea id="proofInstructions"
+                                    name="proofInstructions"
+                                    rows="4"
+                                    placeholder="Explain what proof workers must submit..."></textarea>
+
+                            </div>
+
+
+                            <div class="form-actions">
+
+                                <button type="button"
+                                    class="secondary-button"
+                                    id="saveJobDraft">
+                                    Save as Draft
+                                </button>
+
+                                <button type="submit"
+                                    class="primary-button">
+                                    Submit Job
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </section>
 
                 </section>
 
 
 
                 <!-- =================================
-                     MY POSTED JOBS
+                     MY POSTED JOBS SECTION
                 ================================== -->
 
-                <section class="content-panel posted-jobs-panel">
+                <section id="myPostedJobsSection" class="page-section">
 
-                    <div class="panel-heading">
+                    <div class="section-heading">
 
                         <div>
-                            <h2>My Recent Posted Jobs</h2>
-                            <p>Keep track of your example job listings.</p>
+                            <span>ADVERTISER AREA</span>
+                            <h1>My Posted Jobs</h1>
+                            <p>Manage your job listings and worker submissions.</p>
                         </div>
 
-                        <a href="my-posted-jobs.html" class="view-all-link">
-                            View All
+                        <a href="#postJobSection"
+                            class="primary-button"
+                            data-open-section="postJobSection">
+                            Post a New Job
                         </a>
 
                     </div>
 
 
-                    <div class="table-responsive">
+                    <!-- POSTED JOB STATISTICS -->
 
-                        <table class="dashboard-table">
+                    <div class="stats-grid">
 
-                            <thead>
-                                <tr>
-                                    <th>Job Title</th>
-                                    <th>Workers Needed</th>
-                                    <th>Completed</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
+                        <div class="stat-card">
+                            <p>Total Posted</p>
+                            <h3>0</h3>
+                        </div>
 
-                            <tbody>
+                        <div class="stat-card">
+                            <p>Active</p>
+                            <h3>0</h3>
+                        </div>
 
-                                <tr>
-                                    <td>
-                                        <div class="job-title-cell">
-                                            <strong>Product Review Task</strong>
-                                            <small>Example Listing</small>
-                                        </div>
-                                    </td>
+                        <div class="stat-card">
+                            <p>Pending Approval</p>
+                            <h3>0</h3>
+                        </div>
 
-                                    <td>20</td>
-                                    <td>12</td>
+                        <div class="stat-card">
+                            <p>Completed</p>
+                            <h3>0</h3>
+                        </div>
 
-                                    <td>
-                                        <span class="status-badge active-status">
-                                            Active
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <a href="my-posted-jobs.html" class="table-action-link">
-                                            Manage
-                                        </a>
-                                    </td>
-                                </tr>
-
-
-                                <tr>
-                                    <td>
-                                        <div class="job-title-cell">
-                                            <strong>Website Feedback</strong>
-                                            <small>Example Listing</small>
-                                        </div>
-                                    </td>
-
-                                    <td>15</td>
-                                    <td>8</td>
-
-                                    <td>
-                                        <span class="status-badge pending-status">
-                                            Pending
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <a href="my-posted-jobs.html" class="table-action-link">
-                                            Manage
-                                        </a>
-                                    </td>
-                                </tr>
-
-                            </tbody>
-
-                        </table>
+                        <div class="stat-card">
+                            <p>Rejected</p>
+                            <h3>0</h3>
+                        </div>
 
                     </div>
+
+
+                    <!-- JOB STATUS FILTER -->
+
+                    <section class="content-panel">
+
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Manage Your Jobs</h2>
+                                <p>Review and manage all your posted tasks.</p>
+                            </div>
+                        </div>
+
+                        <div class="job-tabs">
+
+                            <button type="button" class="job-tab active" data-status="all">
+                                All
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="active">
+                                Active
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="pending">
+                                Pending
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="paused">
+                                Paused
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="completed">
+                                Completed
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="rejected">
+                                Rejected
+                            </button>
+
+                        </div>
+
+
+                        <div class="empty-state">
+
+                            <div class="empty-state-icon">
+                                <svg class="icon">
+                                    <use href="#icon-briefcase"></use>
+                                </svg>
+                            </div>
+
+                            <h3>No Posted Jobs Yet</h3>
+
+                            <p>
+                                You haven't posted any jobs yet.
+                                Create your first job to get started.
+                            </p>
+
+                            <a href="#postJobSection"
+                                class="primary-button"
+                                data-open-section="postJobSection">
+                                Create Your First Job
+                            </a>
+
+                        </div>
+
+                    </section>
 
                 </section>
 
 
 
                 <!-- =================================
-                     RECENT TRANSACTIONS
+                     MY SUBMITTED JOBS SECTION
                 ================================== -->
 
-                <section class="content-panel transactions-panel">
+                <section id="mySubmittedJobsSection" class="page-section">
 
-                    <div class="panel-heading">
+                    <div class="section-heading">
 
                         <div>
-                            <h2>Recent Transactions</h2>
-                            <p>Your latest example wallet transactions.</p>
+                            <span>WORKER AREA</span>
+                            <h1>My Submitted Jobs</h1>
+                            <p>Track your task submissions and rewards.</p>
                         </div>
 
-                        <a href="transactions.html" class="view-all-link">
-                            View History
-                        </a>
+                    </div>
+
+
+                    <!-- SUBMISSION STATISTICS -->
+
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+                            <p>Total Submitted</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Pending Review</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Approved</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Rejected</p>
+                            <h3>0</h3>
+                        </div>
+
+                        <div class="stat-card">
+                            <p>Revision Required</p>
+                            <h3>0</h3>
+                        </div>
 
                     </div>
 
 
-                    <div class="table-responsive">
+                    <!-- SUBMISSION LIST -->
 
-                        <table class="dashboard-table">
+                    <section class="content-panel">
 
-                            <thead>
-                                <tr>
-                                    <th>Transaction</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
+                        <div class="panel-heading">
 
-                            <tbody>
+                            <div>
+                                <h2>My Submissions</h2>
+                                <p>Check the review status of your submitted work.</p>
+                            </div>
 
-                                <tr>
-                                    <td>TXN-DEMO-001</td>
-                                    <td>Job Earnings</td>
-                                    <td>Example Date</td>
-                                    <td class="payment-cell">+$0.50</td>
-
-                                    <td>
-                                        <span class="status-badge active-status">
-                                            Completed
-                                        </span>
-                                    </td>
-                                </tr>
+                        </div>
 
 
-                                <tr>
-                                    <td>TXN-DEMO-002</td>
-                                    <td>Deposit</td>
-                                    <td>Example Date</td>
-                                    <td class="payment-cell">+$10.00</td>
+                        <div class="job-tabs">
 
-                                    <td>
-                                        <span class="status-badge active-status">
-                                            Completed
-                                        </span>
-                                    </td>
-                                </tr>
+                            <button type="button" class="job-tab active" data-status="all">
+                                All
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="pending">
+                                Pending
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="approved">
+                                Approved
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="rejected">
+                                Rejected
+                            </button>
+
+                            <button type="button" class="job-tab" data-status="revision">
+                                Revision Required
+                            </button>
+
+                        </div>
 
 
-                                <tr>
-                                    <td>TXN-DEMO-003</td>
-                                    <td>Withdrawal</td>
-                                    <td>Example Date</td>
-                                    <td class="payment-cell">-$5.00</td>
+                        <div class="empty-state">
 
-                                    <td>
-                                        <span class="status-badge pending-status">
-                                            Pending
-                                        </span>
-                                    </td>
-                                </tr>
+                            <div class="empty-state-icon">
+                                <svg class="icon">
+                                    <use href="#icon-clipboard"></use>
+                                </svg>
+                            </div>
 
-                            </tbody>
+                            <h3>No Submissions Yet</h3>
 
-                        </table>
+                            <p>
+                                You haven't submitted any jobs yet.
+                                Find an available task and start working.
+                            </p>
 
-                    </div>
+                            <a href="#findJobSection"
+                                class="primary-button"
+                                data-open-section="findJobSection">
+                                Find a Job
+                            </a>
+
+                        </div>
+
+                    </section>
 
                 </section>
-
-                
-
-
-                <!-- =================================
-                     DASHBOARD FOOTER
-                ================================== -->
-
-                <footer class="dashboard-footer">
-
-                    <p>
-                        &copy; <span id="current-year">2026</span>
-                        TaskBridge. All Rights Reserved.
-                    </p>
-
-                    <div class="footer-links">
-                        <a href="privacy.html">Privacy Policy</a>
-                        <a href="terms.html">Terms & Conditions</a>
-                        <a href="support.html">Help Center</a>
-                    </div>
-
-                </footer>
 
 
             </main>
+
+
+
+            <!-- =================================
+                 DASHBOARD FOOTER
+                 ALWAYS VISIBLE
+            ================================== -->
+
+            <footer class="dashboard-footer">
+
+                <p>
+                    &copy; <span id="current-year">2026</span>
+                    TaskBridge. All Rights Reserved.
+                </p>
+
+                <div class="footer-links">
+
+                    <a href="./privacy.html">Privacy Policy</a>
+
+                    <a href="./terms.html">Terms & Conditions</a>
+
+                    <a href="./support.html">Help Center</a>
+
+                </div>
+
+            </footer>
+
 
         </div>
 
@@ -1253,4 +1578,5 @@
     <script src="./dashboard.js"></script>
 
 </body>
+
 </html>
