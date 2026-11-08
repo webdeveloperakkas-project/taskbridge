@@ -229,11 +229,6 @@ document.addEventListener("DOMContentLoaded", function () {
     "myPostedJobsSection",
     "mySubmittedJobsSection",
 
-    // FINANCE SECTIONS
-    "walletSection",
-    "depositSection",
-    "withdrawSection",
-    "transactionsSection"
 ];
 
 
