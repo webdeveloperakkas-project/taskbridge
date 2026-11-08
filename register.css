@@ -1,0 +1,644 @@
+
+/* =========================================
+   TASKBRIDGE - REGISTRATION PAGE
+   Green + Yellow + White Theme
+========================================= */
+
+/* CSS RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-green: #16a34a;
+    --dark-green: #15803d;
+    --light-green: #f0fdf4;
+    --yellow: #facc15;
+    --dark-yellow: #eab308;
+    --white: #ffffff;
+    --dark-text: #1f2937;
+    --gray-text: #6b7280;
+    --light-gray: #f3f4f6;
+    --border-color: #e5e7eb;
+    --danger: #dc2626;
+}
+
+/* BODY */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f0fdf4;
+    color: var(--dark-text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* MAIN PAGE */
+
+.register-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 45px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(250, 204, 21, 0.15),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #f0fdf4,
+            #ffffff,
+            #f7fee7
+        );
+}
+
+/* MAIN CONTAINER */
+
+.register-container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+/* BRAND */
+
+.register-brand {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo {
+    display: inline-block;
+    font-size: 35px;
+    font-weight: 800;
+    color: var(--dark-green);
+    text-decoration: none;
+    letter-spacing: -1.5px;
+}
+
+.logo span {
+    color: var(--yellow);
+}
+
+.register-brand p {
+    margin-top: 5px;
+    color: var(--gray-text);
+    font-size: 14px;
+}
+
+/* REGISTRATION CARD */
+
+.register-card {
+    background: var(--white);
+    padding: 38px;
+    border-radius: 16px;
+    border: 1px solid #dcfce7;
+    box-shadow: 0 12px 40px rgba(22, 163, 74, 0.10);
+}
+
+/* HEADING */
+
+.register-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.register-heading h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--dark-text);
+    margin-bottom: 9px;
+}
+
+.register-heading p {
+    font-size: 14px;
+    color: var(--gray-text);
+    line-height: 1.7;
+}
+
+/* FORM GROUP */
+
+.form-group {
+    margin-bottom: 19px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--dark-text);
+}
+
+/* INPUTS AND SELECT */
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    height: 49px;
+    padding: 0 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+    background: var(--white);
+    color: var(--dark-text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.25s ease,
+                box-shadow 0.25s ease;
+}
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+/* SMALL DESCRIPTION */
+
+.form-group small {
+    display: block;
+    margin-top: 7px;
+    color: var(--gray-text);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* CHECKBOX */
+
+.form-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 24px 0;
+}
+
+.form-checkbox input {
+    width: 17px;
+    height: 17px;
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: var(--primary-green);
+    cursor: pointer;
+}
+
+.form-checkbox label {
+    color: var(--gray-text);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.form-checkbox a {
+    color: var(--dark-green);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.form-checkbox a:hover {
+    text-decoration: underline;
+}
+
+/* REGISTER BUTTON */
+
+.register-button {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-green);
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.25s ease,
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+}
+
+.register-button:hover {
+    background: var(--dark-green);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(22, 163, 74, 0.20);
+}
+
+.register-button:active {
+    transform: translateY(0);
+}
+
+/* LOGIN LINK */
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border-color);
+}
+
+.login-link p {
+    color: var(--gray-text);
+    font-size: 14px;
+}
+
+.login-link a {
+    color: var(--dark-green);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* FOOTER */
+
+.register-footer {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.register-footer p {
+    color: var(--gray-text);
+    font-size: 12px;
+}
+
+/* TABLET RESPONSIVE */
+
+@media (max-width: 768px) {
+
+    .register-page {
+        padding: 35px 18px;
+    }
+
+    .register-container {
+        max-width: 500px;
+    }
+
+    .register-card {
+        padding: 32px;
+    }
+
+    .register-heading h1 {
+        font-size: 25px;
+    }
+}
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width: 480px) {
+
+    .register-page {
+        padding: 25px 14px;
+        align-items: flex-start;
+    }
+
+    .register-brand {
+        margin-bottom: 22px;
+    }
+
+    .logo {
+        font-size: 30px;
+    }
+
+    .register-brand p {
+        font-size: 12px;
+    }
+
+    .register-card {
+        padding: 24px 18px;
+        border-radius: 12px;
+    }
+
+    .register-heading {
+        margin-bottom: 24px;
+    }
+
+    .register-heading h1 {
+        font-size: 23px;
+    }
+
+    .register-heading p {
+        font-size: 13px;
+    }
+
+    .form-group {
+        margin-bottom: 17px;
+    }
+
+    .form-group input,
+    .form-group select {
+        height: 47px;
+        font-size: 14px;
+    }
+
+    .register-button {
+        min-height: 48px;
+        font-size: 15px;
+    }
+
+    .form-checkbox label {
+        font-size: 12px;
+    }
+
+    .login-link p {
+        font-size: 13px;
+    }
+
+    .register-footer p {
+        font-size: 11px;
+    }
+}
+
+/* ACCESSIBILITY */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid rgba(250, 204, 21, 0.8);
+    outline-offset: 3px;
+}
+
+
+/* =========================================
+   OTP VERIFICATION PAGE
+========================================= */
+
+#otpStep,
+#successStep {
+    width: 100%;
+}
+
+#otpStep[hidden],
+#successStep[hidden],
+#registrationStep[hidden] {
+    display: none !important;
+}
+
+/* OTP Email Icon */
+
+.otp-icon {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8f5ed;
+    color: #16834a;
+    border-radius: 50%;
+    font-size: 30px;
+}
+
+.otp-form-group {
+    margin-top: 25px;
+}
+
+/* OTP Input */
+
+#otpCode {
+    width: 100%;
+    padding: 16px 14px;
+    border: 1px solid #d9e2dc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 10px;
+    text-align: center;
+    color: #183c2b;
+    background: #ffffff;
+    transition: border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+#otpCode:focus {
+    border-color: #16834a;
+    box-shadow: 0 0 0 3px rgba(22, 131, 74, 0.12);
+}
+
+#otpCode::placeholder {
+    color: #aab5ae;
+    letter-spacing: 5px;
+    font-size: 16px;
+}
+
+/* Form Messages */
+
+.form-message {
+    display: none;
+    margin: 15px 0;
+    padding: 12px 14px;
+    border-radius: 7px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.form-message.success {
+    display: block;
+    color: #166534;
+    background: #eaf7ee;
+    border: 1px solid #b8e4c5;
+}
+
+.form-message.error {
+    display: block;
+    color: #b42318;
+    background: #fff0ef;
+    border: 1px solid #f5c2bd;
+}
+
+.form-message.info {
+    display: block;
+    color: #155e91;
+    background: #eff7ff;
+    border: 1px solid #c5e0fa;
+}
+
+/* Resend OTP */
+
+.otp-resend-section {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.otp-resend-section p {
+    margin-bottom: 8px;
+    color: #68756d;
+    font-size: 14px;
+}
+
+.resend-otp-button,
+.back-register-button {
+    padding: 5px 8px;
+    border: none;
+    background: transparent;
+    color: #16834a;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.resend-otp-button:hover,
+.back-register-button:hover {
+    color: #0d6034;
+    text-decoration: underline;
+}
+
+.resend-otp-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.back-register-button {
+    margin-top: 5px;
+}
+
+
+/* =========================================
+   REGISTRATION SUCCESS PAGE
+========================================= */
+
+.success-content {
+    padding: 25px 5px;
+    text-align: center;
+}
+
+.success-icon {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e8f7ed;
+    color: #16834a;
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.success-content h1 {
+    margin-bottom: 12px;
+    color: #183c2b;
+    font-size: 25px;
+}
+
+.success-content > p {
+    margin-bottom: 25px;
+    color: #68756d;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* Verification Status */
+
+.success-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    border: 1px solid #e2eae4;
+    border-radius: 8px;
+    background: #f8fbf9;
+    text-align: left;
+    font-size: 13px;
+}
+
+.success-status span {
+    color: #53635a;
+}
+
+.success-status strong {
+    color: #16834a;
+}
+
+/* Dashboard Redirect Message */
+
+.redirect-message {
+    margin-top: 25px;
+    color: #16834a;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.redirect-loader {
+    width: 100%;
+    height: 5px;
+    margin-top: 15px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #e5eee8;
+}
+
+.redirect-loader span {
+    display: block;
+    width: 35%;
+    height: 100%;
+    border-radius: 10px;
+    background: #16834a;
+    animation: redirectLoading 1.3s ease-in-out infinite;
+}
+
+@keyframes redirectLoading {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    100% {
+        transform: translateX(300%);
+    }
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 480px) {
+
+    .otp-icon {
+        width: 58px;
+        height: 58px;
+        font-size: 26px;
+    }
+
+    #otpCode {
+        padding: 14px 10px;
+        font-size: 20px;
+        letter-spacing: 7px;
+    }
+
+    .success-content {
+        padding: 15px 0;
+    }
+
+    .success-content h1 {
+        font-size: 22px;
+    }
+
+    .success-status {
+        font-size: 12px;
+        padding: 12px 10px;
+    }
+
+}
