@@ -226,6 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
    DASHBOARD SECTION CONFIGURATION
 ====================================== */
 
+
 const pageSections = [
     "dashboardSection",
     "findJobSection",
@@ -240,44 +241,64 @@ const pageSections = [
 ];
 
 
-    const sectionTitles = {
+const sectionTitles = {
 
-        dashboardSection: {
-            title: "Dashboard",
-            subtitle: "Welcome back! Here's your overview."
-        },
+    dashboardSection: {
+        title: "Dashboard",
+        subtitle: "Welcome back! Here's your overview."
+    },
 
-        findJobSection: {
-            title: "Find a Job",
-            subtitle: "Explore available tasks and opportunities."
-        },
+    findJobSection: {
+        title: "Find a Job",
+        subtitle: "Explore available tasks and opportunities."
+    },
 
-        postJobSection: {
-            title: "Post a Job",
-            subtitle: "Create and publish your own tasks."
-        },
+    postJobSection: {
+        title: "Post a Job",
+        subtitle: "Create and publish your own tasks."
+    },
 
-        myPostedJobsSection: {
-            title: "My Posted Jobs",
-            subtitle: "Manage your job listings and submissions."
-        },
+    myPostedJobsSection: {
+        title: "My Posted Jobs",
+        subtitle: "Manage your job listings and submissions."
+    },
 
-       jobDetailsSection: {
-    title: "Job Details",
-    subtitle: "Review the complete task information before starting."
-}
+    mySubmittedJobsSection: {
+        title: "My Submitted Jobs",
+        subtitle: "Track your submitted work and rewards."
+    },
 
-        mySubmittedJobsSection: {
-            title: "My Submitted Jobs",
-            subtitle: "Track your submitted work and rewards."
-        }
+    walletSection: {
+        title: "My Wallet",
+        subtitle: "Manage your available balance and earnings."
+    },
 
-    };
+    depositSection: {
+        title: "Deposit",
+        subtitle: "Add funds to your TaskBridge wallet."
+    },
+
+    withdrawSection: {
+        title: "Withdraw",
+        subtitle: "Request a withdrawal of your available balance."
+    },
+
+    transactionsSection: {
+        title: "Transactions",
+        subtitle: "View your wallet transaction history."
+    },
+
+    jobDetailsSection: {
+        title: "Job Details",
+        subtitle: "Review the complete task information before starting."
+    }
+
+};
 
 
-    const sectionLinks = document.querySelectorAll(
-        ".sidebar-navigation .nav-link[data-section]"
-    );
+const sectionLinks = document.querySelectorAll(
+    ".sidebar-navigation .nav-link[data-section]"
+);
 
 
     /* =====================================
