@@ -232,12 +232,11 @@ const pageSections = [
     "postJobSection",
     "myPostedJobsSection",
     "mySubmittedJobsSection",
-
-    // FINANCE SECTIONS
     "walletSection",
     "depositSection",
     "withdrawSection",
-    "transactionsSection"
+    "transactionsSection",
+    "jobDetailsSection"
 ];
 
 
