@@ -5,6 +5,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+
     /* =====================================
        CURRENT YEAR
     ====================================== */
@@ -30,6 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const profileToggle = document.getElementById("profileToggle");
     const profileMenu = document.getElementById("profileMenu");
+
+    const headerTitle = document.querySelector(".header-welcome h2");
+    const headerSubtitle = document.querySelector(".header-welcome p");
 
 
     /* =====================================
@@ -88,37 +92,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (sidebarClose) {
-
         sidebarClose.addEventListener("click", closeSidebar);
-
     }
 
 
     if (sidebarOverlay) {
-
         sidebarOverlay.addEventListener("click", closeSidebar);
-
-    }
-
-
-    /* Close sidebar after clicking a navigation link on mobile */
-
-    if (sidebar) {
-
-        const sidebarLinks = sidebar.querySelectorAll(".nav-link");
-
-        sidebarLinks.forEach(function (link) {
-
-            link.addEventListener("click", function () {
-
-                if (window.innerWidth <= 900) {
-                    closeSidebar();
-                }
-
-            });
-
-        });
-
     }
 
 
@@ -239,6 +218,511 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================
+       DASHBOARD SECTION CONFIGURATION
+    ====================================== */
+
+    const pageSections = [
+        "dashboardSection",
+        "findJobSection",
+        "postJobSection",
+        "myPostedJobsSection",
+        "mySubmittedJobsSection"
+    ];
+
+
+    const sectionTitles = {
+
+        dashboardSection: {
+            title: "Dashboard",
+            subtitle: "Welcome back! Here's your overview."
+        },
+
+        findJobSection: {
+            title: "Find a Job",
+            subtitle: "Explore available tasks and opportunities."
+        },
+
+        postJobSection: {
+            title: "Post a Job",
+            subtitle: "Create and publish your own tasks."
+        },
+
+        myPostedJobsSection: {
+            title: "My Posted Jobs",
+            subtitle: "Manage your job listings and submissions."
+        },
+
+        mySubmittedJobsSection: {
+            title: "My Submitted Jobs",
+            subtitle: "Track your submitted work and rewards."
+        }
+
+    };
+
+
+    const sectionLinks = document.querySelectorAll(
+        ".sidebar-navigation .nav-link[data-section]"
+    );
+
+
+    /* =====================================
+       SHOW SELECTED SECTION
+    ====================================== */
+
+    function showPageSection(sectionId, updateURL = true) {
+
+        const targetSection = document.getElementById(sectionId);
+
+        if (
+            !targetSection ||
+            !pageSections.includes(sectionId)
+        ) {
+
+            console.warn("Dashboard section not found:", sectionId);
+
+            return;
+
+        }
+
+
+        // Hide all sections
+
+        pageSections.forEach(function (id) {
+
+            const section = document.getElementById(id);
+
+            if (section) {
+
+                section.classList.remove("active");
+                section.hidden = true;
+
+            }
+
+        });
+
+
+        // Show selected section
+
+        targetSection.hidden = false;
+        targetSection.classList.add("active");
+
+
+        // Update sidebar active link
+
+        sectionLinks.forEach(function (link) {
+
+            const isActive = link.dataset.section === sectionId;
+
+            link.classList.toggle("active", isActive);
+
+            if (isActive) {
+
+                link.setAttribute("aria-current", "page");
+
+            } else {
+
+                link.removeAttribute("aria-current");
+
+            }
+
+        });
+
+
+        // Update header title and subtitle
+
+        if (sectionTitles[sectionId]) {
+
+            if (headerTitle) {
+                headerTitle.textContent = sectionTitles[sectionId].title;
+            }
+
+            if (headerSubtitle) {
+                headerSubtitle.textContent = sectionTitles[sectionId].subtitle;
+            }
+
+        }
+
+
+        // Update URL
+
+        if (updateURL) {
+
+            history.replaceState(null, "", "#" + sectionId);
+
+        }
+
+
+        // Close mobile sidebar
+
+        if (window.innerWidth <= 900) {
+            closeSidebar();
+        }
+
+
+        // Close dropdowns
+
+        closeAllDropdowns();
+
+
+        // Scroll to top
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+
+    /* =====================================
+       SIDEBAR SECTION CLICK
+    ====================================== */
+
+    sectionLinks.forEach(function (link) {
+
+        link.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            const sectionId = this.dataset.section;
+
+            showPageSection(sectionId);
+
+        });
+
+    });
+
+
+    /* =====================================
+       CONTENT SECTION BUTTONS
+    ====================================== */
+
+    const contentSectionLinks = document.querySelectorAll(
+        "[data-open-section]"
+    );
+
+
+    contentSectionLinks.forEach(function (link) {
+
+        link.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            const sectionId = this.dataset.openSection;
+
+            showPageSection(sectionId);
+
+        });
+
+    });
+
+
+    /* =====================================
+       INITIAL SECTION
+    ====================================== */
+
+    function initializeDashboardSection() {
+
+        const hashSection = window.location.hash.replace("#", "");
+
+        if (
+            pageSections.includes(hashSection) &&
+            document.getElementById(hashSection)
+        ) {
+
+            showPageSection(hashSection, false);
+
+        } else {
+
+            showPageSection("dashboardSection", false);
+
+        }
+
+    }
+
+
+    initializeDashboardSection();
+
+
+    /* =====================================
+       BROWSER BACK / FORWARD
+    ====================================== */
+
+    window.addEventListener("popstate", function () {
+
+        const hashSection = window.location.hash.replace("#", "");
+
+        if (
+            pageSections.includes(hashSection) &&
+            document.getElementById(hashSection)
+        ) {
+
+            showPageSection(hashSection, false);
+
+        } else {
+
+            showPageSection("dashboardSection", false);
+
+        }
+
+    });
+
+
+    /* =====================================
+       JOB BUDGET CALCULATOR
+    ====================================== */
+
+    const workerReward = document.getElementById("workerReward");
+    const workersRequired = document.getElementById("workersRequired");
+    const totalJobBudget = document.getElementById("totalJobBudget");
+
+
+    function calculateJobBudget() {
+
+        if (!workerReward || !workersRequired || !totalJobBudget) {
+            return;
+        }
+
+        const reward = parseFloat(workerReward.value) || 0;
+        const workers = parseInt(workersRequired.value, 10) || 0;
+
+        const total = reward * workers;
+
+        totalJobBudget.textContent = "$" + total.toFixed(2);
+
+    }
+
+
+    if (workerReward) {
+        workerReward.addEventListener("input", calculateJobBudget);
+    }
+
+    if (workersRequired) {
+        workersRequired.addEventListener("input", calculateJobBudget);
+    }
+
+
+    calculateJobBudget();
+
+
+    /* =====================================
+       POST JOB FORM
+    ====================================== */
+
+    const postJobForm = document.getElementById("postJobForm");
+
+    if (postJobForm) {
+
+        postJobForm.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            if (!postJobForm.reportValidity()) {
+                return;
+            }
+
+            alert(
+                "Your job form is ready. Actual job submission will be enabled after backend and Supabase integration."
+            );
+
+        });
+
+    }
+
+
+    /* =====================================
+       SAVE JOB DRAFT
+    ====================================== */
+
+    const saveJobDraft = document.getElementById("saveJobDraft");
+
+    if (saveJobDraft) {
+
+        saveJobDraft.addEventListener("click", function () {
+
+            alert(
+                "Draft saving will be enabled after backend integration. Your form has not been saved yet."
+            );
+
+        });
+
+    }
+
+
+    /* =====================================
+       FIND JOB SEARCH AND FILTER
+    ====================================== */
+
+    const jobSearchInput = document.getElementById("jobSearchInput");
+    const jobCategoryFilter = document.getElementById("jobCategoryFilter");
+    const jobSortFilter = document.getElementById("jobSortFilter");
+
+
+    function filterAvailableJobs() {
+
+        const searchTerm = jobSearchInput
+            ? jobSearchInput.value.trim().toLowerCase()
+            : "";
+
+        const selectedCategory = jobCategoryFilter
+            ? jobCategoryFilter.value
+            : "all";
+
+
+        const jobCards = document.querySelectorAll(
+            "#findJobSection .job-card"
+        );
+
+
+        jobCards.forEach(function (card) {
+
+            const title = (
+                card.dataset.title ||
+                card.textContent
+            ).toLowerCase();
+
+            const category = (
+                card.dataset.category || ""
+            ).toLowerCase();
+
+            const matchesSearch = title.includes(searchTerm);
+
+            const matchesCategory =
+                selectedCategory === "all" ||
+                category === selectedCategory;
+
+            card.hidden = !(matchesSearch && matchesCategory);
+
+        });
+
+    }
+
+
+    if (jobSearchInput) {
+
+        jobSearchInput.addEventListener(
+            "input",
+            filterAvailableJobs
+        );
+
+    }
+
+
+    if (jobCategoryFilter) {
+
+        jobCategoryFilter.addEventListener(
+            "change",
+            filterAvailableJobs
+        );
+
+    }
+
+
+    if (jobSortFilter) {
+
+        jobSortFilter.addEventListener("change", function () {
+
+            const jobContainer = document.querySelector(
+                "#findJobSection .job-list"
+            );
+
+            if (!jobContainer) return;
+
+            const cards = Array.from(
+                jobContainer.querySelectorAll(".job-card")
+            );
+
+            const sortType = jobSortFilter.value;
+
+            cards.sort(function (a, b) {
+
+                const rewardA = parseFloat(a.dataset.reward) || 0;
+                const rewardB = parseFloat(b.dataset.reward) || 0;
+
+                const dateA = new Date(a.dataset.date || 0);
+                const dateB = new Date(b.dataset.date || 0);
+
+                if (sortType === "highest") {
+                    return rewardB - rewardA;
+                }
+
+                if (sortType === "lowest") {
+                    return rewardA - rewardB;
+                }
+
+                return dateB - dateA;
+
+            });
+
+
+            cards.forEach(function (card) {
+                jobContainer.appendChild(card);
+            });
+
+        });
+
+    }
+
+
+    /* =====================================
+       JOB TABS
+    ====================================== */
+
+    const jobTabGroups = document.querySelectorAll(".job-tabs");
+
+
+    jobTabGroups.forEach(function (group) {
+
+        const tabs = group.querySelectorAll(".job-tab");
+
+        tabs.forEach(function (tab) {
+
+            tab.addEventListener("click", function () {
+
+                const selectedStatus = this.dataset.status;
+
+                // Update selected tab
+
+                tabs.forEach(function (item) {
+
+                    item.classList.toggle(
+                        "active",
+                        item === tab
+                    );
+
+                });
+
+
+                // Filter real job cards if they are added later
+
+                const panel = group.closest(".content-panel");
+
+                if (!panel) return;
+
+                const cards = panel.querySelectorAll(
+                    ".job-list-item"
+                );
+
+                cards.forEach(function (card) {
+
+                    const cardStatus = card.dataset.status || "";
+
+                    const shouldShow =
+                        selectedStatus === "all" ||
+                        cardStatus === selectedStatus;
+
+                    card.hidden = !shouldShow;
+
+                });
+
+            });
+
+        });
+
+    });
+
+
+    /* =====================================
        ESCAPE KEY
     ====================================== */
 
@@ -261,36 +745,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("resize", function () {
 
         if (window.innerWidth > 900) {
-
             closeSidebar();
-
-        }
-
-    });
-
-
-    /* =====================================
-       ACTIVE SIDEBAR LINK
-    ====================================== */
-
-    const currentPage = window.location.pathname.split("/").pop();
-
-    const sidebarLinks = document.querySelectorAll(
-        ".sidebar-navigation .nav-link"
-    );
-
-    sidebarLinks.forEach(function (link) {
-
-        const linkPage = link.getAttribute("href");
-
-        if (linkPage === currentPage) {
-
-            sidebarLinks.forEach(function (item) {
-                item.classList.remove("active");
-            });
-
-            link.classList.add("active");
-
         }
 
     });
@@ -300,103 +755,8 @@ document.addEventListener("DOMContentLoaded", function () {
        DASHBOARD INITIALIZATION
     ====================================== */
 
-    console.log("TaskBridge Dashboard initialized successfully.");
+    console.log(
+        "TaskBridge Dashboard initialized successfully."
+    );
 
 });
-
-
-/* =====================================
-   DASHBOARD PAGE SECTION SWITCHING
-===================================== */
-
-const pageSections = [
-    "dashboardContent",
-    "findJobSection",
-    "postJobSection",
-    "myPostedJobsSection",
-    "mySubmittedJobsSection"
-];
-
-const sectionLinks = document.querySelectorAll(
-    ".sidebar-navigation .nav-link[data-section]"
-);
-
-
-function showPageSection(sectionId) {
-
-    const targetSection = document.getElementById(sectionId);
-
-    // Section না থাকলে পরিবর্তন করবে না
-    if (!targetSection) {
-        console.warn("Section not found:", sectionId);
-        return;
-    }
-
-    // সব Section hide করবে
-    pageSections.forEach(function (id) {
-
-        const section = document.getElementById(id);
-
-        if (section) {
-            section.classList.remove("active");
-            section.hidden = true;
-        }
-
-    });
-
-    // নির্বাচিত Section show করবে
-    targetSection.hidden = false;
-    targetSection.classList.add("active");
-
-    // Sidebar active menu পরিবর্তন
-    sectionLinks.forEach(function (link) {
-
-        link.classList.toggle(
-            "active",
-            link.dataset.section === sectionId
-        );
-
-    });
-
-    // URL hash আপডেট
-    history.replaceState(null, "", "#" + sectionId);
-
-    // Content-এর শুরুতে নিয়ে যাবে
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-}
-
-
-// Sidebar menu click
-sectionLinks.forEach(function (link) {
-
-    link.addEventListener("click", function (event) {
-
-        event.preventDefault();
-
-        const sectionId = this.dataset.section;
-
-        showPageSection(sectionId);
-
-    });
-
-});
-
-
-// Initial page load
-const initialSection = window.location.hash.replace("#", "");
-
-if (pageSections.includes(initialSection) &&
-    document.getElementById(initialSection)) {
-
-    showPageSection(initialSection);
-
-} else {
-
-    showPageSection("dashboardContent");
-
-}
-
