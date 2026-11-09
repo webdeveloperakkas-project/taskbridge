@@ -219,12 +219,23 @@ if (loginForm) {
             // CHECK ADMIN ROLE
             // =================================
 
-            const { data: adminRole, error: roleError } = await client
-                .from("user_roles")
-                .select("role")
-                .eq("user_id", userId)
-                .eq("role", "admin")
-                .maybeSingle();
+            const { data: isAdmin, error: roleError } = await client.rpc(
+    "has_role",
+    {
+        p_user_id: userId,
+        p_role: "admin"
+    }
+);
+
+if (roleError) {
+    throw roleError;
+}
+
+if (isAdmin === true) {
+    window.location.replace("./admin.html");
+} else {
+    window.location.replace("./dashboard.html");
+}
 
             if (roleError) {
 
