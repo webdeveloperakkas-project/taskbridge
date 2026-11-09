@@ -35,7 +35,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     let currentAdmin = null;
     let allUsers = [];
     let allJobs = [];
+    let allCategories = [];
     let allSubmissions = [];
+    let selectedJobId = null;
     let allDeposits = [];
     let allWithdrawals = [];
     let realtimeChannel = null;
@@ -1110,56 +1112,162 @@ document.addEventListener("DOMContentLoaded", async function () {
     function renderJobs() {
 
         const tbody = $("#jobsTable");
-
         if (!tbody) return;
 
-
-        const search = ($("#jobSearch")?.value || "")
-            .trim()
-            .toLowerCase();
-
+        const search = ($("#jobSearch")?.value || "").trim().toLowerCase();
         const status = $("#jobStatusFilter")?.value || "all";
 
-
         const filtered = allJobs.filter(function (job) {
-
-            const matchesSearch = [
-
-                job.title,
-                job.id
-
-            ].some(function (value) {
-
-                return String(value || "")
-                    .toLowerCase()
-                    .includes(search);
-
-            });
-
-
-            return (
-                matchesSearch &&
-                (status === "all" || job.status === status)
-            );
-
+            const matchesSearch = [job.title, job.id, job.advertiser_id]
+                .some(value => String(value || "").toLowerCase().includes(search));
+            return matchesSearch && (status === "all" || job.status === status);
         });
 
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No matching jobs found.</td></tr>';
+            return;
+        }
 
-        renderGenericTable(
-            "jobsTable",
-            filtered,
-            [
-                ["title", "Job Title"],
-                ["id", "Job ID"],
-                ["advertiser_id", "Advertiser"],
-                ["reward_per_worker", "Reward"],
-                ["workers_required", "Workers"],
-                ["status", "Status"],
-                ["created_at", "Created"]
-            ]
-        );
+        tbody.innerHTML = filtered.map(function (job) {
+            return `
+                <tr>
+                    <td>${escapeHTML(job.title || "Untitled Job")}</td>
+                    <td><small class="user-id">${escapeHTML(job.id)}</small></td>
+                    <td><small class="user-id">${escapeHTML(job.advertiser_id || "—")}</small></td>
+                    <td>${escapeHTML(job.reward_per_worker ?? "—")} ${escapeHTML(job.currency || "USD")}</td>
+                    <td>${escapeHTML(job.total_slots ?? "—")}</td>
+                    <td>${statusBadge(job.status)}</td>
+                    <td>
+                        <button type="button" class="action-btn"
+                            data-job-details="${escapeHTML(job.id)}">View Details</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
 
     }
+
+
+    /* =====================================
+       JOB DETAILS AND ADMIN REVIEW
+    ====================================== */
+
+    function showJobDetails(jobId) {
+
+        const job = allJobs.find(item => item.id === jobId);
+        const content = $("#jobDetailsContent");
+        const noteInput = $("#jobReviewNote");
+        const actions = $("#jobReviewActions");
+        if (!job || !content) return;
+
+        selectedJobId = job.id;
+        if (noteInput) noteInput.value = job.admin_review_note || "";
+
+        const category = allCategories.find(item => item.id === job.category_id);
+        const advertiser = allUsers.find(item => item.id === job.advertiser_id);
+        const details = [
+            ["Job Title", job.title],
+            ["Job ID", job.id],
+            ["Advertiser", advertiser?.full_name || advertiser?.email || job.advertiser_id],
+            ["Advertiser ID", job.advertiser_id],
+            ["Category", category?.name || job.category_id],
+            ["Description", job.description],
+            ["Instructions", job.instructions],
+            ["Target URL", job.target_url],
+            ["Proof Requirements", job.proof_requirements],
+            ["Extra Instructions", job.extra_instructions],
+            ["Reward per Worker", job.reward_per_worker == null ? null : job.reward_per_worker + " " + (job.currency || "USD")],
+            ["Total Workers", job.total_slots],
+            ["Duration (minutes)", job.duration_minutes],
+            ["Platform Fee Rate (%)", job.platform_fee_rate],
+            ["Reward Budget", job.reward_budget],
+            ["Platform Fee Budget", job.platform_fee_budget],
+            ["Reserved Budget", job.reserved_budget],
+            ["Remaining Budget", job.remaining_budget],
+            ["Status", job.status],
+            ["Created At", job.created_at ? new Date(job.created_at).toLocaleString() : null],
+            ["Last Updated", job.updated_at ? new Date(job.updated_at).toLocaleString() : null],
+            ["Reviewed By", job.admin_reviewed_by],
+            ["Reviewed At", job.admin_reviewed_at ? new Date(job.admin_reviewed_at).toLocaleString() : null],
+            ["Previous Admin Note", job.admin_review_note]
+        ];
+
+        content.innerHTML = details.map(([label, value]) => `
+            <div class="detail-row">
+                <span>${escapeHTML(label)}</span>
+                <span style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(value ?? "—")}</span>
+            </div>
+        `).join("");
+
+        if (actions) actions.hidden = job.status !== "pending_review";
+        openModal("jobDetailsModal");
+    }
+
+
+    async function reviewJob(decision, button) {
+
+        const job = allJobs.find(item => item.id === selectedJobId);
+        if (!job || job.status !== "pending_review") {
+            showToast("This job is no longer pending review. Refreshing...");
+            closeModal($("#jobDetailsModal"));
+            await loadAdminData();
+            return;
+        }
+
+        const note = ($("#jobReviewNote")?.value || "").trim();
+        if (decision === "reject" && !note) {
+            showToast("Please enter a reason before rejecting this job.");
+            $("#jobReviewNote")?.focus();
+            return;
+        }
+
+        const confirmed = window.confirm(
+            decision === "approve"
+                ? "Approve this job? It will become active and its reserved budget will remain held."
+                : "Reject this job? Its remaining held budget will be refunded to the advertiser."
+        );
+        if (!confirmed) return;
+
+        if (button) button.disabled = true;
+
+        try {
+            const functionName = decision === "approve" ? "approve_job" : "reject_job";
+            const { error } = await supabaseClient.rpc(functionName, {
+                p_job_id: job.id,
+                p_admin_note: note || null
+            });
+            if (error) throw error;
+
+            showToast(decision === "approve"
+                ? "Job approved and activated."
+                : "Job rejected and remaining held budget refunded.");
+
+            closeModal($("#jobDetailsModal"));
+            selectedJobId = null;
+            await loadAdminData();
+
+        } catch (error) {
+            console.error("Job review failed:", error);
+            showToast(error.message || "Could not review this job.");
+            await loadAdminData();
+        } finally {
+            if (button) button.disabled = false;
+        }
+    }
+
+
+    document.addEventListener("click", function (event) {
+        const detailsButton = event.target.closest("[data-job-details]");
+        if (detailsButton) {
+            showJobDetails(detailsButton.dataset.jobDetails);
+            return;
+        }
+
+        const reviewButton = event.target.closest("[data-job-review]");
+        if (reviewButton) {
+            reviewJob(reviewButton.dataset.jobReview, reviewButton);
+        }
+    });
 
 
     /* =====================================
@@ -1590,6 +1698,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             allUsers = data.profiles || [];
             allJobs = data.jobs || [];
+            allCategories = data.job_categories || [];
             allSubmissions = data.job_submissions || [];
             allDeposits = data.deposits || [];
             allWithdrawals = data.withdrawals || [];
