@@ -130,6 +130,12 @@
                     <span>Transactions</span>
                 </a>
 
+                <a href="#wallets" class="admin-nav-link"
+                    data-panel="walletsPanel">
+                    <span class="nav-icon">▣</span>
+                    <span>Wallet Management</span>
+                </a>
+
 
                 <!-- SUPPORT -->
 
@@ -874,6 +880,83 @@
 
                         </div>
 
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     WALLET MANAGEMENT
+                ================================== -->
+
+                <section class="admin-panel" id="walletsPanel">
+
+                    <div class="section-intro">
+                        <h2>Wallet Management</h2>
+                        <p>View every user's wallet balance and account details. Balances are read-only here.</p>
+                    </div>
+
+                    <div class="stats-grid wallet-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon users-icon">▣</div>
+                            <div>
+                                <p>Total Wallets</p>
+                                <h3 id="walletCount">0</h3>
+                                <span>Wallet accounts</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon verified-icon">$</div>
+                            <div>
+                                <p>Total Available Balance</p>
+                                <h3 id="walletAvailableTotal">0.00</h3>
+                                <span>Across all wallets</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon pending-icon">▤</div>
+                            <div>
+                                <p>Total Held Balance</p>
+                                <h3 id="walletHeldTotal">0.00</h3>
+                                <span>Funds reserved for jobs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-toolbar">
+                        <input type="search" id="walletSearch"
+                            placeholder="Search name, email or user ID...">
+                        <button type="button" class="secondary-btn" id="refreshWallets">
+                            ↻ Refresh
+                        </button>
+                    </div>
+
+                    <div class="admin-card">
+                        <div class="card-heading">
+                            <div>
+                                <h3>All User Wallets</h3>
+                                <p>Available and held balances by user.</p>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>User ID</th>
+                                        <th>Currency</th>
+                                        <th>Available Balance</th>
+                                        <th>Held Balance</th>
+                                        <th>Last Updated</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="walletsTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">Loading wallets...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                 </section>
