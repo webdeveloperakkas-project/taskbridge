@@ -2175,10 +2175,16 @@
         </div>
     </div>
 
-    <div class="content-panel">
-        <h3>Available Balance</h3>
-        <h2 id="availableBalanceWallet">Loading...</h2>
-        <p>Your current available wallet balance.</p>
+    <div class="content-panel wallet-balance-panel">
+        <div class="wallet-balance-heading">
+            <div><h3>Available Balance</h3><h2 id="availableBalanceWallet">Loading...</h2></div>
+            <label for="walletCurrencySelector">Wallet
+                <select id="walletCurrencySelector" aria-label="Choose wallet currency" disabled>
+                    <option value="">Loading wallets...</option>
+                </select>
+            </label>
+        </div>
+        <p>Your selected wallet's available balance. Each currency is kept separate.</p>
     </div>
 
     <div class="quick-actions-grid">
@@ -2288,7 +2294,7 @@
             <button type="button" class="withdraw-method-card" data-withdraw-method="USDT - BEP20"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>BEP20 Network</small></button>
             <button type="button" class="withdraw-method-card" data-withdraw-method="USDT - TRC20"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>TRC20 Network</small></button>
         </div>
-        <p class="withdraw-balance-line">Available Balance: <strong id="availableBalanceWithdraw">Loading...</strong></p>
+        <p class="withdraw-balance-line">Selected Wallet Available Balance: <strong id="availableBalanceWithdraw">Loading...</strong></p>
         <p id="withdrawFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
     </div>
     <div class="finance-modal-backdrop" id="withdrawModal" hidden>
