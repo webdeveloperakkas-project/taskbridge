@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const notificationToggle = document.getElementById("notificationToggle");
     const notificationMenu = document.getElementById("notificationMenu");
+    const walletBalanceToggle = document.getElementById("walletBalanceToggle");
+    const headerWalletMenu = document.getElementById("headerWalletMenu");
 
     const profileToggle = document.getElementById("profileToggle");
     const profileMenu = document.getElementById("profileMenu");
@@ -120,7 +122,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (notificationMenu) {
             notificationMenu.classList.remove("show");
         }
+        if (headerWalletMenu) {
+            headerWalletMenu.classList.remove("show");
+        }
 
+        if (walletBalanceToggle) {
+            walletBalanceToggle.setAttribute("aria-expanded", "false");
+        }
         if (profileMenu) {
             profileMenu.classList.remove("show");
         }
@@ -135,6 +143,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+    /* =====================================
+       HEADER WALLET CURRENCY DROPDOWN
+    ====================================== */
+
+    if (walletBalanceToggle && headerWalletMenu) {
+        walletBalanceToggle.addEventListener("click", function (event) {
+            event.stopPropagation();
+            const isOpen = headerWalletMenu.classList.contains("show");
+            closeAllDropdowns();
+            if (!isOpen) {
+                headerWalletMenu.classList.add("show");
+                walletBalanceToggle.setAttribute("aria-expanded", "true");
+            }
+        });
+    }
 
     /* =====================================
        NOTIFICATION DROPDOWN
@@ -196,6 +220,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("click", function (event) {
 
+        const clickedWalletMenu =
+            headerWalletMenu &&
+            headerWalletMenu.contains(event.target);
+
+        const clickedWalletButton =
+            walletBalanceToggle &&
+            walletBalanceToggle.contains(event.target);
+
         const clickedNotification =
             notificationMenu &&
             notificationMenu.contains(event.target);
@@ -214,6 +246,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         if (
+            !clickedWalletMenu &&
+            !clickedWalletButton &&
             !clickedNotification &&
             !clickedNotificationButton &&
             !clickedProfile &&
@@ -847,6 +881,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function currencyWalletIcon(currency) {
+        return ({ BDT: "৳", USD: "$", USDT: "₮" })[currency] || currency;
+    }
+
+    function renderHeaderWalletOptions() {
+        if (!headerWalletMenu) return;
+        const funded = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
+        headerWalletMenu.innerHTML = funded.map(wallet => {
+            const currency = String(wallet.currency || "").toUpperCase();
+            const selected = currency === walletCurrency;
+            return '<button type="button" class="wallet-currency-option' +
+                (selected ? ' active' : '') + '" data-wallet-currency="' +
+                escapeFinanceText(currency) + '">' +
+                '<span class="wallet-currency-option-icon">' + escapeFinanceText(currencyWalletIcon(currency)) + '</span>' +
+                '<span class="wallet-currency-option-name">' + escapeFinanceText(currency) + '</span>' +
+                '<strong>' + escapeFinanceText(formatWalletMoney(wallet.available_balance, currency)) + '</strong>' +
+                '</button>';
+        }).join("");
+        headerWalletMenu.querySelectorAll("[data-wallet-currency]").forEach(option => {
+            option.addEventListener("click", () => {
+                const wallet = walletsByCurrency.get(option.dataset.walletCurrency);
+                if (!wallet || Number(wallet.available_balance) <= 0) return;
+                renderWalletBalance(wallet);
+                if (headerWalletMenu) headerWalletMenu.classList.remove("show");
+                if (walletBalanceToggle) walletBalanceToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+
     function renderWalletBalance(wallet) {
         walletCurrency = wallet?.currency || "USD";
         walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
@@ -857,11 +920,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (node) node.textContent = formatted;
         });
         const selector = document.getElementById("walletCurrencySelector");
-        if (selector && wallet) selector.value = walletCurrency;
+        if (selector && wallet && Number(wallet.available_balance) > 0) selector.value = walletCurrency;
         const withdrawAmount = document.getElementById("withdrawAmount");
         if (withdrawAmount) withdrawAmount.max = String(walletAvailableBalance);
         const withdrawLabel = document.querySelector('label[for="withdrawAmount"]');
         if (withdrawLabel) withdrawLabel.textContent = "Withdrawal Amount (" + walletCurrency + ")";
+        renderHeaderWalletOptions();
         updateWithdrawMethodCards();
     }
 
@@ -1081,6 +1145,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             renderWalletBalance(fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0] || null);
         }
+        renderHeaderWalletOptions();
     }
 
 
