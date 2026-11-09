@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let walletChannel = null;
     let walletCurrency = "USD";
     let walletAvailableBalance = 0;
+    let walletRows = [];
+    let walletsByCurrency = new Map();
+    let selectedWithdrawCurrency = "";
 
     /* =====================================
        CURRENT YEAR
