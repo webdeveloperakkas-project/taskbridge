@@ -1198,7 +1198,18 @@ document.addEventListener("DOMContentLoaded", async function () {
             </div>
         `).join("");
 
-        if (actions) actions.hidden = job.status !== "pending_review";
+        if (actions) {
+            const canReview = job.status === "pending_review" || job.status === "active";
+            actions.hidden = !canReview;
+            const approveButton = actions.querySelector('[data-job-review="approve"]');
+            const rejectButton = actions.querySelector('[data-job-review="reject"]');
+            const noteLabel = actions.querySelector('label[for="jobReviewNote"]');
+            if (approveButton) approveButton.hidden = job.status !== "pending_review";
+            if (rejectButton) rejectButton.textContent = job.status === "active"
+                ? "Reject Approved Job" : "Reject Job";
+            if (noteLabel) noteLabel.textContent = job.status === "active"
+                ? "Admin Rejection Reason (required)" : "Admin Review Note";
+        }
         openModal("jobDetailsModal");
     }
 
@@ -1206,8 +1217,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function reviewJob(decision, button) {
 
         const job = allJobs.find(item => item.id === selectedJobId);
-        if (!job || job.status !== "pending_review") {
-            showToast("This job is no longer pending review. Refreshing...");
+        const canApprove = job?.status === "pending_review";
+        const canReject = job?.status === "pending_review" || job?.status === "active";
+        if (!job || (decision === "approve" && !canApprove) || (decision === "reject" && !canReject)) {
+            showToast("This job status has changed. Refreshing...");
             closeModal($("#jobDetailsModal"));
             await loadAdminData();
             return;
@@ -1220,17 +1233,24 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+        const rejectingApprovedJob = decision === "reject" && job.status === "active";
         const confirmed = window.confirm(
             decision === "approve"
                 ? "Approve this job? It will become active and its reserved budget will remain held."
-                : "Reject this job? Its remaining held budget will be refunded to the advertiser."
+                : rejectingApprovedJob
+                    ? "Reject this already-approved job? The remaining held budget will be refunded. Any worker submissions currently in progress or submitted will be cancelled. Completed work and payouts will not be reversed."
+                    : "Reject this pending job? Its remaining held budget will be refunded to the advertiser."
         );
         if (!confirmed) return;
 
         if (button) button.disabled = true;
 
         try {
-            const functionName = decision === "approve" ? "approve_job" : "reject_job";
+            const functionName = decision === "approve"
+                ? "approve_job"
+                : rejectingApprovedJob
+                    ? "admin_reject_approved_job"
+                    : "reject_job";
             const { error } = await supabaseClient.rpc(functionName, {
                 p_job_id: job.id,
                 p_admin_note: note || null
@@ -1239,7 +1259,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             showToast(decision === "approve"
                 ? "Job approved and activated."
-                : "Job rejected and remaining held budget refunded.");
+                : rejectingApprovedJob
+                    ? "Approved job rejected; remaining held budget refunded."
+                    : "Job rejected and remaining held budget refunded.");
 
             closeModal($("#jobDetailsModal"));
             selectedJobId = null;
