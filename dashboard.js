@@ -914,7 +914,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         depositDetailsPanel.hidden = false;
         if (depositSelectedTitle) {
-            depositSelectedTitle.textContent = selectedDepositMethod === "Visa / Mastercard (Gateway setup required)"
+            depositSelectedTitle.textContent = ["Visa", "Mastercard"].includes(selectedDepositMethod)
                 ? "Visa / Mastercard instructions" : (depositMethodDetails[selectedDepositMethod]?.title || "Payment instructions");
         }
         if (selectedDepositMethod === "Visa / Mastercard (Gateway setup required)") {
@@ -946,7 +946,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const method = selectedDepositMethod;
             const reference = document.getElementById("depositTransactionId")?.value.trim() || "";
             if (!method) { if (depositMessage) depositMessage.textContent = "Please select a payment method first."; return; }
-            if (method === "Visa / Mastercard (Gateway setup required)") {
+            if (["Visa", "Mastercard"].includes(method)) {
                 if (depositMessage) depositMessage.textContent = "Card gateway is not connected yet.";
                 return;
             }
