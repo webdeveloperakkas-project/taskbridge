@@ -913,12 +913,31 @@ document.addEventListener("DOMContentLoaded", function () {
             const card = document.createElement("article");
             card.className = "job-list-item";
             card.dataset.status = uiStatus(job.status);
-            const title = document.createElement("h3");
-            title.textContent = job.title || "Untitled job";
             const category = categoryRows.find(c => c.id === job.category_id);
+            const categoryHeading = document.createElement("h3");
+            categoryHeading.className = "posted-job-category";
+
+            if (category?.icon) {
+                const iconValue = String(category.icon).trim();
+                const iconNode = document.createElement(
+                    /^(fa[srb]?\\s|fa-)/i.test(iconValue) ? "i" : "span"
+                );
+                if (iconNode.tagName === "I") {
+                    iconNode.className = iconValue;
+                    iconNode.setAttribute("aria-hidden", "true");
+                } else {
+                    iconNode.textContent = iconValue;
+                    iconNode.setAttribute("aria-hidden", "true");
+                }
+                categoryHeading.appendChild(iconNode);
+            }
+
+            const categoryName = document.createElement("span");
+            categoryName.textContent = category?.name || "Uncategorized";
+            categoryHeading.appendChild(categoryName);
+
             const detail = document.createElement("p");
-            detail.textContent = (category?.name || "Uncategorized") + " · " +
-                formatJobMoney(job.reward_per_worker) + " per worker · " +
+            detail.textContent = formatJobMoney(job.reward_per_worker) + " per worker · " +
                 Number(job.total_slots || 0) + " workers";
             const budget = document.createElement("p");
             budget.textContent = "Reserved: " + formatJobMoney(job.reserved_budget) +
@@ -928,7 +947,7 @@ document.addEventListener("DOMContentLoaded", function () {
             status.textContent = String(job.status || "").replaceAll("_", " ");
             const created = document.createElement("small");
             created.textContent = job.created_at ? new Date(job.created_at).toLocaleString() : "";
-            card.append(title, status, detail, budget, created);
+            card.append(categoryHeading, status, detail, budget, created);
             if (job.admin_review_note) {
                 const note = document.createElement("p");
                 note.textContent = "Admin note: " + job.admin_review_note;
