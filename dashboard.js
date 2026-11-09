@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
  /* ==================================
        ELEMENTS
-    ====================================== */
+    ======================================*/
 
     const sidebar = document.getElementById("sidebar");
     const menuToggle = document.getElementById("menuToggle");
