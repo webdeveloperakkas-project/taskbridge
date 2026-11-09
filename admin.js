@@ -660,33 +660,30 @@ document.addEventListener("DOMContentLoaded", async function () {
         currentAdmin = session.user;
 
 
-        // Verify admin role from user_roles
-
-        const { data: roles, error: roleError } =
-            await supabaseClient
-                .from("user_roles")
-                .select("*")
-                .eq("user_id", currentAdmin.id);
+        // Use the database's canonical admin check.
+        // This keeps the frontend authorization decision aligned with
+        // the SECURITY DEFINER checks used by protected database functions.
+        const { data: isAdmin, error: adminCheckError } =
+            await supabaseClient.rpc("is_admin");
 
 
-        if (roleError) {
-            throw roleError;
+        if (adminCheckError) {
+            console.error("Admin role verification failed:", adminCheckError);
+            throw adminCheckError;
         }
 
 
-        const isAdmin = (roles || []).some(function (item) {
+        if (isAdmin !== true) {
 
-            return String(item.role).toLowerCase() === "admin";
-
-        });
-
-
-        if (!isAdmin) {
+            console.warn(
+                "Admin access denied for authenticated user:",
+                currentAdmin.id
+            );
 
             showToast("Access denied. Admin permission required.");
 
-            await supabaseClient.auth.signOut();
-
+            // Do not sign the user out just because the admin check failed.
+            // Preserve the valid session so the issue can be diagnosed.
             window.location.href = "./login.html";
 
             return false;
