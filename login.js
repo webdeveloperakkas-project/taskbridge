@@ -474,3 +474,10 @@ if (loginForm) {
 // =========================================
 
 console.log("TaskBridge Login System Initialized.");
+
+
+console.log("TASKBRIDGE LOGIN JS LOADED");
+
+document.getElementById("loginForm")?.addEventListener("submit", function () {
+    console.log("TASKBRIDGE LOGIN FORM SUBMITTED");
+});
