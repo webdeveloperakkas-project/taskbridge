@@ -897,6 +897,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function paymentMethodMark(method) {
         const raw = String(method || "").trim();
         const key = raw.toLowerCase().replace(/[\s_-]+/g, "");
+        if (key === "postjob" || key === "jobpost" || key === "jobfunding") {
+            return '<span class="history-method history-method-postjob" title="Post Job" aria-label="Post Job">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"></path></svg><span>Post Job</span></span>';
+        }
         const brands = {
             bkash: { label: "bKash", className: "bkash" },
             nagad: { label: "NAGAD", className: "nagad" },
@@ -963,15 +967,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const requestIds = new Set([...deposits, ...withdrawals].map(row => row.id));
         const walletRows = (walletResult.data || []).map(row => {
-            const text = String(row.transaction_type || row.description || "").toLowerCase();
+            const transactionLabel = String(row.transaction_type || "").toLowerCase();
+            const descriptionLabel = String(row.description || "").toLowerCase();
+            const text = transactionLabel + " " + descriptionLabel + " " + String(row.reference_type || "").toLowerCase();
             const direction = String(row.direction || "").toLowerCase();
+            const isJobPost = text.includes("job") &&
+                (text.includes("post") || text.includes("fund") || text.includes("creat") || text.includes("advertis"));
             const type = text.includes("deposit") ? "Deposit" :
                 text.includes("withdraw") ? "Withdraw" :
                 (direction === "out" || direction === "debit" ? "Withdraw" :
                 direction === "in" || direction === "credit" ? "Deposit" : "Wallet transaction");
             return {
                 id: row.id, referenceId: row.reference_id, type,
-                method: methodByRequestId.get(row.reference_id) || "",
+                method: methodByRequestId.get(row.reference_id) || (isJobPost ? "Post Job" : ""),
                 transactionId: transactionIdByRequestId.get(row.reference_id) || "—",
                 amount: Number(row.amount), currency: row.currency || "USD",
                 status: "completed", created_at: row.created_at, direction
