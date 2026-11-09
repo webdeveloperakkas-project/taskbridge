@@ -935,6 +935,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 note.textContent = "Admin note: " + job.admin_review_note;
                 card.appendChild(note);
             }
+            if (job.status === "rejected") {
+                const support = document.createElement("p");
+                support.append("Your job was rejected. For assistance, please contact TaskBridge Support: ");
+                const email = document.createElement("a");
+                email.href = "mailto:taskbridgesupport@gmail.com";
+                email.textContent = "taskbridgesupport@gmail.com";
+                support.appendChild(email);
+                card.appendChild(support);
+            }
             list.appendChild(card);
         });
         const activeTab = document.querySelector("#myPostedJobsSection .job-tab.active");
