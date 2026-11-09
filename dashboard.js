@@ -892,10 +892,35 @@ document.addEventListener("DOMContentLoaded", function () {
         if (badge) { badge.textContent = String(unread); badge.hidden = unread === 0; }
     }
 
-    async function loadTransactionHistory() {
+    let activeTransactionHistoryFilter = "deposit";
+
+    function paymentMethodMark(method) {
+        const raw = String(method || "").trim();
+        const key = raw.toLowerCase().replace(/[\s_-]+/g, "");
+        const brands = {
+            bkash: { label: "bKash", className: "bkash" },
+            nagad: { label: "NAGAD", className: "nagad" },
+            rocket: { label: "ROCKET", className: "rocket" },
+            visa: { label: "VISA", className: "visa" },
+            mastercard: { label: '<span class="history-mastercard-circles" aria-hidden="true"><i></i><i></i></span>', className: "mastercard" },
+            wise: { label: "Wise", className: "wise" },
+            banktransfer: { label: '<span class="history-bank-symbol" aria-hidden="true">▤</span><span>Bank</span>', className: "banktransfer" },
+            usdttrc20: { label: "₮ USDT", className: "usdt" },
+            usdtbep20: { label: "₮ USDT", className: "usdt" }
+        };
+        const brand = brands[key];
+        if (!brand) return '<span class="history-method history-method-unknown" title="' +
+            escapeFinanceText(raw || "Payment method not specified") + '">—</span>';
+        return '<span class="history-method history-method-' + brand.className + '" title="' +
+            escapeFinanceText(raw) + '" aria-label="' + escapeFinanceText(raw) + '">' + brand.label + '</span>';
+    }
+
+    async function loadTransactionHistory(filter = activeTransactionHistoryFilter) {
         if (!supabaseClient || !currentUser) return;
+        activeTransactionHistoryFilter = filter === "withdraw" ? "withdraw" : "deposit";
         const body = document.getElementById("transactionHistoryBody");
         if (!body) return;
+
         const [depositResult, withdrawalResult, walletResult] = await Promise.all([
             supabaseClient.from("deposits")
                 .select("id,amount,currency,payment_method,transaction_reference,status,created_at")
@@ -911,52 +936,85 @@ document.addEventListener("DOMContentLoaded", function () {
         if (withdrawalResult.error) throw withdrawalResult.error;
         if (walletResult.error) throw walletResult.error;
 
-        const deposits = (depositResult.data || []).filter(row => String(row.status).toLowerCase() !== "approved")
-            .map(row => ({ id: row.id, type: "Deposit", method: row.payment_method,
-                transactionId: row.transaction_reference || row.id, amount: Number(row.amount),
+        const depositRows = depositResult.data || [];
+        const withdrawalRows = withdrawalResult.data || [];
+        const methodByRequestId = new Map();
+        const transactionIdByRequestId = new Map();
+        depositRows.forEach(row => {
+            methodByRequestId.set(row.id, row.payment_method || "");
+            transactionIdByRequestId.set(row.id, row.transaction_reference || "—");
+        });
+        withdrawalRows.forEach(row => methodByRequestId.set(row.id, row.payment_method || ""));
+
+        const deposits = depositRows
+            .filter(row => String(row.status).toLowerCase() !== "approved")
+            .map(row => ({
+                id: row.id, type: "Deposit", method: row.payment_method,
+                transactionId: row.transaction_reference || "—", amount: Number(row.amount),
                 currency: row.currency || "USD", status: row.status, created_at: row.created_at,
-                requestKind: "deposit" }));
-        const withdrawals = (withdrawalResult.data || []).map(row => ({
-            id: row.id, type: "Withdraw", method: row.payment_method, transactionId: row.id,
-            amount: Number(row.amount), currency: row.currency || "USD", status: row.status,
-            created_at: row.created_at, requestKind: "withdraw"
+                direction: "in"
+            }));
+
+        const withdrawals = withdrawalRows.map(row => ({
+            id: row.id, type: "Withdraw", method: row.payment_method,
+            transactionId: "—", amount: Number(row.amount), currency: row.currency || "USD",
+            status: row.status, created_at: row.created_at, direction: "out"
         }));
+
         const requestIds = new Set([...deposits, ...withdrawals].map(row => row.id));
-        const walletRows = (walletResult.data || [])
-            .filter(row => !requestIds.has(row.reference_id))
-            .map(row => {
-                const text = String(row.transaction_type || row.description || "").toLowerCase();
-                const direction = String(row.direction || "").toLowerCase();
-                return { id: row.id,
-                    type: text.includes("deposit") ? "Deposit" : text.includes("withdraw") ? "Withdraw" :
-                        (direction === "out" || direction === "debit" ? "Withdraw" : "Wallet transaction"),
-                    method: "", transactionId: row.id, amount: Number(row.amount),
-                    currency: row.currency || "USD", status: "completed", created_at: row.created_at,
-                    direction: row.direction };
-            });
-        const rows = [...deposits, ...withdrawals, ...walletRows]
-            .sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,100);
-        const methodMark = method => {
-            const key = String(method || "").toLowerCase().replace(/[\\s_-]+/g, "");
-            const marks = {bkash:"b",nagad:"n",rocket:"✦",visa:"V",mastercard:"MC",wise:"W",
-                banktransfer:"▤",usdttrc20:"₮",usdtbep20:"₮"};
-            return '<span class="history-method history-method-' + escapeFinanceText(key) + '" title="' +
-                escapeFinanceText(method || "Wallet") + '">' + (marks[key] || "—") + '</span>';
-        };
+        const walletRows = (walletResult.data || []).map(row => {
+            const text = String(row.transaction_type || row.description || "").toLowerCase();
+            const direction = String(row.direction || "").toLowerCase();
+            const type = text.includes("deposit") ? "Deposit" :
+                text.includes("withdraw") ? "Withdraw" :
+                (direction === "out" || direction === "debit" ? "Withdraw" :
+                direction === "in" || direction === "credit" ? "Deposit" : "Wallet transaction");
+            return {
+                id: row.id, referenceId: row.reference_id, type,
+                method: methodByRequestId.get(row.reference_id) || "",
+                transactionId: transactionIdByRequestId.get(row.reference_id) || "—",
+                amount: Number(row.amount), currency: row.currency || "USD",
+                status: "completed", created_at: row.created_at, direction
+            };
+        }).filter(row => !requestIds.has(row.referenceId));
+
+        const allRows = [...deposits, ...withdrawals, ...walletRows]
+            .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+        const rows = allRows.filter(row =>
+            activeTransactionHistoryFilter === "deposit" ? row.type === "Deposit" :
+            row.type === "Withdraw"
+        ).slice(0,100);
+
         body.innerHTML = rows.length ? rows.map(row => {
             const negative = row.direction === "out" || row.direction === "debit" || row.type === "Withdraw";
             const amount = (negative ? "−" : "+") + formatWalletMoney(row.amount, row.currency);
             const status = String(row.status || "pending").toLowerCase();
             const label = status === "approved" || status === "completed" ? "Completed" :
                 status === "rejected" ? "Rejected" : "Pending";
-            return '<tr><td>' + escapeFinanceText(row.type) + '</td><td>' + methodMark(row.method) +
-                '</td><td>' + escapeFinanceText(String(row.transactionId || row.id)) +
+            return '<tr><td>' + paymentMethodMark(row.method) +
+                '</td><td class="history-transaction-id">' + escapeFinanceText(String(row.transactionId || "—")) +
                 '</td><td class="payment-cell">' + escapeFinanceText(amount) +
                 '</td><td><span class="status-badge ' +
                 (label === "Completed" ? "active-status" : label === "Rejected" ? "rejected-status" : "pending-status") +
                 '">' + label + '</span></td><td>' + escapeFinanceText(formatFinanceDate(row.created_at)) + '</td></tr>';
-        }).join("") : '<tr><td colspan="6" class="empty-state">No transactions yet.</td></tr>';
+        }).join("") : '<tr><td colspan="5" class="empty-state">No ' +
+            (activeTransactionHistoryFilter === "deposit" ? "deposit" : "withdrawal") +
+            ' transactions yet.</td></tr>';
     }
+
+    document.querySelectorAll("[data-history-filter]").forEach(button => {
+        button.addEventListener("click", () => {
+            const filter = button.dataset.historyFilter === "withdraw" ? "withdraw" : "deposit";
+            document.querySelectorAll("[data-history-filter]").forEach(tab => {
+                const selected = tab === button;
+                tab.classList.toggle("active", selected);
+                tab.setAttribute("aria-selected", selected ? "true" : "false");
+            });
+            loadTransactionHistory(filter).catch(error =>
+                console.error("Transaction history refresh failed:", error)
+            );
+        });
+    });
 
     async function loadMyWallet() {
         const { data, error } = await supabaseClient.from("wallets")
