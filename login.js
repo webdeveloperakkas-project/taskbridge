@@ -481,3 +481,18 @@ console.log("TASKBRIDGE LOGIN JS LOADED");
 document.getElementById("loginForm")?.addEventListener("submit", function () {
     console.log("TASKBRIDGE LOGIN FORM SUBMITTED");
 });
+
+// TASKBRIDGE LOGIN FORM DIAGNOSTIC
+
+document.addEventListener("submit", function (event) {
+
+    if (event.target && event.target.id === "loginForm") {
+
+        event.preventDefault();
+
+        console.log("TASKBRIDGE LOGIN FORM SUBMITTED");
+        console.log("Form ID:", event.target.id);
+
+    }
+
+}, true);
