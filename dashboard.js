@@ -6,6 +6,11 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    let supabaseClient = null;
+    let currentUser = null;
+    let categoryRows = [];
+    let postedJobsChannel = null;
+
     /* =====================================
        CURRENT YEAR
     ====================================== */
@@ -561,21 +566,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const postJobForm = document.getElementById("postJobForm");
 
     if (postJobForm) {
-
-        postJobForm.addEventListener("submit", function (event) {
-
+        postJobForm.addEventListener("submit", async function (event) {
             event.preventDefault();
-
-            if (!postJobForm.reportValidity()) {
-                return;
-            }
-
-            alert(
-                "Your job form is ready. Actual job submission will be enabled after backend and Supabase integration."
-            );
-
+            if (postJobForm.reportValidity()) await submitNewJob();
         });
-
     }
 
 
@@ -586,15 +580,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const saveJobDraft = document.getElementById("saveJobDraft");
 
     if (saveJobDraft) {
-
         saveJobDraft.addEventListener("click", function () {
-
-            alert(
-                "Draft saving will be enabled after backend integration. Your form has not been saved yet."
-            );
-
+            if (!postJobForm) return;
+            try {
+                localStorage.setItem("taskbridge_job_draft",
+                    JSON.stringify(Object.fromEntries(new FormData(postJobForm).entries())));
+                showJobFormMessage("Draft saved in this browser.", "success");
+            } catch (error) {
+                showJobFormMessage("Could not save this draft in your browser.", "error");
+            }
         });
-
     }
 
 
@@ -804,6 +799,210 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+
+
+    /* SUPABASE AUTHENTICATION AND ADVERTISER JOB DATA */
+    const SUPABASE_URL = "https://eboagroxkgpplccufpuk.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
+    const authStorage = {
+        getItem(key) { return localStorage.getItem(key) ?? sessionStorage.getItem(key); },
+        setItem(key, value) {
+            if (localStorage.getItem(key) !== null) localStorage.setItem(key, value);
+            else sessionStorage.setItem(key, value);
+        },
+        removeItem(key) { localStorage.removeItem(key); sessionStorage.removeItem(key); }
+    };
+
+    function showJobFormMessage(message, type) {
+        if (!postJobForm) return;
+        let box = document.getElementById("jobFormMessage");
+        if (!box) {
+            box = document.createElement("p");
+            box.id = "jobFormMessage";
+            box.setAttribute("role", "status");
+            postJobForm.prepend(box);
+        }
+        box.textContent = message;
+        box.dataset.type = type;
+    }
+
+    function formatJobMoney(value) { return "$" + (Number(value) || 0).toFixed(2); }
+    function uiStatus(status) { return status === "pending_review" ? "pending" : status; }
+
+    async function loadJobCategories() {
+        const { data, error } = await supabaseClient.from("job_categories")
+            .select("id,name,slug,icon,is_active,display_order")
+            .eq("is_active", true).order("display_order", { ascending: true });
+        if (error) throw error;
+        categoryRows = data || [];
+        const select = document.getElementById("postJobCategory");
+        if (select) {
+            select.replaceChildren(new Option("Select Category", ""));
+            categoryRows.forEach(row => select.add(new Option(row.name, row.id)));
+        }
+    }
+
+    function updatePostedJobStats(jobs) {
+        const counts = {
+            postedTotalCount: jobs.length,
+            postedActiveCount: jobs.filter(j => j.status === "active").length,
+            postedPendingCount: jobs.filter(j => j.status === "pending_review").length,
+            postedCompletedCount: jobs.filter(j => j.status === "completed").length,
+            postedRejectedCount: jobs.filter(j => j.status === "rejected").length
+        };
+        Object.entries(counts).forEach(([id, value]) => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = String(value);
+        });
+    }
+
+    function renderPostedJobs(jobs) {
+        const list = document.getElementById("postedJobsList");
+        const empty = document.getElementById("postedJobsMessage");
+        if (!list || !empty) return;
+        list.replaceChildren();
+        empty.hidden = jobs.length !== 0;
+        jobs.forEach(job => {
+            const card = document.createElement("article");
+            card.className = "job-list-item";
+            card.dataset.status = uiStatus(job.status);
+            const title = document.createElement("h3");
+            title.textContent = job.title || "Untitled job";
+            const category = categoryRows.find(c => c.id === job.category_id);
+            const detail = document.createElement("p");
+            detail.textContent = (category?.name || "Uncategorized") + " · " +
+                formatJobMoney(job.reward_per_worker) + " per worker · " +
+                Number(job.total_slots || 0) + " workers";
+            const budget = document.createElement("p");
+            budget.textContent = "Reserved: " + formatJobMoney(job.reserved_budget) +
+                " · Remaining: " + formatJobMoney(job.remaining_budget);
+            const status = document.createElement("span");
+            status.className = "status-badge";
+            status.textContent = String(job.status || "").replaceAll("_", " ");
+            const created = document.createElement("small");
+            created.textContent = job.created_at ? new Date(job.created_at).toLocaleString() : "";
+            card.append(title, status, detail, budget, created);
+            if (job.admin_review_note) {
+                const note = document.createElement("p");
+                note.textContent = "Admin note: " + job.admin_review_note;
+                card.appendChild(note);
+            }
+            list.appendChild(card);
+        });
+        const activeTab = document.querySelector("#myPostedJobsSection .job-tab.active");
+        const selected = activeTab?.dataset.status || "all";
+        list.querySelectorAll(".job-list-item").forEach(card => {
+            card.hidden = selected !== "all" && card.dataset.status !== selected;
+        });
+    }
+
+    async function loadMyPostedJobs() {
+        const { data, error } = await supabaseClient.from("jobs")
+            .select("id,advertiser_id,category_id,title,reward_per_worker,total_slots,reserved_budget,remaining_budget,status,admin_review_note,created_at")
+            .eq("advertiser_id", currentUser.id)
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        const jobs = data || [];
+        updatePostedJobStats(jobs);
+        renderPostedJobs(jobs);
+    }
+
+    async function submitNewJob() {
+        const categoryId = document.getElementById("postJobCategory")?.value;
+        const title = document.getElementById("jobTitle")?.value.trim();
+        const description = document.getElementById("jobDescription")?.value.trim();
+        const instructions = document.getElementById("jobInstructions")?.value.trim();
+        const targetUrl = document.getElementById("targetUrl")?.value.trim();
+        const reward = Number(document.getElementById("workerReward")?.value);
+        const slots = Number.parseInt(document.getElementById("workersRequired")?.value, 10);
+        const duration = Number.parseInt(document.getElementById("jobDuration")?.value, 10);
+        const proofType = document.getElementById("proofType")?.value;
+        const proofDetails = document.getElementById("proofInstructions")?.value.trim();
+
+        if (!categoryRows.some(c => c.id === categoryId) || !title || !description ||
+            !instructions || !proofType || !Number.isFinite(reward) || reward <= 0 ||
+            !Number.isInteger(slots) || slots <= 0 || !Number.isInteger(duration) || duration <= 0) {
+            showJobFormMessage("Please complete all required fields with valid values.", "error");
+            return;
+        }
+        const proofRequirements = "Proof type: " + proofType +
+            (proofDetails ? "\n" + proofDetails : "");
+        const submit = postJobForm?.querySelector('button[type="submit"]');
+        if (submit) { submit.disabled = true; submit.textContent = "Submitting..."; }
+        try {
+            const { data, error } = await supabaseClient.rpc("create_job_with_funding", {
+                p_category_id: categoryId,
+                p_title: title,
+                p_description: description,
+                p_instructions: instructions,
+                p_target_url: targetUrl || null,
+                p_proof_requirements: proofRequirements,
+                p_extra_instructions: null,
+                p_reward_per_worker: reward,
+                p_total_slots: slots,
+                p_duration_minutes: duration
+            });
+            if (error) throw error;
+            showJobFormMessage("Job submitted. It is pending admin review. Reference: " + data, "success");
+            postJobForm.reset();
+            const durationInput = document.getElementById("jobDuration");
+            if (durationInput) durationInput.value = "5";
+            calculateJobBudget();
+            localStorage.removeItem("taskbridge_job_draft");
+            await loadMyPostedJobs();
+            document.querySelector('[data-section="myPostedJobsSection"]')?.click();
+        } catch (error) {
+            console.error("Job posting error:", error);
+            showJobFormMessage(error.message || "Could not submit job.", "error");
+        } finally {
+            if (submit) { submit.disabled = false; submit.textContent = "Submit Job"; }
+        }
+    }
+
+    async function initializeSupabaseDashboard() {
+        if (!window.supabase?.createClient) throw new Error("Supabase library did not load.");
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+            auth: { storage: authStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
+        });
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        currentUser = data?.session?.user || null;
+        if (!currentUser) { window.location.replace("./login.html"); return; }
+
+        const email = currentUser.email || "Account";
+        const name = document.querySelector("#profileToggle .profile-info strong");
+        const avatar = document.querySelector("#profileToggle .profile-avatar");
+        if (name) name.textContent = email;
+        if (avatar) avatar.textContent = email.charAt(0).toUpperCase();
+
+        await loadJobCategories();
+        await loadMyPostedJobs();
+
+        document.querySelectorAll(".logout-link").forEach(link => {
+            link.addEventListener("click", async event => {
+                event.preventDefault();
+                const { error: signOutError } = await supabaseClient.auth.signOut();
+                if (signOutError) { alert(signOutError.message); return; }
+                window.location.replace("./login.html");
+            });
+        });
+
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === "SIGNED_OUT" || !session) window.location.replace("./login.html");
+        });
+
+        postedJobsChannel = supabaseClient.channel("advertiser-jobs-" + currentUser.id)
+            .on("postgres_changes", {
+                event: "*", schema: "public", table: "jobs",
+                filter: "advertiser_id=eq." + currentUser.id
+            }, () => loadMyPostedJobs().catch(err => console.error("Realtime refresh failed:", err)))
+            .subscribe();
+    }
+
+    initializeSupabaseDashboard().catch(error => {
+        console.error("Supabase dashboard setup failed:", error);
+        showJobFormMessage(error.message || "Dashboard data could not be loaded.", "error");
+    });
 
     /* =====================================
        DASHBOARD INITIALIZATION
