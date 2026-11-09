@@ -2444,7 +2444,14 @@ button.header-balance {
 }
 .header-balance-copy { display: block; }
 .wallet-balance-chevron {
-    width: 14px; height: 14px; flex: 0 0 auto; color: var(--muted);
+    width: 23px; height: 23px; flex: 0 0 23px;
+    box-sizing: border-box;
+    padding: 4px;
+    color: #14532d;
+    background: #fef08a;
+    border: 1px solid #eab308;
+    border-radius: 6px;
+    stroke-width: 3;
     transition: transform .18s ease;
 }
 #walletBalanceToggle[aria-expanded="true"] .wallet-balance-chevron { transform: rotate(180deg); }
