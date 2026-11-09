@@ -864,6 +864,70 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function escapeFinanceText(value) {
+        return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+    }
+
+    function formatFinanceDate(value) {
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString();
+    }
+
+    async function loadHeaderNotifications() {
+        if (!supabaseClient || !currentUser) return;
+        const list = document.getElementById("headerNotificationList");
+        const badge = document.getElementById("notificationIndicator");
+        const { data, error } = await supabaseClient.from("notifications")
+            .select("id,title,message,notification_type,is_read,created_at")
+            .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(10);
+        if (error) throw error;
+        const rows = data || [];
+        if (list) list.innerHTML = rows.length ? rows.map(item =>
+            '<div class="notification-item' + (item.is_read ? '' : ' unread') + '">' +
+            '<strong>' + escapeFinanceText(item.title) + '</strong>' +
+            '<p>' + escapeFinanceText(item.message) + '</p>' +
+            '<small>' + escapeFinanceText(formatFinanceDate(item.created_at)) + '</small></div>'
+        ).join("") : '<p class="notification-item">No notifications yet.</p>';
+        const unread = rows.filter(item => !item.is_read).length;
+        if (badge) { badge.textContent = String(unread); badge.hidden = unread === 0; }
+    }
+
+    async function loadTransactionHistory() {
+        if (!supabaseClient || !currentUser) return;
+        const body = document.getElementById("transactionHistoryBody");
+        if (!body) return;
+        const [depositResult, walletResult] = await Promise.all([
+            supabaseClient.from("deposits")
+                .select("id,amount,currency,payment_method,status,created_at")
+                .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(100),
+            supabaseClient.from("wallet_transactions")
+                .select("id,transaction_type,direction,balance_type,amount,currency,description,created_at")
+                .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(100)
+        ]);
+        if (depositResult.error) throw depositResult.error;
+        if (walletResult.error) throw walletResult.error;
+        const deposits = (depositResult.data || []).filter(row => String(row.status).toLowerCase() !== "approved")
+            .map(row => ({ id: row.id, type: "Deposit request · " + row.payment_method, amount: Number(row.amount),
+                currency: row.currency || "USD", status: row.status, created_at: row.created_at, pendingRequest: true }));
+        const walletRows = (walletResult.data || []).map(row => ({ id: row.id,
+            type: row.description || row.transaction_type, amount: Number(row.amount),
+            currency: row.currency || "USD", status: "completed", created_at: row.created_at,
+            direction: row.direction }));
+        const rows = [...deposits, ...walletRows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,100);
+        body.innerHTML = rows.length ? rows.map(row => {
+            const negative = row.direction === "out" || row.direction === "debit";
+            const amount = (negative ? "−" : "+") + formatWalletMoney(row.amount, row.currency);
+            const status = String(row.status || "pending").toLowerCase();
+            const label = status === "approved" || status === "completed" ? "Completed" :
+                status === "rejected" ? "Rejected" : "Pending";
+            return '<tr><td>' + escapeFinanceText(String(row.id).slice(0,8).toUpperCase()) +
+                '</td><td>' + escapeFinanceText(row.type) + '</td><td class="payment-cell">' +
+                escapeFinanceText(amount) + '</td><td><span class="status-badge ' +
+                (label === "Completed" ? "active-status" : label === "Rejected" ? "rejected-status" : "pending-status") +
+                '">' + label + '</span></td><td>' + escapeFinanceText(formatFinanceDate(row.created_at)) + '</td></tr>';
+        }).join("") : '<tr><td colspan="5" class="empty-state">No transactions yet.</td></tr>';
+    }
+
     async function loadMyWallet() {
         const { data, error } = await supabaseClient.from("wallets")
             .select("id,user_id,currency,available_balance,held_balance,updated_at")
@@ -1012,6 +1076,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     payment_method: method, transaction_reference: reference, status: "pending"
                 });
                 if (error) throw error;
+                await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
+                if (depositSubmitButton) depositSubmitButton.textContent = "Request Submitted";
+                await new Promise(resolve => setTimeout(resolve, 1200));
                 depositForm.reset();
                 closeFinanceModal(depositModal);
                 selectedDepositMethod = "";
@@ -1019,7 +1086,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     card.classList.remove("active");
                     card.setAttribute("aria-pressed", "false");
                 });
-                if (depositMessage) depositMessage.textContent = "Deposit request submitted. It will remain pending until an admin verifies your transaction.";
+                if (depositMessage) depositMessage.textContent = "Deposit request submitted successfully. Your request is pending admin verification.";
             } catch (error) {
                 console.error("Deposit request failed:", error);
                 if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
@@ -1275,6 +1342,7 @@ document.addEventListener("DOMContentLoaded", function () {
         await loadJobCategories();
         await loadMyPostedJobs();
         await loadMyWallet();
+        await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
 
         document.querySelectorAll(".logout-link").forEach(link => {
             link.addEventListener("click", async event => {
@@ -1294,6 +1362,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 event: "*", schema: "public", table: "wallets",
                 filter: "user_id=eq." + currentUser.id
             }, () => loadMyWallet().catch(err => console.error("Wallet realtime refresh failed:", err)))
+            .subscribe();
+
+        supabaseClient.channel("user-finance-updates-" + currentUser.id)
+            .on("postgres_changes", { event: "*", schema: "public", table: "deposits", filter: "user_id=eq." + currentUser.id }, () => {
+                loadTransactionHistory().catch(err => console.error("Deposit history refresh failed:", err));
+            })
+            .on("postgres_changes", { event: "*", schema: "public", table: "wallet_transactions", filter: "user_id=eq." + currentUser.id }, () => {
+                loadTransactionHistory().catch(err => console.error("Wallet transaction refresh failed:", err));
+                loadMyWallet().catch(err => console.error("Wallet refresh failed:", err));
+            })
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: "user_id=eq." + currentUser.id }, () => {
+                loadHeaderNotifications().catch(err => console.error("Notification refresh failed:", err));
+            })
             .subscribe();
 
         postedJobsChannel = supabaseClient.channel("advertiser-jobs-" + currentUser.id)
