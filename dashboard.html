@@ -2260,68 +2260,79 @@
         </div>
     </div>
 
-    <div class="deposit-layout">
-        <div class="content-panel deposit-form-panel" id="depositDetailsPanel" hidden>
-            <div class="deposit-selected-heading"><span class="deposit-selected-check">✓</span><div><h3 id="depositSelectedTitle">Payment instructions</h3><p>Follow the details below, then submit your transaction reference.</p></div></div>
-            <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
-            <form id="depositForm">
-                <div class="deposit-entry-fields" id="depositEntryFields">
-                    <label for="depositAmount">Deposit Amount (USD)</label>
-                    <input type="number" id="depositAmount" name="amount" min="1" max="100000" step="0.01" placeholder="Enter amount in USD" required>
-                    <label for="depositTransactionId">Transaction ID / Reference Number</label>
-                    <input type="text" id="depositTransactionId" name="transaction_reference" maxlength="160" placeholder="Enter the transaction/reference ID" required>
-                    <p class="deposit-field-hint">After sending your payment, enter its transaction ID. Our team will verify it before adding funds.</p>
-                    <button type="submit" id="depositSubmitButton" class="btn-primary">Submit Deposit Request</button>
+    <div class="content-panel deposit-security-panel">
+        <h3>Before you submit</h3>
+        <ul><li>Send the exact amount shown in your request.</li><li>Choose the correct USDT network. BEP20 and TRC20 are not interchangeable.</li><li>Keep your transaction ID until the deposit is reviewed.</li><li>Never share your card PIN, CVV, password or one-time code.</li></ul>
+        <p class="deposit-demo-note">Payment account details shown here are temporary demo placeholders. Replace them with verified business payment details before accepting real deposits.</p>
+    </div>
+
+    <div class="finance-modal-backdrop" id="depositModal" hidden>
+        <div class="finance-modal" role="dialog" aria-modal="true" aria-labelledby="depositModalTitle">
+            <div class="finance-modal-header">
+                <button type="button" class="finance-modal-close" id="closeDepositModal" aria-label="Close deposit form">← Close</button>
+                <div class="finance-modal-brand">
+                    <span class="finance-modal-brand-mark" id="depositModalMark">₮</span>
+                    <div><h3 id="depositModalTitle">Deposit method</h3><p>Payment instructions and request form</p></div>
                 </div>
-                <p id="depositFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
-            </form>
+            </div>
+            <div class="finance-modal-body">
+                <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
+                <form id="depositForm">
+                    <div class="deposit-entry-fields" id="depositEntryFields">
+                        <label for="depositAmount">Deposit Amount (USD)</label>
+                        <input type="number" id="depositAmount" name="amount" min="1" max="100000" step="0.01" placeholder="Enter amount in USD" required>
+                        <label for="depositTransactionId">Transaction ID / Reference Number</label>
+                        <input type="text" id="depositTransactionId" name="transaction_reference" maxlength="160" placeholder="Enter the transaction/reference ID" required>
+                        <p class="deposit-field-hint">After sending your payment, enter its transaction ID. Our team will verify it before adding funds.</p>
+                        <button type="submit" id="depositSubmitButton" class="btn-primary">Submit Deposit Request</button>
+                    </div>
+                    <p id="depositFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
+                </form>
+            </div>
         </div>
-        <aside class="content-panel deposit-security-panel">
-            <h3>Before you submit</h3>
-            <ul><li>Send the exact amount shown in your request.</li><li>Choose the correct USDT network. BEP20 and TRC20 are not interchangeable.</li><li>Keep your transaction ID until the deposit is reviewed.</li><li>Never share your card PIN, CVV, password or one-time code.</li></ul>
-            <p class="deposit-demo-note">Payment account details shown here are temporary demo placeholders. Replace them with verified business payment details before accepting real deposits.</p>
-        </aside>
     </div>
 </section>
 
 
 <!-- WITHDRAW SECTION -->
 <section id="withdrawSection" class="page-section" hidden>
-
-    <div class="section-heading">
-        <div>
-            <h2>Withdraw</h2>
-            <p>Request a withdrawal from your wallet.</p>
+    <div class="section-heading"><div><h2>Withdraw</h2><p>Choose a payout method and submit your withdrawal request.</p></div></div>
+    <div class="content-panel withdraw-method-panel">
+        <div class="deposit-method-heading"><div><h3>Select Your Withdrawal Method</h3><p>Choose where you want to receive your funds. A secure form will open for the selected method.</p></div></div>
+        <div class="withdraw-method-grid">
+            <button type="button" class="withdraw-method-card" data-withdraw-method="bKash"><span class="deposit-brand-mark brand-bkash">bKash</span><strong>bKash</strong><small>Bangladesh mobile banking</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="Nagad"><span class="deposit-brand-mark brand-nagad">N</span><strong>Nagad</strong><small>Bangladesh mobile banking</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="Rocket"><span class="deposit-brand-mark brand-rocket">R</span><strong>Rocket</strong><small>Bangladesh mobile banking</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="Bank Transfer"><span class="deposit-brand-mark brand-bank">৳</span><strong>Bank Transfer</strong><small>Bank account payout</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="Wise"><span class="deposit-brand-mark brand-wise">wise</span><strong>Wise</strong><small>International transfer</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="USDT - BEP20"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>BEP20 Network</small></button>
+            <button type="button" class="withdraw-method-card" data-withdraw-method="USDT - TRC20"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>TRC20 Network</small></button>
+        </div>
+        <p class="withdraw-balance-line">Available Balance: <strong id="availableBalanceWithdraw">Loading...</strong></p>
+        <p id="withdrawFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
+    </div>
+    <div class="finance-modal-backdrop" id="withdrawModal" hidden>
+        <div class="finance-modal" role="dialog" aria-modal="true" aria-labelledby="withdrawModalTitle">
+            <div class="finance-modal-header">
+                <button type="button" class="finance-modal-close" id="closeWithdrawModal" aria-label="Close withdrawal form">← Close</button>
+                <div class="finance-modal-brand">
+                    <span class="finance-modal-brand-mark" id="withdrawModalMark">৳</span>
+                    <div><h3 id="withdrawModalTitle">Withdrawal method</h3><p>Enter your payout details</p></div>
+                </div>
+            </div>
+            <div class="finance-modal-body">
+                <p class="withdraw-modal-balance">Available Balance: <strong id="withdrawModalBalance">Loading...</strong></p>
+                <form id="withdrawForm">
+                    <label for="withdrawAmount">Withdrawal Amount</label>
+                    <input type="number" id="withdrawAmount" name="amount" min="1" step="0.01" placeholder="Enter amount" required>
+                    <label for="withdrawPaymentAccount" id="withdrawAccountLabel">Account / Wallet Details</label>
+                    <textarea id="withdrawPaymentAccount" name="payment_account" rows="3" maxlength="500" placeholder="Enter your receiving account number or wallet address" required></textarea>
+                    <p class="deposit-field-hint" id="withdrawAccountHint">Check your account details carefully. Incorrect details may delay payment.</p>
+                    <button type="submit" id="withdrawSubmitButton" class="btn-primary">Submit Withdrawal Request</button>
+                </form>
+            </div>
         </div>
     </div>
-
-    <div class="content-panel">
-        <h3>Withdraw Funds</h3>
-
-        <p>Available Balance: <strong id="availableBalanceWithdraw">Loading...</strong></p>
-
-        <form id="withdrawForm">
-
-            <label for="withdrawAmount">Withdrawal Amount (USD)</label>
-            <input type="number" id="withdrawAmount"
-                   min="1" step="0.01"
-                   placeholder="Enter amount">
-
-            <label for="withdrawMethod">Withdrawal Method</label>
-            <select id="withdrawMethod">
-                <option value="">Select Withdrawal Method</option>
-                <option value="bank">Bank Transfer</option>
-                <option value="paypal">PayPal</option>
-                <option value="crypto">Cryptocurrency</option>
-            </select>
-
-            <button type="submit" class="btn-primary">
-                Submit Withdrawal Request
-            </button>
-
-        </form>
-    </div>
-
 </section>
 
 
