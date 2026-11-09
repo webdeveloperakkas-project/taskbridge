@@ -2334,3 +2334,25 @@ body.finance-modal-open{overflow:hidden}
 .withdraw-modal-balance{margin:0 0 8px;padding:12px 14px;border-radius:10px;background:#f0fdf4;color:#475569;font-size:13px}
 @media(max-width:600px){.finance-modal-backdrop{padding:10px;align-items:flex-end}.finance-modal{max-height:92vh;border-radius:18px 18px 12px 12px}.finance-modal-header{padding:16px;gap:10px;align-items:flex-start}.finance-modal-close{padding:0 9px;min-height:36px;font-size:11px}.finance-modal-brand-mark{width:44px;height:44px;flex-basis:44px}.finance-modal-brand h3{font-size:15px}.finance-modal-body{padding:17px}.withdraw-method-panel{padding:17px}.withdraw-method-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.withdraw-method-card{min-height:102px;padding:9px 4px}.withdraw-method-card strong{font-size:10px}.withdraw-method-card small{font-size:9px}}
 @media(max-width:360px){.withdraw-method-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Compact payment method marks in transaction history */
+.history-method {
+    display: inline-flex;
+    width: 30px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 800;
+    background: #fff4c7;
+    color: #876300;
+}
+.history-method-bkash { background:#e2136e; color:#fff; }
+.history-method-nagad { background:#f58220; color:#fff; }
+.history-method-rocket { background:#8b2f8f; color:#fff; }
+.history-method-visa { background:#fff; color:#1a1f71; border:1px solid #e5e7eb; }
+.history-method-mastercard { background:#fff; color:#eb001b; border:1px solid #e5e7eb; }
+.history-method-wise { background:#9fe870; color:#163300; }
+.history-method-banktransfer { background:#e8edf5; color:#34445e; }
+.history-method-usdttrc20, .history-method-usdtbep20 { background:#26a17b; color:#fff; }
