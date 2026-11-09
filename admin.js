@@ -867,10 +867,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             user_id: item.user_id,
             category: "deposit",
             payment_method: item.payment_method,
+            payment_transaction_id: item.transaction_reference,
             amount: item.amount,
             currency: item.currency || "USD",
             status: item.status,
-            description: item.review_note || item.transaction_reference || "Deposit request",
+            description: item.review_note || "Deposit request",
             created_at: item.created_at
         }));
 
@@ -879,6 +880,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             user_id: item.user_id,
             category: "withdraw",
             payment_method: item.payment_method,
+            payment_transaction_id: "",
             amount: item.amount,
             currency: item.currency || "USD",
             status: item.status,
@@ -924,7 +926,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <td><span class="user-id transaction-user-id">${escapeHTML(item.user_id || "—")}</span></td>
                     <td><span class="transaction-type-badge ${typeClass}">${typeLabel}</span></td>
                     <td><span class="user-id transaction-id">${escapeHTML(item.id || "—")}</span></td>
-                    <td class="transaction-method-cell">${paymentMethodLogo(item.payment_method)}</td>
+                    <td class="transaction-method-cell">
+                        ${paymentMethodLogo(item.payment_method)}
+                        ${item.payment_transaction_id ? '<small class="payment-transaction-id">Txn: ' + escapeHTML(item.payment_transaction_id) + '</small>' : ''}
+                    </td>
                     <td><strong>${amount} ${escapeHTML(item.currency)}</strong></td>
                     <td>${escapeHTML(item.description || "—")}</td>
                     <td>${formatDate(item.created_at)}</td>
