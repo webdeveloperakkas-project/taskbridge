@@ -2,31 +2,42 @@
 /* =========================================
    TASKBRIDGE LOGIN SYSTEM
    Supabase Authentication
+   Version 2.0
 ========================================= */
 
-// Supabase Configuration
-const SUPABASE_URL = "https://eboagroxkgpplccufpuk.supabase.co";
-
-// এখানে তোমার Supabase Publishable Key বসাবে
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
 
 // =========================================
-// DOM ELEMENTS
+// 1. SUPABASE CONFIGURATION
+// =========================================
+
+const SUPABASE_URL =
+    "https://eboagroxkgpplccufpuk.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
+
+
+// =========================================
+// 2. DOM ELEMENTS
 // =========================================
 
 const loginForm = document.getElementById("loginForm");
+
 const emailInput = document.getElementById("loginIdentity");
+
 const passwordInput = document.getElementById("loginPassword");
+
 const rememberMeInput = document.getElementById("rememberMe");
 
 const loginButton = document.getElementById("loginButton");
+
 const loginMessage = document.getElementById("loginMessage");
 
 const currentYear = document.getElementById("current-year");
 
 
 // =========================================
-// CURRENT YEAR
+// 3. CURRENT YEAR
 // =========================================
 
 if (currentYear) {
@@ -35,36 +46,7 @@ if (currentYear) {
 
 
 // =========================================
-// SUPABASE CLIENT
-// =========================================
-
-if (!window.supabase) {
-    showMessage(
-        "Supabase library could not be loaded. Please refresh the page.",
-        "error"
-    );
-
-    if (loginButton) {
-        loginButton.disabled = true;
-    }
-
-} else if (
-    SUPABASE_PUBLISHABLE_KEY === "YOUR_SUPABASE_PUBLISHABLE_KEY" ||
-    !SUPABASE_PUBLISHABLE_KEY
-) {
-    showMessage(
-        "Supabase configuration is missing. Please contact the administrator.",
-        "error"
-    );
-
-    if (loginButton) {
-        loginButton.disabled = true;
-    }
-}
-
-
-// =========================================
-// MESSAGE SYSTEM
+// 4. MESSAGE SYSTEM
 // =========================================
 
 function showMessage(message, type = "error") {
@@ -75,7 +57,9 @@ function showMessage(message, type = "error") {
     }
 
     loginMessage.textContent = message;
+
     loginMessage.className = `login-message ${type}`;
+
     loginMessage.hidden = false;
 }
 
@@ -85,12 +69,13 @@ function hideMessage() {
     if (!loginMessage) return;
 
     loginMessage.textContent = "";
+
     loginMessage.hidden = true;
 }
 
 
 // =========================================
-// BUTTON LOADING
+// 5. BUTTON LOADING
 // =========================================
 
 function setLoading(isLoading) {
@@ -99,32 +84,149 @@ function setLoading(isLoading) {
 
     loginButton.disabled = isLoading;
 
-    if (isLoading) {
-        loginButton.textContent = "Logging In...";
-    } else {
-        loginButton.textContent = "Log In";
+    loginButton.textContent = isLoading
+        ? "Logging In..."
+        : "Log In";
+}
+
+
+// =========================================
+// 6. SUPABASE CONFIGURATION CHECK
+// =========================================
+
+if (!window.supabase) {
+
+    showMessage(
+        "Supabase library could not be loaded. Please refresh the page.",
+        "error"
+    );
+
+    if (loginButton) {
+        loginButton.disabled = true;
+    }
+
+} else if (
+    !SUPABASE_PUBLISHABLE_KEY ||
+    SUPABASE_PUBLISHABLE_KEY === "YOUR_SUPABASE_PUBLISHABLE_KEY"
+) {
+
+    showMessage(
+        "Supabase configuration is missing.",
+        "error"
+    );
+
+    if (loginButton) {
+        loginButton.disabled = true;
     }
 }
 
 
 // =========================================
-// LOGIN FORM SUBMISSION
+// 7. REMEMBER ME STORAGE
+// =========================================
+
+// Save session according to Remember Me selection.
+// If unchecked, use sessionStorage.
+// If checked, use localStorage.
+
+const authStorage = {
+
+    getItem(key) {
+
+        return (
+            window.localStorage.getItem(key) ??
+            window.sessionStorage.getItem(key)
+        );
+    },
+
+    setItem(key, value) {
+
+        const rememberMe = rememberMeInput
+            ? rememberMeInput.checked
+            : true;
+
+        if (rememberMe) {
+
+            window.localStorage.setItem(key, value);
+
+            window.sessionStorage.removeItem(key);
+
+        } else {
+
+            window.sessionStorage.setItem(key, value);
+
+            window.localStorage.removeItem(key);
+
+        }
+    },
+
+    removeItem(key) {
+
+        window.localStorage.removeItem(key);
+
+        window.sessionStorage.removeItem(key);
+
+    }
+
+};
+
+
+// =========================================
+// 8. CREATE SUPABASE CLIENT
+// =========================================
+
+let supabaseClient = null;
+
+if (
+    window.supabase &&
+    SUPABASE_PUBLISHABLE_KEY &&
+    SUPABASE_PUBLISHABLE_KEY !== "YOUR_SUPABASE_PUBLISHABLE_KEY"
+) {
+
+    supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+            auth: {
+                storage: authStorage,
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        }
+    );
+
+}
+
+
+// =========================================
+// 9. LOGIN FORM SUBMISSION
 // =========================================
 
 if (loginForm) {
 
     loginForm.addEventListener("submit", async function (event) {
 
-        // Prevent password from appearing in URL
+        // Prevent normal form submission.
+        // Password will never be added to the URL.
+
         event.preventDefault();
 
         hideMessage();
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        const rememberMe = rememberMeInput
-            ? rememberMeInput.checked
-            : true;
+
+        // =====================================
+        // GET FORM VALUES
+        // =====================================
+
+        const email = emailInput
+            ? emailInput.value.trim()
+            : "";
+
+        const password = passwordInput
+            ? passwordInput.value
+            : "";
+
 
         // =====================================
         // VALIDATION
@@ -140,161 +242,186 @@ if (loginForm) {
             return;
         }
 
-        if (!window.supabase) {
+
+        if (!supabaseClient) {
 
             showMessage(
-                "Supabase is not available. Please refresh the page.",
+                "Supabase is not configured correctly.",
                 "error"
             );
 
             return;
         }
 
-        if (
-            !SUPABASE_PUBLISHABLE_KEY ||
-            SUPABASE_PUBLISHABLE_KEY === "YOUR_SUPABASE_PUBLISHABLE_KEY"
-        ) {
-
-            showMessage(
-                "Supabase Publishable Key is not configured.",
-                "error"
-            );
-
-            return;
-        }
 
         setLoading(true);
+
 
         try {
 
             // =================================
-            // CREATE SUPABASE CLIENT
+            // 10. SUPABASE EMAIL LOGIN
             // =================================
 
-            const client = window.supabase.createClient(
-                SUPABASE_URL,
-                SUPABASE_PUBLISHABLE_KEY,
-                {
-                    auth: {
-                        persistSession: rememberMe,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: true,
-                        storage: rememberMe
-                            ? window.localStorage
-                            : window.sessionStorage
-                    }
-                }
-            );
+            const { data, error } =
+                await supabaseClient.auth.signInWithPassword({
 
+                    email: email,
 
-            // =================================
-            // SUPABASE EMAIL LOGIN
-            // =================================
+                    password: password
 
-            const { data, error } = await client.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+                });
+
 
             if (error) {
                 throw error;
             }
 
-            if (!data.user) {
+
+            if (!data || !data.user) {
 
                 throw new Error(
-                    "Unable to verify your account. Please try again."
+                    "Unable to verify your account."
                 );
+
             }
 
 
             // =================================
-            // GET USER ID
+            // 11. GET AUTH USER ID
             // =================================
 
             const userId = data.user.id;
 
 
+            if (!userId) {
+
+                throw new Error(
+                    "User ID could not be retrieved."
+                );
+
+            }
+
+
             // =================================
-            // CHECK ADMIN ROLE
+            // 12. VERIFY ADMIN ROLE USING RPC
             // =================================
 
-            const { data: isAdmin, error: roleError } = await client.rpc(
-    "has_role",
-    {
-        p_user_id: userId,
-        p_role: "admin"
-    }
-);
+            const { data: isAdmin, error: roleError } =
+                await supabaseClient.rpc(
 
-if (roleError) {
-    throw roleError;
-}
+                    "has_role",
 
-if (isAdmin === true) {
-    window.location.replace("./admin.html");
-} else {
-    window.location.replace("./dashboard.html");
-}
+                    {
+                        p_user_id: userId,
+                        p_role: "admin"
+                    }
+
+                );
+
 
             if (roleError) {
 
-                // Do not silently bypass role verification
-                await client.auth.signOut();
+                console.error(
+                    "Admin Role Verification Error:",
+                    roleError
+                );
 
                 throw new Error(
-                    "Login succeeded, but your account role could not be verified. Please contact support."
+                    "Login successful, but Admin Role verification failed. Please try again or contact support."
                 );
+
             }
 
 
             // =================================
-            // REDIRECT USER
+            // 13. LOGIN SUCCESS
             // =================================
 
-            showMessage(
-                "Login successful! Redirecting...",
-                "success"
-            );
+            if (isAdmin === true) {
 
-            if (adminRole && adminRole.role === "admin") {
+                // ADMIN ACCOUNT
+
+                showMessage(
+                    "Admin login successful! Redirecting...",
+                    "success"
+                );
 
                 window.location.replace("./admin.html");
 
-            } else {
+                return;
+
+            } else if (isAdmin === false) {
+
+                // NORMAL USER ACCOUNT
+
+                showMessage(
+                    "Login successful! Redirecting to Dashboard...",
+                    "success"
+                );
 
                 window.location.replace("./dashboard.html");
 
+                return;
+
+            } else {
+
+                throw new Error(
+                    "Unexpected role verification response."
+                );
+
             }
+
 
         } catch (error) {
 
-            console.error("TaskBridge Login Error:", error);
+            console.error(
+                "TaskBridge Login Error:",
+                error
+            );
 
-            let errorMessage = "Login failed. Please try again.";
+
+            // =================================
+            // 14. ERROR HANDLING
+            // =================================
+
+            let errorMessage =
+                "Login failed. Please try again.";
+
+
+            const message = error.message
+                ? error.message.toLowerCase()
+                : "";
+
 
             if (
-                error.message &&
-                (
-                    error.message.toLowerCase().includes("invalid login credentials") ||
-                    error.message.toLowerCase().includes("invalid credentials")
-                )
+                message.includes("invalid login credentials") ||
+                message.includes("invalid credentials")
             ) {
 
-                errorMessage = "Incorrect email address or password.";
+                errorMessage =
+                    "Incorrect email address or password.";
 
             } else if (
-                error.message &&
-                error.message.toLowerCase().includes("email not confirmed")
+                message.includes("email not confirmed")
             ) {
 
-                errorMessage = "Please verify your email address before logging in.";
+                errorMessage =
+                    "Please verify your email address before logging in.";
+
+            } else if (
+                message.includes("failed to fetch")
+            ) {
+
+                errorMessage =
+                    "Network error. Please check your internet connection.";
 
             } else if (error.message) {
 
                 errorMessage = error.message;
 
             }
+
 
             showMessage(errorMessage, "error");
 
@@ -308,19 +435,42 @@ if (isAdmin === true) {
 
 
 // =========================================
-// CLEAR ERROR WHEN USER TYPES
+// 15. CLEAR ERROR WHEN USER TYPES
 // =========================================
 
 if (emailInput) {
 
-    emailInput.addEventListener("input", hideMessage);
+    emailInput.addEventListener(
+        "input",
+        hideMessage
+    );
 
 }
+
 
 if (passwordInput) {
 
-    passwordInput.addEventListener("input", hideMessage);
+    passwordInput.addEventListener(
+        "input",
+        hideMessage
+    );
 
 }
 
 
+// =========================================
+// 16. PREVENT EMPTY FORM SUBMISSION
+// =========================================
+
+if (loginForm) {
+
+    loginForm.setAttribute("novalidate", "false");
+
+}
+
+
+// =========================================
+// TASKBRIDGE LOGIN SYSTEM COMPLETE
+// =========================================
+
+console.log("TaskBridge Login System Initialized.");
