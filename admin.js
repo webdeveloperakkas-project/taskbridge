@@ -147,18 +147,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const tableConfig = {
 
-        transactionsTable: {
-            table: "wallet_transactions",
-            columns: [
-                ["id", "Transaction ID"],
-                ["user_id", "User ID"],
-                ["type", "Type"],
-                ["amount", "Amount"],
-                ["description", "Description"],
-                ["created_at", "Date"]
-            ]
-        },
-
         reportsTable: {
             table: "user_reports",
             columns: [
@@ -847,6 +835,102 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         }).join("");
 
+    }
+
+
+    /* =====================================
+       TRANSACTION TABLE
+    ====================================== */
+
+    function paymentMethodLogo(method) {
+        const value = String(method || "").toLowerCase().replace(/[\\s_-]+/g, "");
+        const logos = {
+            bkash: '<span class="payment-logo payment-logo-bkash" title="bKash" aria-label="bKash">b</span>',
+            nagad: '<span class="payment-logo payment-logo-nagad" title="Nagad" aria-label="Nagad">n</span>',
+            rocket: '<span class="payment-logo payment-logo-rocket" title="Rocket" aria-label="Rocket">✦</span>',
+            visa: '<span class="payment-logo payment-logo-visa" title="Visa" aria-label="Visa">V</span>',
+            mastercard: '<span class="payment-logo payment-logo-mastercard" title="Mastercard" aria-label="Mastercard"><i></i><i></i></span>',
+            wise: '<span class="payment-logo payment-logo-wise" title="Wise" aria-label="Wise">W</span>',
+            banktransfer: '<span class="payment-logo payment-logo-bank" title="Bank Transfer" aria-label="Bank Transfer">▤</span>',
+            usdttrc20: '<span class="payment-logo payment-logo-usdt" title="USDT TRC20" aria-label="USDT TRC20">₮</span>',
+            usdtbep20: '<span class="payment-logo payment-logo-usdt" title="USDT BEP20" aria-label="USDT BEP20">₮</span>'
+        };
+        return logos[value] || '<span class="payment-logo payment-logo-default" title="Payment method" aria-label="Payment method">↔</span>';
+    }
+
+    function renderTransactions(data) {
+        const tbody = $("#transactionsTable");
+        if (!tbody) return;
+
+        const deposits = (data.deposits || []).map(item => ({
+            id: item.id,
+            user_id: item.user_id,
+            category: "deposit",
+            payment_method: item.payment_method,
+            amount: item.amount,
+            currency: item.currency || "USD",
+            status: item.status,
+            description: item.review_note || item.transaction_reference || "Deposit request",
+            created_at: item.created_at
+        }));
+
+        const withdrawals = (data.withdrawals || []).map(item => ({
+            id: item.id,
+            user_id: item.user_id,
+            category: "withdraw",
+            payment_method: item.payment_method,
+            amount: item.amount,
+            currency: item.currency || "USD",
+            status: item.status,
+            description: item.admin_note || "Withdrawal request",
+            created_at: item.created_at
+        }));
+
+        const requestIds = new Set([...deposits, ...withdrawals].map(item => item.id));
+        const ledger = (data.wallet_transactions || [])
+            .filter(item => !requestIds.has(item.reference_id))
+            .map(item => ({
+                id: item.id,
+                user_id: item.user_id,
+                category: String(item.transaction_type || "transaction").toLowerCase().includes("withdraw")
+                    ? "withdraw" : String(item.transaction_type || "").toLowerCase().includes("deposit")
+                        ? "deposit" : "other",
+                payment_method: "",
+                amount: item.amount,
+                currency: item.currency || "USD",
+                status: "completed",
+                description: item.description || item.transaction_type || "Wallet transaction",
+                created_at: item.created_at
+            }));
+
+        const rows = [...deposits, ...withdrawals, ...ledger]
+            .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+        if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No transactions found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = rows.map(item => {
+            const typeLabel = item.category === "deposit" ? "Deposit"
+                : item.category === "withdraw" ? "Withdraw" : "Other";
+            const typeClass = item.category === "deposit" ? "transaction-type-deposit"
+                : item.category === "withdraw" ? "transaction-type-withdraw" : "transaction-type-other";
+            const amount = Number(item.amount || 0).toLocaleString("en-US", {
+                minimumFractionDigits: 2, maximumFractionDigits: 2
+            });
+            return `
+                <tr>
+                    <td><span class="user-id transaction-user-id">${escapeHTML(item.user_id || "—")}</span></td>
+                    <td><span class="transaction-type-badge ${typeClass}">${typeLabel}</span></td>
+                    <td><span class="user-id transaction-id">${escapeHTML(item.id || "—")}</span></td>
+                    <td class="transaction-method-cell">${paymentMethodLogo(item.payment_method)}</td>
+                    <td><strong>${amount} ${escapeHTML(item.currency)}</strong></td>
+                    <td>${escapeHTML(item.description || "—")}</td>
+                    <td>${formatDate(item.created_at)}</td>
+                </tr>
+            `;
+        }).join("");
     }
 
 
@@ -1857,6 +1941,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderDeposits();
             renderWithdrawals();
             renderWallets();
+
+
+            // Render deposit/withdraw requests and remaining wallet ledger entries.
+            renderTransactions(data);
 
 
             // Generic financial and support tables
