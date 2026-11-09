@@ -2405,13 +2405,15 @@ body.finance-modal-open{overflow:hidden}
 
 /* Post Job method chip and consistent horizontal brand-logo tiles */
 .history-method-postjob {
-    width:auto; min-width:92px; height:34px; padding:5px 10px;
-    display:inline-flex; flex-direction:row; gap:6px; border:1px solid #f1d36b;
-    border-radius:8px; background:#fff8dc; color:#8a6500; font-size:11px;
-    font-weight:750; white-space:nowrap;
+    width:auto; min-width:104px; height:38px; padding:6px 12px;
+    display:inline-flex; flex-direction:row; align-items:center; justify-content:center;
+    gap:8px; border:1px solid #e9c64f; border-radius:10px;
+    background:linear-gradient(135deg,#fff9df 0%,#ffefad 100%);
+    color:#755400; font-size:12px; font-weight:800; white-space:nowrap;
+    box-shadow:0 3px 9px rgba(180,135,0,.13);
 }
 .history-method-postjob svg {
-    width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8;
+    width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.9;
     stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto;
 }
 .history-method-bkash,.history-method-nagad,.history-method-rocket,
