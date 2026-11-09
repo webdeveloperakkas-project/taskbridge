@@ -899,7 +899,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const key = raw.toLowerCase().replace(/[\s_-]+/g, "");
         if (key === "postjob" || key === "jobpost" || key === "jobfunding") {
             return '<span class="history-method history-method-postjob" title="Post Job" aria-label="Post Job">' +
-                '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"></path></svg><span>Post Job</span></span>';
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5.8A2.8 2.8 0 0 1 10.8 3h2.4A2.8 2.8 0 0 1 16 5.8V7"/><rect x="2.5" y="7" width="19" height="14" rx="3"/><path d="M2.8 12h18.4M9.5 12v2.2h5V12"/></svg><span>Post Job</span></span>';
         }
         const brands = {
             bkash: { label: "bKash", className: "bkash" },
@@ -1057,9 +1057,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "Nagad": { title: "Nagad payment details (demo)", lines: ["Account type: Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
         "Rocket": { title: "Rocket payment details (demo)", lines: ["Account type: Merchant / Agent (replace with your verified account)", "Account number: 01XXXXXXXXXX", "Reference: TaskBridge Deposit"] },
         "Bank Transfer": { title: "Bank transfer details (demo)", lines: ["Bank: Replace with your bank name", "Account name: TaskBridge (replace with verified account name)", "Account number: XXXX-XXXX-XXXX", "Branch: Replace with branch name", "Routing number: XXXXXXXX"] },
-        "Wise (manual transfer)": { title: "Wise transfer details (demo)", lines: ["Wise recipient: Replace with your verified Wise business account", "Recipient email / account details: payments@example.com", "Use USD and include your TaskBridge user ID in the reference"] },
-        "USDT - BEP20": { title: "USDT wallet (BEP20 demo)", lines: ["Network: BNB Smart Chain (BEP20)", "Wallet address: 0xDEMO_REPLACE_WITH_YOUR_BEP20_ADDRESS", "Send USDT on BEP20 network only"] },
-        "USDT - TRC20": { title: "USDT wallet (TRC20 demo)", lines: ["Network: TRON (TRC20)", "Wallet address: TDEMO_REPLACE_WITH_YOUR_TRC20_ADDRESS", "Send USDT on TRC20 network only"] }
+        "Wise (manual transfer)": { title: "Wise transfer details (demo)", lines: ["Wise recipient: Replace with your verified Wise business account", "Recipient email / account details: payments@example.com", "Use USD and include your TaskBridge user ID in the reference"] }
     };
 
     const depositModal = document.getElementById("depositModal");
