@@ -1,0 +1,1170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TaskBridge - Admin Control Panel</title>
+
+    <meta name="description" content="TaskBridge Administration Control Panel">
+
+    <link rel="stylesheet" href="./admin.css">
+
+    <!-- Supabase JavaScript SDK -->
+    <script
+        defer
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <!-- Admin JavaScript -->
+    <script defer src="./admin.js"></script>
+</head>
+
+<body>
+
+    <!-- =================================
+         SIDEBAR
+    ================================== -->
+
+    <div class="admin-layout">
+
+        <aside class="admin-sidebar" id="adminSidebar">
+
+            <div class="admin-brand">
+                <div class="brand-icon">TB</div>
+
+                <div>
+                    <h2>TaskBridge</h2>
+                    <span>Administration</span>
+                </div>
+
+                <button class="sidebar-close" id="sidebarClose"
+                    aria-label="Close sidebar">
+                    &times;
+                </button>
+            </div>
+
+
+            <div class="admin-profile">
+
+                <div class="admin-avatar">A</div>
+
+                <div class="admin-profile-info">
+                    <h3 id="adminName">Administrator</h3>
+                    <span id="adminRole">Admin</span>
+                </div>
+
+                <span class="online-indicator"></span>
+
+            </div>
+
+
+            <nav class="admin-navigation">
+
+                <!-- OVERVIEW -->
+
+                <p class="nav-heading">OVERVIEW</p>
+
+                <a href="#overview" class="admin-nav-link active"
+                    data-panel="overviewPanel">
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard Overview</span>
+                </a>
+
+
+                <!-- USERS -->
+
+                <p class="nav-heading">USER MANAGEMENT</p>
+
+                <a href="#users" class="admin-nav-link"
+                    data-panel="usersPanel">
+                    <span class="nav-icon">♙</span>
+                    <span>All Users</span>
+                </a>
+
+                <a href="#verification" class="admin-nav-link"
+                    data-panel="verificationPanel">
+                    <span class="nav-icon">✓</span>
+                    <span>Account Verification</span>
+                </a>
+
+
+                <!-- JOBS -->
+
+                <p class="nav-heading">JOB MANAGEMENT</p>
+
+                <a href="#jobs" class="admin-nav-link"
+                    data-panel="jobsPanel">
+                    <span class="nav-icon">▤</span>
+                    <span>All Jobs</span>
+                </a>
+
+                <a href="#submissions" class="admin-nav-link"
+                    data-panel="submissionsPanel">
+                    <span class="nav-icon">☑</span>
+                    <span>Job Submissions</span>
+                </a>
+
+
+                <!-- FINANCE -->
+
+                <p class="nav-heading">FINANCIAL MANAGEMENT</p>
+
+                <a href="#deposits" class="admin-nav-link"
+                    data-panel="depositsPanel">
+                    <span class="nav-icon">＋</span>
+                    <span>Deposit Requests</span>
+                </a>
+
+                <a href="#withdrawals" class="admin-nav-link"
+                    data-panel="withdrawalsPanel">
+                    <span class="nav-icon">－</span>
+                    <span>Withdrawal Requests</span>
+                </a>
+
+                <a href="#transactions" class="admin-nav-link"
+                    data-panel="transactionsPanel">
+                    <span class="nav-icon">⇄</span>
+                    <span>Transactions</span>
+                </a>
+
+
+                <!-- SUPPORT -->
+
+                <p class="nav-heading">SUPPORT & SECURITY</p>
+
+                <a href="#reports" class="admin-nav-link"
+                    data-panel="reportsPanel">
+                    <span class="nav-icon">⚑</span>
+                    <span>User Reports</span>
+                </a>
+
+                <a href="#support" class="admin-nav-link"
+                    data-panel="supportPanel">
+                    <span class="nav-icon">✉</span>
+                    <span>Support Tickets</span>
+                </a>
+
+                <a href="#logs" class="admin-nav-link"
+                    data-panel="logsPanel">
+                    <span class="nav-icon">▧</span>
+                    <span>Admin Activity Logs</span>
+                </a>
+
+
+                <!-- SETTINGS -->
+
+                <p class="nav-heading">SYSTEM</p>
+
+                <a href="#settings" class="admin-nav-link"
+                    data-panel="settingsPanel">
+                    <span class="nav-icon">⚙</span>
+                    <span>Platform Settings</span>
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <a href="./dashboard.html" class="back-dashboard">
+                    ← Back to User Dashboard
+                </a>
+
+                <button type="button" id="adminLogout"
+                    class="admin-logout">
+                    <span>↪</span>
+                    Sign Out
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- SIDEBAR OVERLAY -->
+
+        <div class="admin-overlay" id="adminOverlay"></div>
+
+
+        <!-- =================================
+             MAIN CONTENT
+        ================================== -->
+
+        <main class="admin-main">
+
+
+            <!-- HEADER -->
+
+            <header class="admin-header">
+
+                <div class="header-left">
+
+                    <button type="button" id="sidebarToggle"
+                        class="sidebar-toggle"
+                        aria-label="Open sidebar">
+                        ☰
+                    </button>
+
+                    <div>
+                        <h1 id="pageTitle">Dashboard Overview</h1>
+                        <p id="pageSubtitle">
+                            Monitor and manage your TaskBridge platform.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="header-right">
+
+                    <div class="realtime-status" id="realtimeStatus">
+                        <span class="status-dot"></span>
+                        <span id="realtimeStatusText">Connecting...</span>
+                    </div>
+
+                    <div class="admin-header-user">
+
+                        <div class="header-avatar">A</div>
+
+                        <div>
+                            <strong id="headerAdminName">Administrator</strong>
+                            <span>Admin Panel</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- PAGE CONTENT -->
+
+            <div class="admin-content">
+
+
+                <!-- =================================
+                     OVERVIEW PANEL
+                ================================== -->
+
+                <section class="admin-panel active"
+                    id="overviewPanel">
+
+                    <div class="welcome-banner">
+
+                        <div>
+                            <h2>Welcome to TaskBridge Admin</h2>
+
+                            <p>
+                                Manage users, jobs, payments and your
+                                entire platform from one place.
+                            </p>
+                        </div>
+
+                        <div class="welcome-icon">TB</div>
+
+                    </div>
+
+
+                    <!-- STATISTICS -->
+
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+                            <div class="stat-icon users-icon">♙</div>
+
+                            <div>
+                                <p>Total Users</p>
+                                <h3 id="totalUsers">0</h3>
+                                <span>Registered accounts</span>
+                            </div>
+                        </div>
+
+
+                        <div class="stat-card">
+                            <div class="stat-icon verified-icon">✓</div>
+
+                            <div>
+                                <p>Verified Users</p>
+                                <h3 id="verifiedUsers">0</h3>
+                                <span>Approved accounts</span>
+                            </div>
+                        </div>
+
+
+                        <div class="stat-card">
+                            <div class="stat-icon jobs-icon">▤</div>
+
+                            <div>
+                                <p>Total Jobs</p>
+                                <h3 id="totalJobs">0</h3>
+                                <span>All job listings</span>
+                            </div>
+                        </div>
+
+
+                        <div class="stat-card">
+                            <div class="stat-icon pending-icon">◷</div>
+
+                            <div>
+                                <p>Pending Jobs</p>
+                                <h3 id="pendingJobs">0</h3>
+                                <span>Awaiting review</span>
+                            </div>
+                        </div>
+
+
+                        <div class="stat-card">
+                            <div class="stat-icon deposit-icon">$</div>
+
+                            <div>
+                                <p>Pending Deposits</p>
+                                <h3 id="pendingDeposits">0</h3>
+                                <span>Awaiting approval</span>
+                            </div>
+                        </div>
+
+
+                        <div class="stat-card">
+                            <div class="stat-icon withdraw-icon">↗</div>
+
+                            <div>
+                                <p>Pending Withdrawals</p>
+                                <h3 id="pendingWithdrawals">0</h3>
+                                <span>Awaiting processing</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECENT USERS -->
+
+                    <div class="admin-card">
+
+                        <div class="card-heading">
+
+                            <div>
+                                <h3>Recent Registered Users</h3>
+                                <p>Latest accounts registered on TaskBridge.</p>
+                            </div>
+
+                            <button type="button"
+                                class="secondary-btn"
+                                data-go-panel="usersPanel">
+                                View All
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>User ID</th>
+                                        <th>Verification</th>
+                                        <th>Account Status</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="recentUsersTable">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">
+                                            Loading recent users...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECENT JOBS -->
+
+                    <div class="admin-card">
+
+                        <div class="card-heading">
+
+                            <div>
+                                <h3>Recent Jobs</h3>
+                                <p>Recently created job listings.</p>
+                            </div>
+
+                            <button type="button"
+                                class="secondary-btn"
+                                data-go-panel="jobsPanel">
+                                View All
+                            </button>
+
+                        </div>
+
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Advertiser ID</th>
+                                        <th>Budget</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="recentJobsTable">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">
+                                            Loading recent jobs...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     ALL USERS
+                ================================== -->
+
+                <section class="admin-panel" id="usersPanel">
+
+                    <div class="section-intro">
+                        <h2>User Management</h2>
+                        <p>View and manage all registered TaskBridge users.</p>
+                    </div>
+
+
+                    <div class="filter-toolbar">
+
+                        <input type="search"
+                            id="userSearch"
+                            placeholder="Search name, email or user ID...">
+
+                        <select id="userStatusFilter">
+                            <option value="all">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="blocked">Blocked</option>
+                        </select>
+
+                        <select id="userVerificationFilter">
+                            <option value="all">All Verification</option>
+                            <option value="verified">Verified</option>
+                            <option value="unverified">Unverified</option>
+                        </select>
+
+                        <button type="button" class="secondary-btn"
+                            id="refreshUsers">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>User ID</th>
+                                        <th>Roles</th>
+                                        <th>Verification</th>
+                                        <th>Account Status</th>
+                                        <th>Joined</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="usersTable">
+                                    <tr>
+                                        <td colspan="7" class="empty-state">
+                                            Loading users...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     ACCOUNT VERIFICATION
+                ================================== -->
+
+                <section class="admin-panel"
+                    id="verificationPanel">
+
+                    <div class="section-intro">
+                        <h2>Account Verification</h2>
+                        <p>Review and approve unverified user accounts.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>User ID</th>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="verificationTable">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">
+                                            Loading verification requests...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     ALL JOBS
+                ================================== -->
+
+                <section class="admin-panel" id="jobsPanel">
+
+                    <div class="section-intro">
+                        <h2>Job Management</h2>
+                        <p>Review and manage all platform job listings.</p>
+                    </div>
+
+
+                    <div class="filter-toolbar">
+
+                        <input type="search"
+                            id="jobSearch"
+                            placeholder="Search job title or ID...">
+
+                        <select id="jobStatusFilter">
+                            <option value="all">All Jobs</option>
+                            <option value="draft">Draft</option>
+                            <option value="pending_review">Pending Review</option>
+                            <option value="active">Active</option>
+                            <option value="paused">Paused</option>
+                            <option value="completed">Completed</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+
+                        <button type="button" class="secondary-btn"
+                            id="refreshJobs">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Job ID</th>
+                                        <th>Advertiser</th>
+                                        <th>Reward</th>
+                                        <th>Workers</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="jobsTable">
+                                    <tr>
+                                        <td colspan="7" class="empty-state">
+                                            Loading jobs...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     JOB SUBMISSIONS
+                ================================== -->
+
+                <section class="admin-panel"
+                    id="submissionsPanel">
+
+                    <div class="section-intro">
+                        <h2>Job Submissions</h2>
+                        <p>Monitor worker submissions and review activity.</p>
+                    </div>
+
+
+                    <div class="filter-toolbar">
+
+                        <select id="submissionStatusFilter">
+                            <option value="all">All Submissions</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="expired">Expired</option>
+                        </select>
+
+                        <button type="button" class="secondary-btn"
+                            id="refreshSubmissions">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Submission ID</th>
+                                        <th>Job ID</th>
+                                        <th>Worker ID</th>
+                                        <th>Status</th>
+                                        <th>Submitted</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="submissionsTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            Loading submissions...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     DEPOSITS
+                ================================== -->
+
+                <section class="admin-panel"
+                    id="depositsPanel">
+
+                    <div class="section-intro">
+                        <h2>Deposit Management</h2>
+                        <p>Review incoming deposit requests.</p>
+                    </div>
+
+
+                    <div class="filter-toolbar">
+
+                        <select id="depositStatusFilter">
+                            <option value="all">All Deposits</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+
+                        <button type="button" class="secondary-btn"
+                            id="refreshDeposits">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Deposit ID</th>
+                                        <th>User ID</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="depositsTable">
+                                    <tr>
+                                        <td colspan="7" class="empty-state">
+                                            Loading deposits...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     WITHDRAWALS
+                ================================== -->
+
+                <section class="admin-panel"
+                    id="withdrawalsPanel">
+
+                    <div class="section-intro">
+                        <h2>Withdrawal Management</h2>
+                        <p>Review and process user withdrawal requests.</p>
+                    </div>
+
+
+                    <div class="filter-toolbar">
+
+                        <select id="withdrawalStatusFilter">
+                            <option value="all">All Withdrawals</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+
+                        <button type="button" class="secondary-btn"
+                            id="refreshWithdrawals">
+                            ↻ Refresh
+                        </button>
+
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Withdrawal ID</th>
+                                        <th>User ID</th>
+                                        <th>Amount</th>
+                                        <th>Method</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="withdrawalsTable">
+                                    <tr>
+                                        <td colspan="7" class="empty-state">
+                                            Loading withdrawals...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     TRANSACTIONS
+                ================================== -->
+
+                <section class="admin-panel"
+                    id="transactionsPanel">
+
+                    <div class="section-intro">
+                        <h2>Transaction Management</h2>
+                        <p>Monitor all wallet transactions.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>User ID</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Description</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="transactionsTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            Loading transactions...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     USER REPORTS
+                ================================== -->
+
+                <section class="admin-panel" id="reportsPanel">
+
+                    <div class="section-intro">
+                        <h2>User Reports</h2>
+                        <p>Review reports submitted by platform users.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Report ID</th>
+                                        <th>Reporter ID</th>
+                                        <th>Reported User</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="reportsTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            Loading reports...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     SUPPORT TICKETS
+                ================================== -->
+
+                <section class="admin-panel" id="supportPanel">
+
+                    <div class="section-intro">
+                        <h2>Support Tickets</h2>
+                        <p>Manage customer support requests.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Ticket ID</th>
+                                        <th>User ID</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="supportTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            Loading support tickets...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     ADMIN LOGS
+                ================================== -->
+
+                <section class="admin-panel" id="logsPanel">
+
+                    <div class="section-intro">
+                        <h2>Admin Activity Logs</h2>
+                        <p>Track important administrative activities.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="table-responsive">
+
+                            <table class="admin-table">
+
+                                <thead>
+                                    <tr>
+                                        <th>Log ID</th>
+                                        <th>Admin ID</th>
+                                        <th>Action</th>
+                                        <th>Target</th>
+                                        <th>Details</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="logsTable">
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            Loading admin logs...
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- =================================
+                     PLATFORM SETTINGS
+                ================================== -->
+
+                <section class="admin-panel" id="settingsPanel">
+
+                    <div class="section-intro">
+                        <h2>Platform Settings</h2>
+                        <p>Manage your platform configuration.</p>
+                    </div>
+
+
+                    <div class="admin-card">
+
+                        <div class="card-heading">
+                            <div>
+                                <h3>General Settings</h3>
+                                <p>Platform-wide configuration.</p>
+                            </div>
+                        </div>
+
+                        <div id="platformSettingsContainer">
+
+                            <p class="empty-state">
+                                Platform settings will load here.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <footer class="admin-footer">
+                <p>
+                    &copy; <span id="adminCurrentYear"></span>
+                    TaskBridge. All rights reserved.
+                </p>
+
+                <span>Admin Control Panel</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- =================================
+         USER DETAILS MODAL
+    ================================== -->
+
+    <div class="admin-modal" id="userDetailsModal"
+        aria-hidden="true">
+
+        <div class="modal-backdrop"
+            data-close-modal></div>
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <h2>User Details</h2>
+                    <p>Registered account information.</p>
+                </div>
+
+                <button type="button"
+                    class="modal-close"
+                    data-close-modal>
+                    &times;
+                </button>
+
+            </div>
+
+            <div class="modal-body" id="userDetailsContent">
+                Loading user details...
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         CONFIRMATION MODAL
+    ================================== -->
+
+    <div class="admin-modal" id="confirmModal"
+        aria-hidden="true">
+
+        <div class="modal-backdrop"
+            data-close-modal></div>
+
+        <div class="modal-content confirm-content">
+
+            <div class="modal-header">
+
+                <h2 id="confirmTitle">Confirm Action</h2>
+
+                <button type="button"
+                    class="modal-close"
+                    data-close-modal>
+                    &times;
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p id="confirmMessage">
+                    Are you sure you want to continue?
+                </p>
+
+                <div class="modal-actions">
+
+                    <button type="button"
+                        class="secondary-btn"
+                        data-close-modal>
+                        Cancel
+                    </button>
+
+                    <button type="button"
+                        class="danger-btn"
+                        id="confirmAction">
+                        Confirm
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         TOAST NOTIFICATIONS
+    ================================== -->
+
+    <div id="adminToast"
+        class="admin-toast"
+        role="status"
+        aria-live="polite">
+    </div>
+
+
+</body>
+</html>
