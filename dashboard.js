@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let postedJobsChannel = null;
     let walletChannel = null;
     let walletCurrency = "USD";
+    let walletAvailableBalance = 0;
 
     /* =====================================
        CURRENT YEAR
@@ -845,6 +846,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderWalletBalance(wallet) {
         walletCurrency = wallet?.currency || "USD";
+        walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
         const formatted = formatWalletMoney(wallet?.available_balance ?? 0, walletCurrency);
         ["availableBalanceHeader", "availableBalanceOverview",
             "availableBalanceWallet", "availableBalanceWithdraw"].forEach(id => {
@@ -1013,7 +1015,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 depositForm.reset();
                 closeFinanceModal(depositModal);
                 selectedDepositMethod = "";
-                document.querySelectorAll(".deposit-method-card").forEach(card => card.classList.remove("active"));
+                document.querySelectorAll(".deposit-method-card").forEach(card => {
+                    card.classList.remove("active");
+                    card.setAttribute("aria-pressed", "false");
+                });
                 if (depositMessage) depositMessage.textContent = "Deposit request submitted. It will remain pending until an admin verifies your transaction.";
             } catch (error) {
                 console.error("Deposit request failed:", error);
@@ -1046,8 +1051,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (withdrawAccountHint) withdrawAccountHint.textContent = meta.hint;
             if (withdrawModalBalance) withdrawModalBalance.textContent = document.getElementById("availableBalanceWithdraw")?.textContent || formatWalletMoney(0, walletCurrency);
             if (withdrawAmountInput) {
-                const balanceText = document.getElementById("availableBalanceWithdraw")?.textContent || "";
-                withdrawAmountInput.max = String(Number(withdrawAmountInput.max || 0) || 100000);
+                withdrawAmountInput.max = String(walletAvailableBalance);
                 withdrawAmountInput.value = "";
             }
             if (withdrawMessage) withdrawMessage.textContent = "";
@@ -1062,7 +1066,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!withdrawForm.reportValidity()) return;
             const amount = Number(withdrawAmountInput?.value);
             const paymentAccount = withdrawAccountInput?.value.trim() || "";
-            const available = Number(withdrawAmountInput?.max || 0);
+            const available = walletAvailableBalance;
             if (!selectedWithdrawMethod) { if (withdrawMessage) withdrawMessage.textContent = "Please select a withdrawal method."; return; }
             if (!Number.isFinite(amount) || amount <= 0 || amount > available || !paymentAccount) {
                 if (withdrawMessage) withdrawMessage.textContent = "Enter a valid amount within your available balance and complete the receiving account details.";
