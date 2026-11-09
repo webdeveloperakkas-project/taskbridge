@@ -1726,11 +1726,21 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const totals = allWallets.reduce((acc, wallet) => {
             const currency = String(wallet.currency || "USD").toUpperCase();
-            if (!acc[currency]) acc[currency] = { available: 0, held: 0 };
+            if (!acc[currency]) acc[currency] = { available: 0, held: 0, pending: 0 };
             acc[currency].available += Number(wallet.available_balance || 0);
             acc[currency].held += Number(wallet.held_balance || 0);
             return acc;
         }, {});
+
+        // Pending balance means deposit requests awaiting admin review.
+        // Withdrawal requests remain managed in the separate Withdrawals section.
+        (allDeposits || []).filter(deposit =>
+            String(deposit.status || "").toLowerCase() === "pending"
+        ).forEach(deposit => {
+            const currency = String(deposit.currency || "USD").toUpperCase();
+            if (!totals[currency]) totals[currency] = { available: 0, held: 0, pending: 0 };
+            totals[currency].pending += Number(deposit.amount || 0);
+        });
 
         const formatTotals = key => Object.entries(totals).length
             ? Object.entries(totals).map(([currency, values]) =>
@@ -1743,6 +1753,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         $("#walletCount").textContent = String(allWallets.length);
         $("#walletAvailableTotal").textContent = formatTotals("available");
+        $("#walletPendingTotal").textContent = formatTotals("pending");
         $("#walletHeldTotal").textContent = formatTotals("held");
 
         if (!filtered.length) {
