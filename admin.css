@@ -1221,3 +1221,13 @@ a {
 .payment-logo-bank { background: #e8edf5; color: #34445e; }
 .payment-logo-usdt { background: #26a17b; color: #fff; }
 .payment-logo-default { background: #fff4c7; color: #876300; }
+
+.payment-transaction-id {
+    display: block;
+    max-width: 150px;
+    margin-top: 5px;
+    color: var(--text-muted, #7b8494);
+    font-size: 10px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
