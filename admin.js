@@ -7,7 +7,6 @@
    SUPABASE CONFIGURATION
 ========================================= */
 
-
 const SUPABASE_URL =
     "https://eboagroxkgpplccufpuk.supabase.co";
 
