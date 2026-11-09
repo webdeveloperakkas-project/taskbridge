@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let selectedJobId = null;
     let allDeposits = [];
     let allWithdrawals = [];
+    let allWallets = [];
     let realtimeChannel = null;
     let toastTimer = null;
 
@@ -111,6 +112,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         transactionsPanel: {
             title: "Transactions",
             subtitle: "Monitor wallet transactions."
+        },
+
+        walletsPanel: {
+            title: "Wallet Management",
+            subtitle: "View user wallet balances and account details."
         },
 
         reportsPanel: {
@@ -1696,6 +1702,92 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 
+
+
+    /* =====================================
+       WALLET MANAGEMENT
+    ====================================== */
+
+    function renderWallets() {
+        const tbody = $("#walletsTable");
+        if (!tbody) return;
+
+        const search = ($("#walletSearch")?.value || "").trim().toLowerCase();
+        const usersById = new Map(allUsers.map(user => [user.id, user]));
+        const filtered = allWallets.filter(wallet => {
+            const user = usersById.get(wallet.user_id) || {};
+            return [
+                user.full_name,
+                user.email,
+                wallet.user_id,
+                wallet.currency
+            ].some(value => String(value || "").toLowerCase().includes(search));
+        });
+
+        const totals = allWallets.reduce((acc, wallet) => {
+            const currency = String(wallet.currency || "USD").toUpperCase();
+            if (!acc[currency]) acc[currency] = { available: 0, held: 0 };
+            acc[currency].available += Number(wallet.available_balance || 0);
+            acc[currency].held += Number(wallet.held_balance || 0);
+            return acc;
+        }, {});
+
+        const formatTotals = key => Object.entries(totals).length
+            ? Object.entries(totals).map(([currency, values]) =>
+                currency + " " + values[key].toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
+            ).join(" · ")
+            : "0.00";
+
+        $("#walletCount").textContent = String(allWallets.length);
+        $("#walletAvailableTotal").textContent = formatTotals("available");
+        $("#walletHeldTotal").textContent = formatTotals("held");
+
+        if (!filtered.length) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        ${allWallets.length ? "No wallets match your search." : "No wallet records found."}
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(wallet => {
+            const user = usersById.get(wallet.user_id) || {};
+            const name = user.full_name || "Unknown User";
+            const email = user.email || "No email available";
+            const currency = String(wallet.currency || "USD").toUpperCase();
+            const amount = value => Number(value || 0).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            return `
+                <tr>
+                    <td>
+                        <div class="table-user">
+                            <div class="table-user-avatar">${escapeHTML(name.charAt(0).toUpperCase())}</div>
+                            <div>
+                                <strong>${escapeHTML(name)}</strong>
+                                <small>${escapeHTML(email)}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="user-id">${escapeHTML(wallet.user_id || "—")}</span></td>
+                    <td>${escapeHTML(currency)}</td>
+                    <td><strong class="wallet-available">${escapeHTML(amount(wallet.available_balance))}</strong></td>
+                    <td><strong>${escapeHTML(amount(wallet.held_balance))}</strong></td>
+                    <td>${formatDate(wallet.updated_at)}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+
     /* =====================================
        LOAD ALL ADMIN DATA
     ====================================== */
@@ -1722,6 +1814,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             allSubmissions = data.job_submissions || [];
             allDeposits = data.deposits || [];
             allWithdrawals = data.withdrawals || [];
+            allWallets = data.wallets || [];
 
 
             // Attach roles to user profiles
@@ -1752,6 +1845,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderSubmissions();
             renderDeposits();
             renderWithdrawals();
+            renderWallets();
 
 
             // Generic financial and support tables
@@ -1886,6 +1980,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
 
+    const walletSearch = $("#walletSearch");
+    if (walletSearch) walletSearch.addEventListener("input", renderWallets);
+
     const submissionFilter = $("#submissionStatusFilter");
 
     if (submissionFilter) {
@@ -1917,7 +2014,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         "refreshJobs",
         "refreshSubmissions",
         "refreshDeposits",
-        "refreshWithdrawals"
+        "refreshWithdrawals",
+        "refreshWallets"
 
     ];
 
