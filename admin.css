@@ -1127,3 +1127,34 @@ a {
 
 }
 
+/* =========================================
+   WALLET MANAGEMENT
+========================================= */
+
+.wallet-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wallet-available {
+    color: var(--success);
+}
+
+#walletsTable .table-user {
+    min-width: 190px;
+}
+
+#walletsTable .user-id {
+    max-width: 150px;
+}
+
+@media (max-width: 1150px) {
+    .wallet-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .wallet-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
