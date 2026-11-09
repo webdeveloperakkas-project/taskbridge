@@ -2218,39 +2218,45 @@
 
 <!-- DEPOSIT SECTION -->
 <section id="depositSection" class="page-section" hidden>
-
-    <div class="section-heading">
-        <div>
-            <h2>Deposit</h2>
-            <p>Add funds to your TaskBridge wallet.</p>
+    <div class="section-heading"><div><h2>Deposit</h2><p>Add funds to your TaskBridge wallet using an available payment method.</p></div></div>
+    <div class="deposit-layout">
+        <div class="content-panel deposit-form-panel">
+            <h3>Choose a payment method</h3>
+            <form id="depositForm">
+                <label for="depositAmount">Deposit Amount (USD)</label>
+                <input type="number" id="depositAmount" name="amount" min="1" max="100000" step="0.01" placeholder="Enter amount in USD" required>
+                <label for="depositMethod">Payment Method</label>
+                <select id="depositMethod" name="payment_method" required>
+                    <option value="">Select a payment method</option>
+                    <optgroup label="International">
+                        <option value="Visa / Mastercard (Gateway setup required)">Visa / Mastercard</option>
+                        <option value="Wise (manual transfer)">Wise</option>
+                    </optgroup>
+                    <optgroup label="Bangladesh">
+                        <option value="bKash">bKash</option>
+                        <option value="Nagad">Nagad</option>
+                        <option value="Rocket">Rocket</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </optgroup>
+                    <optgroup label="Cryptocurrency">
+                        <option value="USDT - BEP20">USDT (BEP20)</option>
+                        <option value="USDT - TRC20">USDT (TRC20)</option>
+                    </optgroup>
+                </select>
+                <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
+                <label for="depositTransactionId">Transaction ID / Reference Number</label>
+                <input type="text" id="depositTransactionId" name="transaction_reference" maxlength="160" placeholder="Enter the transaction/reference ID" required>
+                <p class="deposit-field-hint">After sending your payment, enter its transaction ID. Our team will verify it before adding funds.</p>
+                <button type="submit" id="depositSubmitButton" class="btn-primary">Submit Deposit Request</button>
+                <p id="depositFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
+            </form>
         </div>
+        <aside class="content-panel deposit-security-panel">
+            <h3>Before you submit</h3>
+            <ul><li>Send the exact amount shown in your request.</li><li>Choose the correct USDT network. BEP20 and TRC20 are not interchangeable.</li><li>Keep your transaction ID until the deposit is reviewed.</li><li>Never share your card PIN, CVV, password or one-time code.</li></ul>
+            <p class="deposit-demo-note">Payment account details shown here are temporary demo placeholders. Replace them with verified business payment details before accepting real deposits.</p>
+        </aside>
     </div>
-
-    <div class="content-panel">
-        <h3>Deposit Funds</h3>
-
-        <form id="depositForm">
-
-            <label for="depositAmount">Deposit Amount (USD)</label>
-            <input type="number" id="depositAmount"
-                   min="1" step="0.01"
-                   placeholder="Enter amount">
-
-            <label for="depositMethod">Payment Method</label>
-            <select id="depositMethod">
-                <option value="">Select Payment Method</option>
-                <option value="bank">Bank Transfer</option>
-                <option value="paypal">PayPal</option>
-                <option value="crypto">Cryptocurrency</option>
-            </select>
-
-            <button type="submit" class="btn-primary">
-                Continue to Deposit
-            </button>
-
-        </form>
-    </div>
-
 </section>
 
 
