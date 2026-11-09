@@ -549,11 +549,45 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 
+    // Match login.js storage: support both Remember Me
+    // (localStorage) and temporary sessions (sessionStorage).
+    const authStorage = {
+        getItem(key) {
+            return (
+                localStorage.getItem(key) ??
+                sessionStorage.getItem(key)
+            );
+        },
+
+        setItem(key, value) {
+            if (localStorage.getItem(key) !== null) {
+                localStorage.setItem(key, value);
+                sessionStorage.removeItem(key);
+            } else {
+                sessionStorage.setItem(key, value);
+                localStorage.removeItem(key);
+            }
+        },
+
+        removeItem(key) {
+            localStorage.removeItem(key);
+            sessionStorage.removeItem(key);
+        }
+    };
+
     try {
 
         supabaseClient = supabaseLibrary.createClient(
             SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY
+            SUPABASE_PUBLISHABLE_KEY,
+            {
+                auth: {
+                    storage: authStorage,
+                    autoRefreshToken: true,
+                    persistSession: true,
+                    detectSessionInUrl: true
+                }
+            }
         );
 
     } catch (error) {
