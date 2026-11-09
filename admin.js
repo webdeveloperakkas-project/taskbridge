@@ -662,9 +662,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
             );
 
-            showToast("No active login session found. Please check Console (F12).");
-
-            // Keep this page open temporarily so the session issue can be diagnosed.
+            window.location.replace("./admin-login.html");
             return false;
 
         }
@@ -695,9 +693,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 isAdmin
             );
 
-            showToast("Your session is active, but Admin permission was not confirmed. Check Console (F12).");
+            showToast("Admin permission required. Please sign in through Admin Login.");
 
-            // Preserve the session and keep the page open for diagnosis.
+            await supabaseClient.auth.signOut();
+            window.location.replace("./admin-login.html");
             return false;
 
         }
@@ -1925,7 +1924,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
 
-            window.location.href = "./login.html";
+            window.location.href = "./admin-login.html";
 
         });
 
