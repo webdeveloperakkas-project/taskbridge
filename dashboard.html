@@ -8,7 +8,7 @@
     <title>TaskBridge - User Dashboard</title>
 
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./dashboard.css?v=20261109-postjob-fix2">
+    <link rel="stylesheet" href="./dashboard.css?v=20261109-header-wallet-dropdown">
 
 </head>
 
@@ -449,20 +449,22 @@
 
                     <!-- WALLET BALANCE -->
 
-                    <a href="./wallet.html" class="header-balance">
-
-                        <div class="balance-icon">
-                            <svg class="icon">
-                                <use href="#icon-wallet"></use>
-                            </svg>
-                        </div>
-
-                        <div>
-                            <small>Available Balance</small>
-                            <strong id="availableBalanceHeader">Loading...</strong>
-                        </div>
-
-                    </a>
+                    <div class="header-dropdown wallet-balance-dropdown">
+                        <button type="button" class="header-balance" id="walletBalanceToggle"
+                            aria-label="Available balance and currency wallets" aria-expanded="false"
+                            aria-controls="headerWalletMenu">
+                            <span class="balance-icon">
+                                <svg class="icon"><use href="#icon-wallet"></use></svg>
+                            </span>
+                            <span class="header-balance-copy">
+                                <small>Available Balance</small>
+                                <strong id="availableBalanceHeader">Loading...</strong>
+                            </span>
+                            <svg class="icon wallet-balance-chevron"><use href="#icon-chevron"></use></svg>
+                        </button>
+                        <div class="dropdown-menu wallet-balance-menu" id="headerWalletMenu"
+                            aria-label="Available currency wallets"></div>
+                    </div>
 
 
                     <!-- NOTIFICATION DROPDOWN -->
@@ -810,7 +812,7 @@
                                 <p>Your example wallet overview.</p>
                             </div>
 
-                            <a href="./wallet.html" class="view-all-link">
+                            <a href="#walletSection" class="view-all-link" data-section="walletSection">
                                 View Wallet
                             </a>
                         </div>
