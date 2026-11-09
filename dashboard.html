@@ -479,7 +479,7 @@
                                 <use href="#icon-bell"></use>
                             </svg>
 
-                            <span class="notification-indicator">3</span>
+                            <span class="notification-indicator" id="notificationIndicator" hidden>0</span>
 
                         </button>
 
@@ -492,22 +492,8 @@
                                 <a href="#notifications">View All</a>
                             </div>
 
-                            <div class="notification-item">
-                                <strong>Welcome to TaskBridge</strong>
-                                <p>Your account dashboard is ready.</p>
-                                <small>Welcome message</small>
-                            </div>
-
-                            <div class="notification-item">
-                                <strong>Profile Reminder</strong>
-                                <p>Complete your profile information.</p>
-                                <small>Account update</small>
-                            </div>
-
-                            <div class="notification-item">
-                                <strong>Stay Updated</strong>
-                                <p>Check your dashboard for new activities.</p>
-                                <small>Platform update</small>
+                            <div id="headerNotificationList" aria-live="polite">
+                                <p class="notification-item">Loading notifications...</p>
                             </div>
 
                         </div>
@@ -2362,12 +2348,8 @@
                     </tr>
                 </thead>
 
-                <tbody>
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            No transactions yet.
-                        </td>
-                    </tr>
+                <tbody id="transactionHistoryBody">
+                    <tr><td colspan="5" class="empty-state">Loading transactions...</td></tr>
                 </tbody>
 
             </table>
