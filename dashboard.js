@@ -917,7 +917,7 @@ document.addEventListener("DOMContentLoaded", function () {
             depositSelectedTitle.textContent = ["Visa", "Mastercard"].includes(selectedDepositMethod)
                 ? "Visa / Mastercard instructions" : (depositMethodDetails[selectedDepositMethod]?.title || "Payment instructions");
         }
-        if (selectedDepositMethod === "Visa / Mastercard (Gateway setup required)") {
+        if (["Visa", "Mastercard"].includes(selectedDepositMethod)) {
             depositInstructions.innerHTML = '<strong>Card checkout is not connected yet.</strong><p>Visa/Mastercard payments will be enabled after a supported payment gateway merchant account and hosted checkout are configured. Do not enter card number, expiry date or CVV on this page.</p>';
             depositInstructions.hidden = false;
             if (depositSubmitButton) depositSubmitButton.disabled = true;
