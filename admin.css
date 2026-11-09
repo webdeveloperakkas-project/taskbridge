@@ -1158,3 +1158,66 @@ a {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* Transaction type and payment method indicators */
+.transaction-type-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 82px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.15px;
+    white-space: nowrap;
+}
+.transaction-type-deposit {
+    color: #138452;
+    background: #e8f8f0;
+}
+.transaction-type-withdraw {
+    color: #c13e3e;
+    background: #fff0f0;
+}
+.transaction-type-other {
+    color: #8a6500;
+    background: #fff6d8;
+}
+.transaction-user-id,
+.transaction-id {
+    max-width: 145px;
+    overflow-wrap: anywhere;
+}
+.transaction-method-cell {
+    min-width: 64px;
+}
+.payment-logo {
+    width: 34px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 850;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgba(20,30,50,.14);
+}
+.payment-logo-bkash { background: #e2136e; color: #fff; font-style: italic; }
+.payment-logo-nagad { background: #f58220; color: #fff; border-radius: 50%; }
+.payment-logo-rocket { background: #8b2f8f; color: #fff; }
+.payment-logo-visa { background: #fff; color: #1a1f71; font-style: italic; }
+.payment-logo-mastercard { background: #fff; }
+.payment-logo-mastercard i {
+    width: 15px; height: 15px; border-radius: 50%;
+    background: #eb001b; display: block; margin: 0 -2px;
+}
+.payment-logo-mastercard i + i { background: #f79e1b; mix-blend-mode: multiply; }
+.payment-logo-wise { background: #9fe870; color: #163300; }
+.payment-logo-bank { background: #e8edf5; color: #34445e; }
+.payment-logo-usdt { background: #26a17b; color: #fff; }
+.payment-logo-default { background: #fff4c7; color: #876300; }
