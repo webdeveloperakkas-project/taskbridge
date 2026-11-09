@@ -970,7 +970,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Deposit request failed:", error);
                 if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
             } finally {
-                if (depositSubmitButton) { depositSubmitButton.disabled = selectedDepositMethod === "Visa / Mastercard (Gateway setup required)"; depositSubmitButton.textContent = "Submit Deposit Request"; }
+                if (depositSubmitButton) { depositSubmitButton.disabled = ["Visa", "Mastercard"].includes(selectedDepositMethod); depositSubmitButton.textContent = "Submit Deposit Request"; }
             }
         });
     }
