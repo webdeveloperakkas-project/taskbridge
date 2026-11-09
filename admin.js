@@ -1748,7 +1748,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (!filtered.length) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="empty-state">
+                    <td colspan="7" class="empty-state">
                         ${allWallets.length ? "No wallets match your search." : "No wallet records found."}
                     </td>
                 </tr>
@@ -1778,6 +1778,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         </div>
                     </td>
                     <td><span class="user-id">${escapeHTML(wallet.user_id || "—")}</span></td>
+                    <td>${escapeHTML((user.userRoles || []).map(role => role.role).join(", ") || "—")}</td>
                     <td>${escapeHTML(currency)}</td>
                     <td><strong class="wallet-available">${escapeHTML(amount(wallet.available_balance))}</strong></td>
                     <td><strong>${escapeHTML(amount(wallet.held_balance))}</strong></td>
