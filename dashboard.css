@@ -2251,16 +2251,49 @@ button {
 
 
 
-/* Deposit payment method UI */
+/* =========================================
+   DEPOSIT PAYMENT METHOD CARDS
+========================================= */
+.deposit-method-panel{margin-bottom:22px;padding:24px}
+.deposit-method-heading{margin-bottom:24px}
+.deposit-method-heading h3{margin:0 0 6px;color:#1e293b;font-size:18px}
+.deposit-method-heading p,.deposit-group-heading p{margin:0;color:#64748b;font-size:12px;line-height:1.5}
+.deposit-method-group+.deposit-method-group{margin-top:25px;padding-top:22px;border-top:1px solid #edf1f5}
+.deposit-group-heading{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.deposit-group-heading h4{margin:0 0 3px;color:#334155;font-size:14px}
+.deposit-group-mark{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:#f1f5f9;font-size:19px}
+.deposit-method-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.deposit-method-card{min-width:0;min-height:116px;padding:13px 9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1px solid #e2e8f0;border-radius:13px;background:#fff;color:#334155;font-family:inherit;cursor:pointer;transition:border-color .2s,background .2s,box-shadow .2s,transform .2s}
+.deposit-method-card:hover{border-color:#16a36a;background:#f8fdf9;transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.06)}
+.deposit-method-card.active{border:2px solid #16a36a;background:#ecfdf5;box-shadow:0 0 0 3px rgba(22,163,106,.09)}
+.deposit-method-card strong{font-size:12px;font-weight:750}
+.deposit-method-card small{color:#64748b;font-size:10px;text-align:center}
+.deposit-brand-mark{height:37px;min-width:48px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:850;letter-spacing:-.5px}
+.brand-visa{color:#1a1f71;font-style:italic}
+.brand-mastercard{position:relative;min-width:50px}
+.brand-mastercard i{width:24px;height:24px;border-radius:50%;background:#eb001b;display:block}
+.brand-mastercard i+i{margin-left:-9px;background:#f79e1b;mix-blend-mode:multiply}
+.brand-wise{color:#176b55;font-size:23px;font-weight:850}
+.brand-bkash{color:#d7195b;font-size:17px}
+.brand-nagad{width:32px;min-width:32px;height:32px;border-radius:10px;background:#f97316;color:white;font-size:20px}
+.brand-rocket{width:32px;min-width:32px;height:32px;border-radius:50%;background:#7c3aed;color:white;font-size:20px}
+.brand-bank{width:34px;min-width:34px;height:34px;border-radius:9px;background:#e0f2fe;color:#0369a1;font-size:21px}
+.brand-usdt{width:34px;min-width:34px;height:34px;border-radius:50%;background:#e6f7ef;color:#15966b;font-size:22px}
 .deposit-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:22px;align-items:start}
-.deposit-form-panel form{display:grid;gap:11px}
+.deposit-form-panel form,.deposit-entry-fields{display:grid;gap:11px}
 .deposit-form-panel label{font-weight:650;margin-top:7px}
-.deposit-form-panel input,.deposit-form-panel select{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border-color,#d9e0ea);border-radius:10px;background:var(--input-bg,#fff);color:inherit;font:inherit}
-.deposit-payment-instructions{padding:16px;margin:8px 0;border:1px solid var(--border-color,#d9e0ea);border-radius:12px;background:var(--surface-soft,#f7f9fc);line-height:1.65;overflow-wrap:anywhere}
+.deposit-form-panel input{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border-color,#d9e0ea);border-radius:10px;background:var(--input-bg,#fff);color:inherit;font:inherit}
+.deposit-payment-instructions{padding:16px;margin:8px 0 15px;border:1px solid #dbe5ef;border-radius:12px;background:#f8fafc;line-height:1.65;overflow-wrap:anywhere}
 .deposit-payment-instructions ul{margin:9px 0 0;padding-left:20px}
+.deposit-selected-heading{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.deposit-selected-heading h3{margin:0 0 4px;font-size:16px}
+.deposit-selected-heading p{margin:0;color:#64748b;font-size:12px}
+.deposit-selected-check{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#dcfce7;color:#15803d;font-weight:800}
 .deposit-field-hint,.deposit-demo-note{font-size:.88rem;line-height:1.6;opacity:.78}
 .deposit-security-panel ul{padding-left:20px;line-height:1.8}
 .deposit-demo-note{padding:12px;border-radius:10px;background:rgba(220,160,30,.10)}
 .deposit-form-message{min-height:22px;font-size:.92rem;line-height:1.5}
 #depositSubmitButton:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:850px){.deposit-layout{grid-template-columns:1fr}}
+@media(max-width:600px){.deposit-method-panel{padding:17px}.deposit-method-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.deposit-method-card{min-height:102px;padding:9px 4px}.deposit-method-card strong{font-size:10px}.deposit-method-card small{font-size:9px}.deposit-brand-mark{height:31px;min-width:38px;font-size:15px}.brand-nagad,.brand-rocket,.brand-bank,.brand-usdt{width:29px;min-width:29px;height:29px}.deposit-layout{grid-template-columns:1fr}}
+@media(max-width:360px){.deposit-method-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.deposit-method-card{min-height:96px}}
