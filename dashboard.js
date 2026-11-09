@@ -1,10 +1,10 @@
 
 /* =========================================
    TASKBRIDGE - DASHBOARD JAVASCRIPT
+   Updated Complete Version
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
-
 
     /* =====================================
        CURRENT YEAR
@@ -221,84 +221,80 @@ document.addEventListener("DOMContentLoaded", function () {
        DASHBOARD SECTION CONFIGURATION
     ====================================== */
 
-    
-/* =====================================
-   DASHBOARD SECTION CONFIGURATION
-====================================== */
+    const pageSections = [
+
+        "dashboardSection",
+        "findJobSection",
+        "postJobSection",
+        "myPostedJobsSection",
+        "mySubmittedJobsSection",
+        "walletSection",
+        "depositSection",
+        "withdrawSection",
+        "transactionsSection",
+        "jobDetailsSection"
+
+    ];
 
 
-const pageSections = [
-    "dashboardSection",
-    "findJobSection",
-    "postJobSection",
-    "myPostedJobsSection",
-    "mySubmittedJobsSection",
-    "walletSection",
-    "depositSection",
-    "withdrawSection",
-    "transactionsSection",
-    "jobDetailsSection"
-];
+    const sectionTitles = {
+
+        dashboardSection: {
+            title: "Dashboard",
+            subtitle: "Welcome back! Here's your overview."
+        },
+
+        findJobSection: {
+            title: "Find a Job",
+            subtitle: "Explore available tasks and opportunities."
+        },
+
+        postJobSection: {
+            title: "Post a Job",
+            subtitle: "Create and publish your own tasks."
+        },
+
+        myPostedJobsSection: {
+            title: "My Posted Jobs",
+            subtitle: "Manage your job listings and submissions."
+        },
+
+        mySubmittedJobsSection: {
+            title: "My Submitted Jobs",
+            subtitle: "Track your submitted work and rewards."
+        },
+
+        walletSection: {
+            title: "My Wallet",
+            subtitle: "Manage your available balance and earnings."
+        },
+
+        depositSection: {
+            title: "Deposit",
+            subtitle: "Add funds to your TaskBridge wallet."
+        },
+
+        withdrawSection: {
+            title: "Withdraw",
+            subtitle: "Request a withdrawal of your available balance."
+        },
+
+        transactionsSection: {
+            title: "Transactions",
+            subtitle: "View your wallet transaction history."
+        },
+
+        jobDetailsSection: {
+            title: "Job Details",
+            subtitle: "Review the complete task information before starting."
+        }
+
+    };
 
 
-const sectionTitles = {
-
-    dashboardSection: {
-        title: "Dashboard",
-        subtitle: "Welcome back! Here's your overview."
-    },
-
-    findJobSection: {
-        title: "Find a Job",
-        subtitle: "Explore available tasks and opportunities."
-    },
-
-    postJobSection: {
-        title: "Post a Job",
-        subtitle: "Create and publish your own tasks."
-    },
-
-    myPostedJobsSection: {
-        title: "My Posted Jobs",
-        subtitle: "Manage your job listings and submissions."
-    },
-
-    mySubmittedJobsSection: {
-        title: "My Submitted Jobs",
-        subtitle: "Track your submitted work and rewards."
-    },
-
-    walletSection: {
-        title: "My Wallet",
-        subtitle: "Manage your available balance and earnings."
-    },
-
-    depositSection: {
-        title: "Deposit",
-        subtitle: "Add funds to your TaskBridge wallet."
-    },
-
-    withdrawSection: {
-        title: "Withdraw",
-        subtitle: "Request a withdrawal of your available balance."
-    },
-
-    transactionsSection: {
-        title: "Transactions",
-        subtitle: "View your wallet transaction history."
-    },
-
-    jobDetailsSection: {
-        title: "Job Details",
-        subtitle: "Review the complete task information before starting."
-    }
-
-};
-
-
-const sectionLinks = document.querySelectorAll(
-    ".sidebar-navigation .nav-link[data-section]"
-);
+    const sectionLinks = document.querySelectorAll(
+        ".sidebar-navigation .nav-link[data-section]"
+    );
 
 
     /* =====================================
@@ -379,11 +375,17 @@ const sectionLinks = document.querySelectorAll(
         }
 
 
-        // Update URL
+        // Update browser history
 
         if (updateURL) {
 
-            history.replaceState(null, "", "#" + sectionId);
+            const newHash = "#" + sectionId;
+
+            if (window.location.hash !== newHash) {
+
+                history.pushState(null, "", newHash);
+
+            }
 
         }
 
@@ -530,11 +532,22 @@ const sectionLinks = document.querySelectorAll(
 
 
     if (workerReward) {
-        workerReward.addEventListener("input", calculateJobBudget);
+
+        workerReward.addEventListener(
+            "input",
+            calculateJobBudget
+        );
+
     }
 
+
     if (workersRequired) {
-        workersRequired.addEventListener("input", calculateJobBudget);
+
+        workersRequired.addEventListener(
+            "input",
+            calculateJobBudget
+        );
+
     }
 
 
@@ -601,7 +614,7 @@ const sectionLinks = document.querySelectorAll(
             : "";
 
         const selectedCategory = jobCategoryFilter
-            ? jobCategoryFilter.value
+            ? jobCategoryFilter.value.toLowerCase()
             : "all";
 
 
@@ -653,6 +666,10 @@ const sectionLinks = document.querySelectorAll(
 
     }
 
+
+    /* =====================================
+       FIND JOB SORTING
+    ====================================== */
 
     if (jobSortFilter) {
 
@@ -717,6 +734,7 @@ const sectionLinks = document.querySelectorAll(
 
                 const selectedStatus = this.dataset.status;
 
+
                 // Update selected tab
 
                 tabs.forEach(function (item) {
@@ -729,7 +747,7 @@ const sectionLinks = document.querySelectorAll(
                 });
 
 
-                // Filter real job cards if they are added later
+                // Filter job cards
 
                 const panel = group.closest(".content-panel");
 
@@ -796,46 +814,3 @@ const sectionLinks = document.querySelectorAll(
     );
 
 });
-
-
-/* =========================================
-   FINANCE SECTION SWITCHING
-========================================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const financeSections = [
-        "walletSection",
-        "depositSection",
-        "withdrawSection",
-        "transactionsSection"
-    ];
-
-    const financeLinks = document.querySelectorAll(
-        '.sidebar-navigation .nav-link[data-section]'
-    );
-
-    financeLinks.forEach(function (link) {
-
-        link.addEventListener("click", function (event) {
-
-            const sectionId = this.dataset.section;
-
-            if (!financeSections.includes(sectionId)) {
-                return;
-            }
-
-            event.preventDefault();
-
-            if (typeof showPageSection === "function") {
-                showPageSection(sectionId);
-            } else {
-                console.warn("Section switching function not found.");
-            }
-
-        });
-
-    });
-
-});
-
