@@ -920,7 +920,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (category?.icon) {
                 const iconValue = String(category.icon).trim();
                 const iconNode = document.createElement(
-                    /^(fa[srb]?\\s|fa-)/i.test(iconValue) ? "i" : "span"
+                    /^(fa[srb]?\s|fa-)/i.test(iconValue) ? "i" : "span"
                 );
                 if (iconNode.tagName === "I") {
                     iconNode.className = iconValue;
