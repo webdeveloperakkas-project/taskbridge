@@ -879,14 +879,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* =====================================
        DEPOSIT REQUEST FORM
-       Manual methods create a pending request.
-       Card processing requires a real hosted gateway.
+       Select a visual payment card, then submit a pending request.
     ====================================== */
     const depositForm = document.getElementById("depositForm");
-    const depositMethod = document.getElementById("depositMethod");
     const depositInstructions = document.getElementById("depositPaymentInstructions");
+    const depositDetailsPanel = document.getElementById("depositDetailsPanel");
+    const depositSelectedTitle = document.getElementById("depositSelectedTitle");
     const depositMessage = document.getElementById("depositFormMessage");
     const depositSubmitButton = document.getElementById("depositSubmitButton");
+    let selectedDepositMethod = "";
 
     const depositMethodDetails = {
         "bKash": { title: "bKash payment details (demo)", lines: ["Account type: Agent / Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
@@ -898,25 +899,43 @@ document.addEventListener("DOMContentLoaded", function () {
         "USDT - TRC20": { title: "USDT wallet (TRC20 demo)", lines: ["Network: TRON (TRC20)", "Wallet address: TDEMO_REPLACE_WITH_YOUR_TRC20_ADDRESS", "Send USDT on TRC20 network only"] }
     };
 
-    function renderDepositInstructions() {
-        if (!depositMethod || !depositInstructions) return;
-        const method = depositMethod.value;
-        if (!method) { depositInstructions.hidden = true; depositInstructions.replaceChildren(); return; }
-        if (method === "Visa / Mastercard (Gateway setup required)") {
-            depositInstructions.hidden = false;
+    function renderDepositInstructions(method) {
+        selectedDepositMethod = method || "";
+        document.querySelectorAll(".deposit-method-card").forEach(card => {
+            const selected = card.dataset.method === selectedDepositMethod;
+            card.classList.toggle("active", selected);
+            card.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+        if (!depositDetailsPanel || !depositInstructions) return;
+        if (!selectedDepositMethod) {
+            depositDetailsPanel.hidden = true;
+            depositInstructions.hidden = true;
+            return;
+        }
+        depositDetailsPanel.hidden = false;
+        if (depositSelectedTitle) {
+            depositSelectedTitle.textContent = selectedDepositMethod === "Visa / Mastercard (Gateway setup required)"
+                ? "Visa / Mastercard instructions" : (depositMethodDetails[selectedDepositMethod]?.title || "Payment instructions");
+        }
+        if (selectedDepositMethod === "Visa / Mastercard (Gateway setup required)") {
             depositInstructions.innerHTML = '<strong>Card checkout is not connected yet.</strong><p>Visa/Mastercard payments will be enabled after a supported payment gateway merchant account and hosted checkout are configured. Do not enter card number, expiry date or CVV on this page.</p>';
+            depositInstructions.hidden = false;
             if (depositSubmitButton) depositSubmitButton.disabled = true;
             return;
         }
         if (depositSubmitButton) depositSubmitButton.disabled = false;
-        const details = depositMethodDetails[method];
+        const details = depositMethodDetails[selectedDepositMethod];
         if (!details) { depositInstructions.hidden = true; return; }
-        depositInstructions.innerHTML = '<strong>' + details.title + '</strong><ul>' +
-            details.lines.map(line => '<li>' + line.replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])) + '</li>').join('') + '</ul>';
+        const escapeHtml = value => String(value).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+        depositInstructions.innerHTML = "<strong>" + escapeHtml(details.title) + "</strong><ul>" +
+            details.lines.map(line => "<li>" + escapeHtml(line) + "</li>").join("") + "</ul>";
         depositInstructions.hidden = false;
+        if (depositMessage) depositMessage.textContent = "";
     }
 
-    if (depositMethod) depositMethod.addEventListener("change", renderDepositInstructions);
+    document.querySelectorAll(".deposit-method-card").forEach(card => {
+        card.addEventListener("click", () => renderDepositInstructions(card.dataset.method));
+    });
 
     if (depositForm) {
         depositForm.addEventListener("submit", async function(event) {
@@ -924,8 +943,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!supabaseClient || !currentUser) { if (depositMessage) depositMessage.textContent = "Please sign in again and retry."; return; }
             if (!depositForm.reportValidity()) return;
             const amount = Number(document.getElementById("depositAmount")?.value);
-            const method = depositMethod?.value || "";
+            const method = selectedDepositMethod;
             const reference = document.getElementById("depositTransactionId")?.value.trim() || "";
+            if (!method) { if (depositMessage) depositMessage.textContent = "Please select a payment method first."; return; }
             if (method === "Visa / Mastercard (Gateway setup required)") {
                 if (depositMessage) depositMessage.textContent = "Card gateway is not connected yet.";
                 return;
@@ -944,13 +964,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 if (error) throw error;
                 depositForm.reset();
-                renderDepositInstructions();
+                renderDepositInstructions("");
                 if (depositMessage) depositMessage.textContent = "Deposit request submitted. It will remain pending until an admin verifies your transaction.";
             } catch (error) {
                 console.error("Deposit request failed:", error);
                 if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
             } finally {
-                if (depositSubmitButton) { depositSubmitButton.disabled = false; depositSubmitButton.textContent = "Submit Deposit Request"; }
+                if (depositSubmitButton) { depositSubmitButton.disabled = selectedDepositMethod === "Visa / Mastercard (Gateway setup required)"; depositSubmitButton.textContent = "Submit Deposit Request"; }
             }
         });
     }
