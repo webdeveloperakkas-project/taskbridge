@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUser = null;
     let categoryRows = [];
     let postedJobsChannel = null;
+    let walletChannel = null;
+    let walletCurrency = "USD";
 
     /* =====================================
        CURRENT YEAR
@@ -829,6 +831,52 @@ document.addEventListener("DOMContentLoaded", function () {
     function formatJobMoney(value) { return "$" + (Number(value) || 0).toFixed(2); }
     function uiStatus(status) { return status === "pending_review" ? "pending" : status; }
 
+    function formatWalletMoney(amount, currency) {
+        const value = Number(amount);
+        const safeValue = Number.isFinite(value) ? value : 0;
+        try {
+            return new Intl.NumberFormat(undefined, {
+                style: "currency",
+                currency: currency || "USD"
+            }).format(safeValue);
+        } catch (error) {
+            return (currency || "USD") + " " + safeValue.toFixed(2);
+        }
+    }
+
+    function renderWalletBalance(wallet) {
+        walletCurrency = wallet?.currency || "USD";
+        const formatted = formatWalletMoney(wallet?.available_balance ?? 0, walletCurrency);
+        ["availableBalanceHeader", "availableBalanceOverview",
+            "availableBalanceWallet", "availableBalanceWithdraw"].forEach(id => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = formatted;
+        });
+
+        const withdrawAmount = document.getElementById("withdrawAmount");
+        if (withdrawAmount) {
+            withdrawAmount.max = String(Number(wallet?.available_balance ?? 0));
+        }
+        const withdrawLabel = document.querySelector('label[for="withdrawAmount"]');
+        if (withdrawLabel) {
+            withdrawLabel.textContent = "Withdrawal Amount (" + walletCurrency + ")";
+        }
+    }
+
+    async function loadMyWallet() {
+        const { data, error } = await supabaseClient.from("wallets")
+            .select("id,user_id,currency,available_balance,held_balance,updated_at")
+            .eq("user_id", currentUser.id)
+            .maybeSingle();
+        if (error) throw error;
+        if (!data) {
+            renderWalletBalance({ currency: "USD", available_balance: 0 });
+            console.warn("No wallet row found for the signed-in user.");
+            return;
+        }
+        renderWalletBalance(data);
+    }
+
     async function loadJobCategories() {
         const { data, error } = await supabaseClient.from("job_categories")
             .select("id,name,slug,icon,is_active,display_order")
@@ -977,6 +1025,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         await loadJobCategories();
         await loadMyPostedJobs();
+        await loadMyWallet();
 
         document.querySelectorAll(".logout-link").forEach(link => {
             link.addEventListener("click", async event => {
@@ -990,6 +1039,13 @@ document.addEventListener("DOMContentLoaded", function () {
         supabaseClient.auth.onAuthStateChange((event, session) => {
             if (event === "SIGNED_OUT" || !session) window.location.replace("./login.html");
         });
+
+        walletChannel = supabaseClient.channel("user-wallet-" + currentUser.id)
+            .on("postgres_changes", {
+                event: "*", schema: "public", table: "wallets",
+                filter: "user_id=eq." + currentUser.id
+            }, () => loadMyWallet().catch(err => console.error("Wallet realtime refresh failed:", err)))
+            .subscribe();
 
         postedJobsChannel = supabaseClient.channel("advertiser-jobs-" + currentUser.id)
             .on("postgres_changes", {
