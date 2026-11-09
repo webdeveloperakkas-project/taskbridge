@@ -1799,14 +1799,7 @@
                                     name="category"
                                     required>
 
-                                    <option value="">Select Category</option>
-                                    <option value="facebook">Facebook</option>
-                                    <option value="youtube">YouTube</option>
-                                    <option value="instagram">Instagram</option>
-                                    <option value="tiktok">TikTok</option>
-                                    <option value="twitter">Twitter / X</option>
-                                    <option value="website">Website</option>
-                                    <option value="other">Other</option>
+                                    <option value="">Loading categories...</option>
 
                                 </select>
 
@@ -1830,7 +1823,18 @@
 
                             <div class="form-group">
 
-                                <label for="targetUrl">Target URL</label>
+                                <div class="form-group">
+                                <label for="jobInstructions">Worker Instructions</label>
+                                <textarea id="jobInstructions" name="instructions" rows="4"
+                                    placeholder="Step-by-step instructions workers must follow..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="jobDuration">Estimated Completion Time (minutes)</label>
+                                <input type="number" id="jobDuration" name="durationMinutes"
+                                    min="1" step="1" value="5" required>
+                            </div>
+
+                            <label for="targetUrl">Target URL</label>
 
                                 <input type="url"
                                     id="targetUrl"
@@ -1979,27 +1983,27 @@
 
                         <div class="stat-card">
                             <p>Total Posted</p>
-                            <h3>0</h3>
+                            <h3 id="postedTotalCount">0</h3>
                         </div>
 
                         <div class="stat-card">
                             <p>Active</p>
-                            <h3>0</h3>
+                            <h3 id="postedActiveCount">0</h3>
                         </div>
 
                         <div class="stat-card">
                             <p>Pending Approval</p>
-                            <h3>0</h3>
+                            <h3 id="postedPendingCount">0</h3>
                         </div>
 
                         <div class="stat-card">
                             <p>Completed</p>
-                            <h3>0</h3>
+                            <h3 id="postedCompletedCount">0</h3>
                         </div>
 
                         <div class="stat-card">
                             <p>Rejected</p>
-                            <h3>0</h3>
+                            <h3 id="postedRejectedCount">0</h3>
                         </div>
 
                     </div>
@@ -2045,28 +2049,15 @@
                         </div>
 
 
-                        <div class="empty-state">
-
+                        <div id="postedJobsMessage" class="empty-state">
                             <div class="empty-state-icon">
-                                <svg class="icon">
-                                    <use href="#icon-briefcase"></use>
-                                </svg>
+                                <svg class="icon"><use href="#icon-briefcase"></use></svg>
                             </div>
-
                             <h3>No Posted Jobs Yet</h3>
-
-                            <p>
-                                You haven't posted any jobs yet.
-                                Create your first job to get started.
-                            </p>
-
-                            <a href="#postJobSection"
-                                class="primary-button"
-                                data-open-section="postJobSection">
-                                Create Your First Job
-                            </a>
-
+                            <p>You haven't posted any jobs yet. Create your first job to get started.</p>
+                            <a href="#postJobSection" class="primary-button" data-open-section="postJobSection">Create Your First Job</a>
                         </div>
+                        <div id="postedJobsList" class="job-list" aria-live="polite"></div>
 
                     </section>
 
@@ -2380,6 +2371,7 @@
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Dashboard JavaScript -->
     <script src="./dashboard.js"></script>
 
