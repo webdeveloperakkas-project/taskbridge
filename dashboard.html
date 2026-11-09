@@ -2218,36 +2218,62 @@
 
 <!-- DEPOSIT SECTION -->
 <section id="depositSection" class="page-section" hidden>
-    <div class="section-heading"><div><h2>Deposit</h2><p>Add funds to your TaskBridge wallet using an available payment method.</p></div></div>
+    <div class="section-heading">
+        <div>
+            <h2>Deposit</h2>
+            <p>Add funds to your TaskBridge wallet using your preferred payment method.</p>
+        </div>
+    </div>
+
+    <div class="content-panel deposit-method-panel">
+        <div class="deposit-method-heading">
+            <div>
+                <h3>Select Your Preferred Method</h3>
+                <p>Choose a payment option below to view its deposit instructions.</p>
+            </div>
+        </div>
+
+        <div class="deposit-method-group">
+            <div class="deposit-group-heading"><span class="deposit-group-mark">🌐</span><div><h4>International Gateway</h4><p>For international users</p></div></div>
+            <div class="deposit-method-grid">
+                <button type="button" class="deposit-method-card" data-method="Visa / Mastercard (Gateway setup required)" aria-pressed="false"><span class="deposit-brand-mark brand-visa">VISA</span><strong>Visa</strong><small>Card payment</small></button>
+                <button type="button" class="deposit-method-card" data-method="Visa / Mastercard (Gateway setup required)" aria-pressed="false"><span class="deposit-brand-mark brand-mastercard"><i></i><i></i></span><strong>Mastercard</strong><small>Card payment</small></button>
+                <button type="button" class="deposit-method-card" data-method="Wise (manual transfer)" aria-pressed="false"><span class="deposit-brand-mark brand-wise">wise</span><strong>Wise</strong><small>Manual transfer</small></button>
+            </div>
+        </div>
+
+        <div class="deposit-method-group">
+            <div class="deposit-group-heading"><span class="deposit-group-mark">🇧🇩</span><div><h4>For Bangladesh Users</h4><p>Local mobile banking and bank transfer</p></div></div>
+            <div class="deposit-method-grid">
+                <button type="button" class="deposit-method-card" data-method="bKash" aria-pressed="false"><span class="deposit-brand-mark brand-bkash">bKash</span><strong>bKash</strong><small>Mobile banking</small></button>
+                <button type="button" class="deposit-method-card" data-method="Nagad" aria-pressed="false"><span class="deposit-brand-mark brand-nagad">N</span><strong>Nagad</strong><small>Mobile banking</small></button>
+                <button type="button" class="deposit-method-card" data-method="Rocket" aria-pressed="false"><span class="deposit-brand-mark brand-rocket">R</span><strong>Rocket</strong><small>Mobile banking</small></button>
+                <button type="button" class="deposit-method-card" data-method="Bank Transfer" aria-pressed="false"><span class="deposit-brand-mark brand-bank">৳</span><strong>Bank Transfer</strong><small>Bank deposit</small></button>
+            </div>
+        </div>
+
+        <div class="deposit-method-group">
+            <div class="deposit-group-heading"><span class="deposit-group-mark">₮</span><div><h4>Cryptocurrency</h4><p>USDT deposits — select the correct network</p></div></div>
+            <div class="deposit-method-grid">
+                <button type="button" class="deposit-method-card" data-method="USDT - BEP20" aria-pressed="false"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>BEP20 Network</small></button>
+                <button type="button" class="deposit-method-card" data-method="USDT - TRC20" aria-pressed="false"><span class="deposit-brand-mark brand-usdt">₮</span><strong>USDT</strong><small>TRC20 Network</small></button>
+            </div>
+        </div>
+    </div>
+
     <div class="deposit-layout">
-        <div class="content-panel deposit-form-panel">
-            <h3>Choose a payment method</h3>
+        <div class="content-panel deposit-form-panel" id="depositDetailsPanel" hidden>
+            <div class="deposit-selected-heading"><span class="deposit-selected-check">✓</span><div><h3 id="depositSelectedTitle">Payment instructions</h3><p>Follow the details below, then submit your transaction reference.</p></div></div>
+            <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
             <form id="depositForm">
-                <label for="depositAmount">Deposit Amount (USD)</label>
-                <input type="number" id="depositAmount" name="amount" min="1" max="100000" step="0.01" placeholder="Enter amount in USD" required>
-                <label for="depositMethod">Payment Method</label>
-                <select id="depositMethod" name="payment_method" required>
-                    <option value="">Select a payment method</option>
-                    <optgroup label="International">
-                        <option value="Visa / Mastercard (Gateway setup required)">Visa / Mastercard</option>
-                        <option value="Wise (manual transfer)">Wise</option>
-                    </optgroup>
-                    <optgroup label="Bangladesh">
-                        <option value="bKash">bKash</option>
-                        <option value="Nagad">Nagad</option>
-                        <option value="Rocket">Rocket</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                    </optgroup>
-                    <optgroup label="Cryptocurrency">
-                        <option value="USDT - BEP20">USDT (BEP20)</option>
-                        <option value="USDT - TRC20">USDT (TRC20)</option>
-                    </optgroup>
-                </select>
-                <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
-                <label for="depositTransactionId">Transaction ID / Reference Number</label>
-                <input type="text" id="depositTransactionId" name="transaction_reference" maxlength="160" placeholder="Enter the transaction/reference ID" required>
-                <p class="deposit-field-hint">After sending your payment, enter its transaction ID. Our team will verify it before adding funds.</p>
-                <button type="submit" id="depositSubmitButton" class="btn-primary">Submit Deposit Request</button>
+                <div class="deposit-entry-fields" id="depositEntryFields">
+                    <label for="depositAmount">Deposit Amount (USD)</label>
+                    <input type="number" id="depositAmount" name="amount" min="1" max="100000" step="0.01" placeholder="Enter amount in USD" required>
+                    <label for="depositTransactionId">Transaction ID / Reference Number</label>
+                    <input type="text" id="depositTransactionId" name="transaction_reference" maxlength="160" placeholder="Enter the transaction/reference ID" required>
+                    <p class="deposit-field-hint">After sending your payment, enter its transaction ID. Our team will verify it before adding funds.</p>
+                    <button type="submit" id="depositSubmitButton" class="btn-primary">Submit Deposit Request</button>
+                </div>
                 <p id="depositFormMessage" class="deposit-form-message" role="status" aria-live="polite"></p>
             </form>
         </div>
