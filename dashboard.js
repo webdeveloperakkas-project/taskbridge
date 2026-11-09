@@ -899,42 +899,93 @@ document.addEventListener("DOMContentLoaded", function () {
         "USDT - TRC20": { title: "USDT wallet (TRC20 demo)", lines: ["Network: TRON (TRC20)", "Wallet address: TDEMO_REPLACE_WITH_YOUR_TRC20_ADDRESS", "Send USDT on TRC20 network only"] }
     };
 
-    function renderDepositInstructions(method) {
-        selectedDepositMethod = method || "";
-        document.querySelectorAll(".deposit-method-card").forEach(card => {
-            const selected = card.dataset.method === selectedDepositMethod;
-            card.classList.toggle("active", selected);
-            card.setAttribute("aria-pressed", selected ? "true" : "false");
+    const depositModal = document.getElementById("depositModal");
+    const depositModalMark = document.getElementById("depositModalMark");
+    const closeDepositModalButton = document.getElementById("closeDepositModal");
+    const withdrawModal = document.getElementById("withdrawModal");
+    const withdrawModalMark = document.getElementById("withdrawModalMark");
+    const withdrawModalTitle = document.getElementById("withdrawModalTitle");
+    const withdrawForm = document.getElementById("withdrawForm");
+    const withdrawMessage = document.getElementById("withdrawFormMessage");
+    const withdrawSubmitButton = document.getElementById("withdrawSubmitButton");
+    const withdrawAmountInput = document.getElementById("withdrawAmount");
+    const withdrawAccountInput = document.getElementById("withdrawPaymentAccount");
+    const withdrawAccountLabel = document.getElementById("withdrawAccountLabel");
+    const withdrawAccountHint = document.getElementById("withdrawAccountHint");
+    const withdrawModalBalance = document.getElementById("withdrawModalBalance");
+    let selectedDepositMethod = "";
+    let selectedWithdrawMethod = "";
+
+    function openFinanceModal(modal) {
+        if (!modal) return;
+        modal.hidden = false;
+        document.body.classList.add("finance-modal-open");
+        const firstInput = modal.querySelector("input, textarea, button");
+        if (firstInput) setTimeout(() => firstInput.focus(), 0);
+    }
+
+    function closeFinanceModal(modal) {
+        if (!modal) return;
+        modal.hidden = true;
+        if (!document.querySelector(".finance-modal-backdrop:not([hidden])")) {
+            document.body.classList.remove("finance-modal-open");
+        }
+    }
+
+    function setModalBrand(card, markNode, titleNode, title) {
+        const mark = card?.querySelector(".deposit-brand-mark");
+        if (mark && markNode) markNode.innerHTML = mark.innerHTML;
+        if (titleNode) titleNode.textContent = title || card?.querySelector("strong")?.textContent || "Payment method";
+    }
+
+    if (closeDepositModalButton) closeDepositModalButton.addEventListener("click", () => closeFinanceModal(depositModal));
+    const closeWithdrawModalButton = document.getElementById("closeWithdrawModal");
+    if (closeWithdrawModalButton) closeWithdrawModalButton.addEventListener("click", () => closeFinanceModal(withdrawModal));
+    [depositModal, withdrawModal].forEach(modal => {
+        if (!modal) return;
+        modal.addEventListener("click", event => {
+            if (event.target === modal) closeFinanceModal(modal);
         });
-        if (!depositDetailsPanel || !depositInstructions) return;
-        if (!selectedDepositMethod) {
-            depositDetailsPanel.hidden = true;
-            depositInstructions.hidden = true;
-            return;
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            closeFinanceModal(depositModal);
+            closeFinanceModal(withdrawModal);
         }
+    });
+
+    function renderDepositInstructions(method, card) {
+        selectedDepositMethod = method || "";
+        document.querySelectorAll(".deposit-method-card").forEach(item => {
+            const selected = item.dataset.method === selectedDepositMethod;
+            item.classList.toggle("active", selected);
+            item.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+        if (!selectedDepositMethod || !depositDetailsPanel || !depositInstructions) return;
+        const chosenCard = card || document.querySelector('.deposit-method-card[data-method="' + CSS.escape(selectedDepositMethod) + '"]');
+        setModalBrand(chosenCard, depositModalMark, depositSelectedTitle,
+            selectedDepositMethod === "Visa" || selectedDepositMethod === "Mastercard"
+                ? selectedDepositMethod + " payment" : (chosenCard?.querySelector("strong")?.textContent || selectedDepositMethod) + " deposit");
         depositDetailsPanel.hidden = false;
-        if (depositSelectedTitle) {
-            depositSelectedTitle.textContent = ["Visa", "Mastercard"].includes(selectedDepositMethod)
-                ? "Visa / Mastercard instructions" : (depositMethodDetails[selectedDepositMethod]?.title || "Payment instructions");
-        }
         if (["Visa", "Mastercard"].includes(selectedDepositMethod)) {
             depositInstructions.innerHTML = '<strong>Card checkout is not connected yet.</strong><p>Visa/Mastercard payments will be enabled after a supported payment gateway merchant account and hosted checkout are configured. Do not enter card number, expiry date or CVV on this page.</p>';
             depositInstructions.hidden = false;
             if (depositSubmitButton) depositSubmitButton.disabled = true;
-            return;
+        } else {
+            if (depositSubmitButton) depositSubmitButton.disabled = false;
+            const details = depositMethodDetails[selectedDepositMethod];
+            if (!details) { depositInstructions.hidden = true; return; }
+            const escapeHtml = value => String(value).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+            depositInstructions.innerHTML = "<strong>" + escapeHtml(details.title) + "</strong><ul>" +
+                details.lines.map(line => "<li>" + escapeHtml(line) + "</li>").join("") + "</ul>";
+            depositInstructions.hidden = false;
         }
-        if (depositSubmitButton) depositSubmitButton.disabled = false;
-        const details = depositMethodDetails[selectedDepositMethod];
-        if (!details) { depositInstructions.hidden = true; return; }
-        const escapeHtml = value => String(value).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-        depositInstructions.innerHTML = "<strong>" + escapeHtml(details.title) + "</strong><ul>" +
-            details.lines.map(line => "<li>" + escapeHtml(line) + "</li>").join("") + "</ul>";
-        depositInstructions.hidden = false;
         if (depositMessage) depositMessage.textContent = "";
+        openFinanceModal(depositModal);
     }
 
     document.querySelectorAll(".deposit-method-card").forEach(card => {
-        card.addEventListener("click", () => renderDepositInstructions(card.dataset.method));
+        card.addEventListener("click", () => renderDepositInstructions(card.dataset.method, card));
     });
 
     if (depositForm) {
@@ -955,22 +1006,90 @@ document.addEventListener("DOMContentLoaded", function () {
             if (depositMessage) depositMessage.textContent = "";
             try {
                 const { error } = await supabaseClient.from("deposits").insert({
-                    user_id: currentUser.id,
-                    amount: amount,
-                    currency: "USD",
-                    payment_method: method,
-                    transaction_reference: reference,
-                    status: "pending"
+                    user_id: currentUser.id, amount, currency: "USD",
+                    payment_method: method, transaction_reference: reference, status: "pending"
                 });
                 if (error) throw error;
                 depositForm.reset();
-                renderDepositInstructions("");
+                closeFinanceModal(depositModal);
+                selectedDepositMethod = "";
+                document.querySelectorAll(".deposit-method-card").forEach(card => card.classList.remove("active"));
                 if (depositMessage) depositMessage.textContent = "Deposit request submitted. It will remain pending until an admin verifies your transaction.";
             } catch (error) {
                 console.error("Deposit request failed:", error);
                 if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
             } finally {
                 if (depositSubmitButton) { depositSubmitButton.disabled = ["Visa", "Mastercard"].includes(selectedDepositMethod); depositSubmitButton.textContent = "Submit Deposit Request"; }
+            }
+        });
+    }
+
+    const withdrawMethodMeta = {
+        "bKash": { label: "bKash Account Number", placeholder: "01XXXXXXXXX", hint: "Enter the bKash number registered to receive your payout." },
+        "Nagad": { label: "Nagad Account Number", placeholder: "01XXXXXXXXX", hint: "Enter the Nagad number registered to receive your payout." },
+        "Rocket": { label: "Rocket Account Number", placeholder: "01XXXXXXXXXX", hint: "Enter the Rocket number registered to receive your payout." },
+        "Bank Transfer": { label: "Bank Account Details", placeholder: "Bank name, account name, account number, branch and routing number", hint: "Provide the bank details needed to identify your receiving account." },
+        "Wise": { label: "Wise Account Details", placeholder: "Wise email or recipient account details", hint: "Enter the recipient details for your Wise account." },
+        "USDT - BEP20": { label: "USDT BEP20 Wallet Address", placeholder: "Enter your BNB Smart Chain (BEP20) wallet address", hint: "Only provide a wallet address that supports USDT on BEP20." },
+        "USDT - TRC20": { label: "USDT TRC20 Wallet Address", placeholder: "Enter your TRON (TRC20) wallet address", hint: "Only provide a wallet address that supports USDT on TRC20." }
+    };
+
+    document.querySelectorAll(".withdraw-method-card").forEach(card => {
+        card.addEventListener("click", () => {
+            selectedWithdrawMethod = card.dataset.withdrawMethod || "";
+            document.querySelectorAll(".withdraw-method-card").forEach(item => item.classList.toggle("active", item === card));
+            const meta = withdrawMethodMeta[selectedWithdrawMethod];
+            if (!meta) return;
+            setModalBrand(card, withdrawModalMark, withdrawModalTitle, selectedWithdrawMethod + " withdrawal");
+            if (withdrawAccountLabel) withdrawAccountLabel.textContent = meta.label;
+            if (withdrawAccountInput) withdrawAccountInput.placeholder = meta.placeholder;
+            if (withdrawAccountHint) withdrawAccountHint.textContent = meta.hint;
+            if (withdrawModalBalance) withdrawModalBalance.textContent = document.getElementById("availableBalanceWithdraw")?.textContent || formatWalletMoney(0, walletCurrency);
+            if (withdrawAmountInput) {
+                const balanceText = document.getElementById("availableBalanceWithdraw")?.textContent || "";
+                withdrawAmountInput.max = String(Number(withdrawAmountInput.max || 0) || 100000);
+                withdrawAmountInput.value = "";
+            }
+            if (withdrawMessage) withdrawMessage.textContent = "";
+            openFinanceModal(withdrawModal);
+        });
+    });
+
+    if (withdrawForm) {
+        withdrawForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            if (!supabaseClient || !currentUser) { if (withdrawMessage) withdrawMessage.textContent = "Please sign in again and retry."; return; }
+            if (!withdrawForm.reportValidity()) return;
+            const amount = Number(withdrawAmountInput?.value);
+            const paymentAccount = withdrawAccountInput?.value.trim() || "";
+            const available = Number(withdrawAmountInput?.max || 0);
+            if (!selectedWithdrawMethod) { if (withdrawMessage) withdrawMessage.textContent = "Please select a withdrawal method."; return; }
+            if (!Number.isFinite(amount) || amount <= 0 || amount > available || !paymentAccount) {
+                if (withdrawMessage) withdrawMessage.textContent = "Enter a valid amount within your available balance and complete the receiving account details.";
+                return;
+            }
+            if (withdrawSubmitButton) { withdrawSubmitButton.disabled = true; withdrawSubmitButton.textContent = "Submitting..."; }
+            if (withdrawMessage) withdrawMessage.textContent = "";
+            try {
+                const { error } = await supabaseClient.from("withdrawals").insert({
+                    user_id: currentUser.id,
+                    amount,
+                    currency: walletCurrency || "USD",
+                    payment_method: selectedWithdrawMethod,
+                    payment_account: paymentAccount,
+                    status: "pending"
+                });
+                if (error) throw error;
+                withdrawForm.reset();
+                closeFinanceModal(withdrawModal);
+                selectedWithdrawMethod = "";
+                document.querySelectorAll(".withdraw-method-card").forEach(item => item.classList.remove("active"));
+                if (withdrawMessage) withdrawMessage.textContent = "Withdrawal request submitted. It will remain pending until an admin reviews it.";
+            } catch (error) {
+                console.error("Withdrawal request failed:", error);
+                if (withdrawMessage) withdrawMessage.textContent = error.message || "Could not submit withdrawal request. Please try again.";
+            } finally {
+                if (withdrawSubmitButton) { withdrawSubmitButton.disabled = false; withdrawSubmitButton.textContent = "Submit Withdrawal Request"; }
             }
         });
     }
