@@ -876,6 +876,85 @@ document.addEventListener("DOMContentLoaded", function () {
         renderWalletBalance(data);
     }
 
+
+    /* =====================================
+       DEPOSIT REQUEST FORM
+       Manual methods create a pending request.
+       Card processing requires a real hosted gateway.
+    ====================================== */
+    const depositForm = document.getElementById("depositForm");
+    const depositMethod = document.getElementById("depositMethod");
+    const depositInstructions = document.getElementById("depositPaymentInstructions");
+    const depositMessage = document.getElementById("depositFormMessage");
+    const depositSubmitButton = document.getElementById("depositSubmitButton");
+
+    const depositMethodDetails = {
+        "bKash": { title: "bKash payment details (demo)", lines: ["Account type: Agent / Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
+        "Nagad": { title: "Nagad payment details (demo)", lines: ["Account type: Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
+        "Rocket": { title: "Rocket payment details (demo)", lines: ["Account type: Merchant / Agent (replace with your verified account)", "Account number: 01XXXXXXXXXX", "Reference: TaskBridge Deposit"] },
+        "Bank Transfer": { title: "Bank transfer details (demo)", lines: ["Bank: Replace with your bank name", "Account name: TaskBridge (replace with verified account name)", "Account number: XXXX-XXXX-XXXX", "Branch: Replace with branch name", "Routing number: XXXXXXXX"] },
+        "Wise (manual transfer)": { title: "Wise transfer details (demo)", lines: ["Wise recipient: Replace with your verified Wise business account", "Recipient email / account details: payments@example.com", "Use USD and include your TaskBridge user ID in the reference"] },
+        "USDT - BEP20": { title: "USDT wallet (BEP20 demo)", lines: ["Network: BNB Smart Chain (BEP20)", "Wallet address: 0xDEMO_REPLACE_WITH_YOUR_BEP20_ADDRESS", "Send USDT on BEP20 network only"] },
+        "USDT - TRC20": { title: "USDT wallet (TRC20 demo)", lines: ["Network: TRON (TRC20)", "Wallet address: TDEMO_REPLACE_WITH_YOUR_TRC20_ADDRESS", "Send USDT on TRC20 network only"] }
+    };
+
+    function renderDepositInstructions() {
+        if (!depositMethod || !depositInstructions) return;
+        const method = depositMethod.value;
+        if (!method) { depositInstructions.hidden = true; depositInstructions.replaceChildren(); return; }
+        if (method === "Visa / Mastercard (Gateway setup required)") {
+            depositInstructions.hidden = false;
+            depositInstructions.innerHTML = '<strong>Card checkout is not connected yet.</strong><p>Visa/Mastercard payments will be enabled after a supported payment gateway merchant account and hosted checkout are configured. Do not enter card number, expiry date or CVV on this page.</p>';
+            if (depositSubmitButton) depositSubmitButton.disabled = true;
+            return;
+        }
+        if (depositSubmitButton) depositSubmitButton.disabled = false;
+        const details = depositMethodDetails[method];
+        if (!details) { depositInstructions.hidden = true; return; }
+        depositInstructions.innerHTML = '<strong>' + details.title + '</strong><ul>' +
+            details.lines.map(line => '<li>' + line.replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])) + '</li>').join('') + '</ul>';
+        depositInstructions.hidden = false;
+    }
+
+    if (depositMethod) depositMethod.addEventListener("change", renderDepositInstructions);
+
+    if (depositForm) {
+        depositForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            if (!supabaseClient || !currentUser) { if (depositMessage) depositMessage.textContent = "Please sign in again and retry."; return; }
+            if (!depositForm.reportValidity()) return;
+            const amount = Number(document.getElementById("depositAmount")?.value);
+            const method = depositMethod?.value || "";
+            const reference = document.getElementById("depositTransactionId")?.value.trim() || "";
+            if (method === "Visa / Mastercard (Gateway setup required)") {
+                if (depositMessage) depositMessage.textContent = "Card gateway is not connected yet.";
+                return;
+            }
+            if (!Number.isFinite(amount) || amount < 1 || !reference) return;
+            if (depositSubmitButton) { depositSubmitButton.disabled = true; depositSubmitButton.textContent = "Submitting..."; }
+            if (depositMessage) depositMessage.textContent = "";
+            try {
+                const { error } = await supabaseClient.from("deposits").insert({
+                    user_id: currentUser.id,
+                    amount: amount,
+                    currency: "USD",
+                    payment_method: method,
+                    transaction_reference: reference,
+                    status: "pending"
+                });
+                if (error) throw error;
+                depositForm.reset();
+                renderDepositInstructions();
+                if (depositMessage) depositMessage.textContent = "Deposit request submitted. It will remain pending until an admin verifies your transaction.";
+            } catch (error) {
+                console.error("Deposit request failed:", error);
+                if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
+            } finally {
+                if (depositSubmitButton) { depositSubmitButton.disabled = false; depositSubmitButton.textContent = "Submit Deposit Request"; }
+            }
+        });
+    }
+
     async function loadJobCategories() {
         const { data, error } = await supabaseClient.from("job_categories")
             .select("id,name,slug,icon,is_active,display_order")
