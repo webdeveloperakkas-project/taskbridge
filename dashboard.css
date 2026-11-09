@@ -2307,7 +2307,7 @@ button {
 .finance-modal{width:min(100%,560px);max-height:min(88vh,760px);overflow:auto;background:#fff;border:1px solid #e5eaf1;border-radius:20px;box-shadow:0 24px 80px rgba(15,23,42,.28);animation:financeModalIn .2s ease-out}
 @keyframes financeModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 .finance-modal-header{padding:20px 22px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #edf1f5;background:linear-gradient(135deg,#f8fffb,#fff)}
-.finance-modal-close{flex:0 0 auto;min-height:40px;padding:0 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#475569;font:600 12px inherit;cursor:pointer}
+.finance-modal-close{flex:0 0 auto;min-height:40px;padding:0 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#475569;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .finance-modal-close:hover{border-color:#16a36a;color:#15803d;background:#f0fdf4}
 .finance-modal-brand{display:flex;align-items:center;gap:13px;min-width:0}
 .finance-modal-brand-mark{width:52px;height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:center;border-radius:15px;background:#f1f5f9;color:#15966b;font-size:22px;font-weight:850}
