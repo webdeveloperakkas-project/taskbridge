@@ -1153,34 +1153,163 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     /* =====================================
-       DEPOSIT TABLE
+       DEPOSIT TABLE AND REVIEW ACTIONS
     ====================================== */
+
+    function safeHttpURL(value) {
+
+        if (!value) return "";
+
+        try {
+            const url = new URL(String(value));
+            return ["http:", "https:"].includes(url.protocol)
+                ? url.href
+                : "";
+        } catch (error) {
+            return "";
+        }
+
+    }
+
 
     function renderDeposits() {
 
+        const tbody = $("#depositsTable");
+        if (!tbody) return;
+
         const status = $("#depositStatusFilter")?.value || "all";
-
         const filtered = allDeposits.filter(function (item) {
-
             return status === "all" || item.status === status;
-
         });
 
+        if (!filtered.length) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-state">No deposit requests found.</td>
+                </tr>
+            `;
+            return;
+        }
 
-        renderGenericTable(
-            "depositsTable",
-            filtered,
-            [
-                ["id", "Deposit ID"],
-                ["user_id", "User ID"],
-                ["amount", "Amount"],
-                ["payment_method", "Method"],
-                ["status", "Status"],
-                ["created_at", "Date"]
-            ]
-        );
+        tbody.innerHTML = filtered.map(function (item) {
+
+            const proofURL = safeHttpURL(item.proof_file_url);
+            const reference = item.transaction_reference
+                ? `<div><small>Reference: ${escapeHTML(item.transaction_reference)}</small></div>`
+                : "";
+            const proof = proofURL
+                ? `<div><a href="${escapeHTML(proofURL)}" target="_blank" rel="noopener noreferrer">View payment proof</a></div>`
+                : (item.proof_file_url
+                    ? '<div><small>Proof URL unavailable</small></div>'
+                    : '<div><small>No proof uploaded</small></div>');
+            const methodDetails = `
+                <strong>${escapeHTML(item.payment_method || "—")}</strong>
+                ${reference}
+                ${proof}
+            `;
+            const isPending = String(item.status).toLowerCase() === "pending";
+            const actions = isPending
+                ? `
+                    <div class="table-actions">
+                        <button type="button" class="success-btn"
+                            data-deposit-action="approve"
+                            data-deposit-id="${escapeHTML(item.id)}">Approve</button>
+                        <button type="button" class="danger-btn"
+                            data-deposit-action="reject"
+                            data-deposit-id="${escapeHTML(item.id)}">Reject</button>
+                    </div>
+                `
+                : escapeHTML(item.review_note || "Reviewed");
+
+            return `
+                <tr>
+                    <td><small>${escapeHTML(item.id)}</small></td>
+                    <td><small>${escapeHTML(item.user_id)}</small></td>
+                    <td>${escapeHTML(item.amount)} ${escapeHTML(item.currency || "USD")}</td>
+                    <td>${methodDetails}</td>
+                    <td>${statusBadge(item.status)}</td>
+                    <td>${formatDate(item.created_at)}</td>
+                    <td>${actions}</td>
+                </tr>
+            `;
+
+        }).join("");
 
     }
+
+
+    async function reviewDeposit(depositId, approve, button) {
+
+        const deposit = allDeposits.find(function (item) {
+            return item.id === depositId;
+        });
+
+        if (!deposit || String(deposit.status).toLowerCase() !== "pending") {
+            showToast("This deposit is no longer pending. Refreshing list...");
+            await loadAdminData();
+            return;
+        }
+
+        const decision = approve ? "approve" : "reject";
+        const confirmation = window.confirm(
+            `Are you sure you want to ${decision} this deposit of ${deposit.amount} ${deposit.currency || "USD"}?`
+        );
+
+        if (!confirmation) return;
+
+        const reviewNote = window.prompt(
+            "Optional review note (leave blank if none):",
+            ""
+        );
+
+        if (reviewNote === null) return;
+
+        if (button) button.disabled = true;
+
+        try {
+
+            const { error } = await supabaseClient.rpc("process_deposit", {
+                p_deposit_id: depositId,
+                p_approve: approve,
+                p_review_note: reviewNote.trim() || null
+            });
+
+            if (error) throw error;
+
+            showToast(
+                approve
+                    ? "Deposit approved and wallet credited."
+                    : "Deposit rejected successfully."
+            );
+
+            await loadAdminData();
+
+        } catch (error) {
+
+            console.error("Deposit review failed:", error);
+            showToast(error.message || "Could not process deposit.");
+            await loadAdminData();
+
+        } finally {
+
+            if (button) button.disabled = false;
+
+        }
+
+    }
+
+
+    document.addEventListener("click", function (event) {
+
+        const actionButton = event.target.closest("[data-deposit-action]");
+        if (!actionButton) return;
+
+        const depositId = actionButton.dataset.depositId;
+        const approve = actionButton.dataset.depositAction === "approve";
+
+        reviewDeposit(depositId, approve, actionButton);
+
+    });
 
 
     /* =====================================
