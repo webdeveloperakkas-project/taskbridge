@@ -2425,3 +2425,12 @@ body.finance-modal-open{overflow:hidden}
     font-size:12px; letter-spacing:.1px;
 }
 .history-method-mastercard { min-width:72px; }
+
+
+.wallet-balance-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.wallet-balance-heading h2{margin:8px 0}
+.wallet-balance-heading label{display:flex;flex-direction:column;gap:6px;color:#64748b;font-size:12px;font-weight:700}
+#walletCurrencySelector{min-width:130px;padding:10px 34px 10px 12px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#0f172a;font:inherit;font-weight:700}
+.withdraw-card-topline{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px}
+.withdraw-card-balance{color:#0f766e;font-size:10px;font-weight:800;white-space:nowrap}
+.withdraw-method-card[hidden]{display:none!important}
