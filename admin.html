@@ -1107,6 +1107,35 @@
 
 
     <!-- =================================
+         JOB DETAILS AND REVIEW MODAL
+    ================================== -->
+
+    <div class="admin-modal" id="jobDetailsModal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Submitted Job Details</h2>
+                    <p>Review all information submitted by the advertiser.</p>
+                </div>
+                <button type="button" class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="jobDetailsContent">Loading job details...</div>
+                <div id="jobReviewActions">
+                    <label for="jobReviewNote" style="display:block;margin:18px 0 8px;font-weight:600;">Admin Review Note</label>
+                    <textarea id="jobReviewNote" rows="4" style="width:100%;box-sizing:border-box;" placeholder="Add an optional note for approval or explain why this job is rejected..."></textarea>
+                    <div class="modal-actions" style="margin-top:16px;">
+                        <button type="button" class="success-btn" data-job-review="approve">Approve Job</button>
+                        <button type="button" class="danger-btn" data-job-review="reject">Reject Job</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =================================
          CONFIRMATION MODAL
     ================================== -->
 
