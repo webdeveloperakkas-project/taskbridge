@@ -896,36 +896,66 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!supabaseClient || !currentUser) return;
         const body = document.getElementById("transactionHistoryBody");
         if (!body) return;
-        const [depositResult, walletResult] = await Promise.all([
+        const [depositResult, withdrawalResult, walletResult] = await Promise.all([
             supabaseClient.from("deposits")
+                .select("id,amount,currency,payment_method,transaction_reference,status,created_at")
+                .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(100),
+            supabaseClient.from("withdrawals")
                 .select("id,amount,currency,payment_method,status,created_at")
                 .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(100),
             supabaseClient.from("wallet_transactions")
-                .select("id,transaction_type,direction,balance_type,amount,currency,description,created_at")
+                .select("id,transaction_type,direction,balance_type,amount,currency,description,reference_type,reference_id,created_at")
                 .eq("user_id", currentUser.id).order("created_at", { ascending: false }).limit(100)
         ]);
         if (depositResult.error) throw depositResult.error;
+        if (withdrawalResult.error) throw withdrawalResult.error;
         if (walletResult.error) throw walletResult.error;
+
         const deposits = (depositResult.data || []).filter(row => String(row.status).toLowerCase() !== "approved")
-            .map(row => ({ id: row.id, type: "Deposit request · " + row.payment_method, amount: Number(row.amount),
-                currency: row.currency || "USD", status: row.status, created_at: row.created_at, pendingRequest: true }));
-        const walletRows = (walletResult.data || []).map(row => ({ id: row.id,
-            type: row.description || row.transaction_type, amount: Number(row.amount),
-            currency: row.currency || "USD", status: "completed", created_at: row.created_at,
-            direction: row.direction }));
-        const rows = [...deposits, ...walletRows].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,100);
+            .map(row => ({ id: row.id, type: "Deposit", method: row.payment_method,
+                transactionId: row.transaction_reference || row.id, amount: Number(row.amount),
+                currency: row.currency || "USD", status: row.status, created_at: row.created_at,
+                requestKind: "deposit" }));
+        const withdrawals = (withdrawalResult.data || []).map(row => ({
+            id: row.id, type: "Withdraw", method: row.payment_method, transactionId: row.id,
+            amount: Number(row.amount), currency: row.currency || "USD", status: row.status,
+            created_at: row.created_at, requestKind: "withdraw"
+        }));
+        const requestIds = new Set([...deposits, ...withdrawals].map(row => row.id));
+        const walletRows = (walletResult.data || [])
+            .filter(row => !requestIds.has(row.reference_id))
+            .map(row => {
+                const text = String(row.transaction_type || row.description || "").toLowerCase();
+                const direction = String(row.direction || "").toLowerCase();
+                return { id: row.id,
+                    type: text.includes("deposit") ? "Deposit" : text.includes("withdraw") ? "Withdraw" :
+                        (direction === "out" || direction === "debit" ? "Withdraw" : "Wallet transaction"),
+                    method: "", transactionId: row.id, amount: Number(row.amount),
+                    currency: row.currency || "USD", status: "completed", created_at: row.created_at,
+                    direction: row.direction };
+            });
+        const rows = [...deposits, ...withdrawals, ...walletRows]
+            .sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,100);
+        const methodMark = method => {
+            const key = String(method || "").toLowerCase().replace(/[\\s_-]+/g, "");
+            const marks = {bkash:"b",nagad:"n",rocket:"✦",visa:"V",mastercard:"MC",wise:"W",
+                banktransfer:"▤",usdttrc20:"₮",usdtbep20:"₮"};
+            return '<span class="history-method history-method-' + escapeFinanceText(key) + '" title="' +
+                escapeFinanceText(method || "Wallet") + '">' + (marks[key] || "—") + '</span>';
+        };
         body.innerHTML = rows.length ? rows.map(row => {
-            const negative = row.direction === "out" || row.direction === "debit";
+            const negative = row.direction === "out" || row.direction === "debit" || row.type === "Withdraw";
             const amount = (negative ? "−" : "+") + formatWalletMoney(row.amount, row.currency);
             const status = String(row.status || "pending").toLowerCase();
             const label = status === "approved" || status === "completed" ? "Completed" :
                 status === "rejected" ? "Rejected" : "Pending";
-            return '<tr><td>' + escapeFinanceText(String(row.id).slice(0,8).toUpperCase()) +
-                '</td><td>' + escapeFinanceText(row.type) + '</td><td class="payment-cell">' +
-                escapeFinanceText(amount) + '</td><td><span class="status-badge ' +
+            return '<tr><td>' + escapeFinanceText(row.type) + '</td><td>' + methodMark(row.method) +
+                '</td><td>' + escapeFinanceText(String(row.transactionId || row.id)) +
+                '</td><td class="payment-cell">' + escapeFinanceText(amount) +
+                '</td><td><span class="status-badge ' +
                 (label === "Completed" ? "active-status" : label === "Rejected" ? "rejected-status" : "pending-status") +
                 '">' + label + '</span></td><td>' + escapeFinanceText(formatFinanceDate(row.created_at)) + '</td></tr>';
-        }).join("") : '<tr><td colspan="5" class="empty-state">No transactions yet.</td></tr>';
+        }).join("") : '<tr><td colspan="6" class="empty-state">No transactions yet.</td></tr>';
     }
 
     async function loadMyWallet() {
