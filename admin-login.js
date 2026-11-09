@@ -1,4 +1,3 @@
-
 /* =========================================
    TASKBRIDGE ADMIN LOGIN SYSTEM
    Supabase Authentication
