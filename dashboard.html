@@ -8,7 +8,7 @@
     <title>TaskBridge - User Dashboard</title>
 
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./dashboard.css?v=20261109-finance-modal">
+    <link rel="stylesheet" href="./dashboard.css?v=20261109-history-tabs">
 
 </head>
 
@@ -2325,39 +2325,36 @@
 
 <!-- TRANSACTION HISTORY SECTION -->
 <section id="transactionsSection" class="page-section" hidden>
-
     <div class="section-heading">
         <div>
             <h2>Transaction History</h2>
-            <p>View all your wallet transactions.</p>
+            <p>View your deposit and withdrawal requests separately.</p>
         </div>
     </div>
-
-    <div class="content-panel">
-
-        <div class="table-responsive">
-            <table class="dashboard-table">
-
+    <div class="content-panel transaction-history-panel">
+        <div class="transaction-history-tabs" role="tablist" aria-label="Transaction type">
+            <button type="button" class="transaction-history-tab active" id="depositHistoryTab"
+                data-history-filter="deposit" role="tab" aria-selected="true" aria-controls="transactionHistoryBody">
+                <span class="history-tab-icon deposit-tab-icon" aria-hidden="true">↓</span>
+                <span>Deposit</span>
+            </button>
+            <button type="button" class="transaction-history-tab" id="withdrawHistoryTab"
+                data-history-filter="withdraw" role="tab" aria-selected="false" aria-controls="transactionHistoryBody">
+                <span class="history-tab-icon withdraw-tab-icon" aria-hidden="true">↑</span>
+                <span>Withdraw</span>
+            </button>
+        </div>
+        <div class="transaction-history-scroll table-responsive" tabindex="0" aria-label="Scrollable transaction history">
+            <table class="dashboard-table transaction-history-table">
                 <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Method</th>
-                        <th>Transaction ID</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                    </tr>
+                    <tr><th>Method</th><th>Transaction ID</th><th>Amount</th><th>Status</th><th>Date</th></tr>
                 </thead>
-
                 <tbody id="transactionHistoryBody">
-                    <tr><td colspan="6" class="empty-state">Loading transactions...</td></tr>
+                    <tr><td colspan="5" class="empty-state">Loading transactions...</td></tr>
                 </tbody>
-
             </table>
         </div>
-
     </div>
-
 </section>
 
 
