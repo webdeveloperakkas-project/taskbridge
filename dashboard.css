@@ -2434,3 +2434,35 @@ body.finance-modal-open{overflow:hidden}
 .withdraw-card-topline{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px}
 .withdraw-card-balance{color:#0f766e;font-size:10px;font-weight:800;white-space:nowrap}
 .withdraw-method-card[hidden]{display:none!important}
+
+
+/* Header available-balance currency dropdown */
+.wallet-balance-dropdown { position: relative; }
+button.header-balance {
+    appearance: none; font: inherit; color: inherit; background: transparent;
+    cursor: pointer; text-align: left;
+}
+.header-balance-copy { display: block; }
+.wallet-balance-chevron {
+    width: 14px; height: 14px; flex: 0 0 auto; color: var(--muted);
+    transition: transform .18s ease;
+}
+#walletBalanceToggle[aria-expanded="true"] .wallet-balance-chevron { transform: rotate(180deg); }
+.wallet-balance-menu { width: 260px; padding: 6px; }
+.wallet-currency-option {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 11px 10px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--dark); text-align: left;
+    font: inherit; cursor: pointer;
+}
+.wallet-currency-option:hover, .wallet-currency-option.active { background: var(--primary-light, #ecfdf5); }
+.wallet-currency-option-icon {
+    width: 30px; height: 30px; display: grid; place-items: center;
+    border-radius: 50%; background: #f1f5f9; color: var(--primary);
+    font-size: 14px; font-weight: 800; flex: 0 0 auto;
+}
+.wallet-currency-option-name { font-size: 12px; font-weight: 750; }
+.wallet-currency-option strong { margin-left: auto; font-size: 12px; white-space: nowrap; }
+@media(max-width:600px) {
+    .wallet-balance-menu { right: 0; width: min(260px, calc(100vw - 25px)); }
+}
