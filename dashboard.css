@@ -2249,3 +2249,18 @@ button {
 
 }
 
+
+
+/* Deposit payment method UI */
+.deposit-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:22px;align-items:start}
+.deposit-form-panel form{display:grid;gap:11px}
+.deposit-form-panel label{font-weight:650;margin-top:7px}
+.deposit-form-panel input,.deposit-form-panel select{width:100%;min-height:46px;padding:11px 13px;border:1px solid var(--border-color,#d9e0ea);border-radius:10px;background:var(--input-bg,#fff);color:inherit;font:inherit}
+.deposit-payment-instructions{padding:16px;margin:8px 0;border:1px solid var(--border-color,#d9e0ea);border-radius:12px;background:var(--surface-soft,#f7f9fc);line-height:1.65;overflow-wrap:anywhere}
+.deposit-payment-instructions ul{margin:9px 0 0;padding-left:20px}
+.deposit-field-hint,.deposit-demo-note{font-size:.88rem;line-height:1.6;opacity:.78}
+.deposit-security-panel ul{padding-left:20px;line-height:1.8}
+.deposit-demo-note{padding:12px;border-radius:10px;background:rgba(220,160,30,.10)}
+.deposit-form-message{min-height:22px;font-size:.92rem;line-height:1.5}
+#depositSubmitButton:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:850px){.deposit-layout{grid-template-columns:1fr}}
