@@ -2356,3 +2356,48 @@ body.finance-modal-open{overflow:hidden}
 .history-method-wise { background:#9fe870; color:#163300; }
 .history-method-banktransfer { background:#e8edf5; color:#34445e; }
 .history-method-usdttrc20, .history-method-usdtbep20 { background:#26a17b; color:#fff; }
+
+
+/* Transaction History: Deposit / Withdraw tabs and payment brand marks */
+.transaction-history-panel { padding: 0; overflow: hidden; }
+.transaction-history-tabs { display:flex; gap:8px; padding:16px 18px 0; border-bottom:1px solid #edf1f5; background:#fff; }
+.transaction-history-tab {
+    position:relative; display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    min-width:132px; min-height:48px; padding:10px 18px; border:0; border-bottom:3px solid transparent;
+    border-radius:10px 10px 0 0; background:transparent; color:#64748b; font:inherit;
+    font-size:13px; font-weight:700; cursor:pointer; transition:color .2s ease,background .2s ease,border-color .2s ease;
+}
+.transaction-history-tab:hover { background:#fffbeb; color:#a16207; }
+.transaction-history-tab.active { border-bottom-color:#eab308; background:#fefce8; color:#854d0e; }
+.history-tab-icon { width:23px; height:23px; display:inline-grid; place-items:center; border-radius:7px; font-size:16px; font-weight:800; }
+.deposit-tab-icon { background:#dcfce7; color:#15803d; }
+.withdraw-tab-icon { background:#fee2e2; color:#dc2626; }
+.transaction-history-scroll { max-height:460px; overflow:auto; overscroll-behavior:contain; }
+.transaction-history-table { min-width:650px; }
+.transaction-history-table thead th { position:sticky; top:0; z-index:2; background:#f8fafc; }
+.transaction-history-table tbody tr:hover { background:#fffdf2; }
+.history-method {
+    display:inline-flex; min-width:54px; min-height:30px; padding:4px 7px; align-items:center; justify-content:center;
+    gap:3px; border-radius:7px; font-size:11px; line-height:1; font-weight:850; letter-spacing:-.2px;
+    white-space:nowrap; box-sizing:border-box;
+}
+.history-method-bkash { background:#e2136e; color:#fff; font-style:italic; }
+.history-method-nagad { background:#f58220; color:#fff; letter-spacing:.2px; }
+.history-method-rocket { background:#6f2c91; color:#fff; font-size:9px; letter-spacing:.1px; }
+.history-method-visa { background:#fff; color:#1a1f71; border:1px solid #d8dce8; font-size:13px; font-style:italic; }
+.history-method-mastercard { background:#fff; border:1px solid #e5e7eb; }
+.history-mastercard-circles { display:inline-flex; align-items:center; }
+.history-mastercard-circles i { width:15px; height:15px; display:block; border-radius:50%; background:#eb001b; }
+.history-mastercard-circles i+i { margin-left:-5px; background:#f79e1b; }
+.history-method-wise { background:#9fe870; color:#163300; font-size:14px; }
+.history-method-banktransfer { background:#e8edf5; color:#34445e; }
+.history-bank-symbol { font-size:16px; }
+.history-method-usdt { background:#e6f7ef; color:#15966b; font-size:11px; }
+.history-method-unknown { background:#fff7d6; color:#8a6500; border:1px solid #f5df91; }
+.history-transaction-id { max-width:210px; overflow-wrap:anywhere; font-size:12px; color:#475569; }
+@media(max-width:600px) {
+    .transaction-history-tabs { padding:12px 12px 0; gap:5px; }
+    .transaction-history-tab { flex:1; min-width:0; min-height:45px; padding:9px 10px; font-size:12px; }
+    .transaction-history-scroll { max-height:55vh; }
+    .transaction-history-table { min-width:610px; }
+}
