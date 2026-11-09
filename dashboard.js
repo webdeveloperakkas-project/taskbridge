@@ -850,21 +850,49 @@ document.addEventListener("DOMContentLoaded", function () {
     function renderWalletBalance(wallet) {
         walletCurrency = wallet?.currency || "USD";
         walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
-        const formatted = formatWalletMoney(wallet?.available_balance ?? 0, walletCurrency);
+        const formatted = formatWalletMoney(walletAvailableBalance, walletCurrency);
         ["availableBalanceHeader", "availableBalanceOverview",
             "availableBalanceWallet", "availableBalanceWithdraw"].forEach(id => {
             const node = document.getElementById(id);
             if (node) node.textContent = formatted;
         });
-
+        const selector = document.getElementById("walletCurrencySelector");
+        if (selector && wallet) selector.value = walletCurrency;
         const withdrawAmount = document.getElementById("withdrawAmount");
-        if (withdrawAmount) {
-            withdrawAmount.max = String(Number(wallet?.available_balance ?? 0));
-        }
+        if (withdrawAmount) withdrawAmount.max = String(walletAvailableBalance);
         const withdrawLabel = document.querySelector('label[for="withdrawAmount"]');
-        if (withdrawLabel) {
-            withdrawLabel.textContent = "Withdrawal Amount (" + walletCurrency + ")";
-        }
+        if (withdrawLabel) withdrawLabel.textContent = "Withdrawal Amount (" + walletCurrency + ")";
+        updateWithdrawMethodCards();
+    }
+
+    function currencyForWithdrawMethod(method) {
+        return ({
+            "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
+            "Bank Transfer": "BDT", "Wise": "USD",
+            "USDT - BEP20": "USDT", "USDT - TRC20": "USDT"
+        })[method] || "";
+    }
+
+    function updateWithdrawMethodCards() {
+        document.querySelectorAll(".withdraw-method-card").forEach(card => {
+            const currency = currencyForWithdrawMethod(card.dataset.withdrawMethod || "");
+            const wallet = walletsByCurrency.get(currency);
+            const balance = Math.max(0, Number(wallet?.available_balance || 0));
+            card.hidden = !wallet || balance <= 0;
+            let topline = card.querySelector(".withdraw-card-topline");
+            if (!topline) {
+                topline = document.createElement("span");
+                topline.className = "withdraw-card-topline";
+                const brand = card.querySelector(".deposit-brand-mark");
+                const balanceNode = document.createElement("small");
+                balanceNode.className = "withdraw-card-balance";
+                topline.append(balanceNode);
+                if (brand) topline.append(brand);
+                card.insertBefore(topline, card.firstChild);
+            }
+            const balanceNode = topline.querySelector(".withdraw-card-balance");
+            if (balanceNode) balanceNode.textContent = formatWalletMoney(balance, currency);
+        });
     }
 
     function escapeFinanceText(value) {
@@ -1032,14 +1060,27 @@ document.addEventListener("DOMContentLoaded", function () {
         const { data, error } = await supabaseClient.from("wallets")
             .select("id,user_id,currency,available_balance,held_balance,updated_at")
             .eq("user_id", currentUser.id)
-            .maybeSingle();
+            .order("currency", { ascending: true });
         if (error) throw error;
-        if (!data) {
-            renderWalletBalance({ currency: "USD", available_balance: 0 });
-            console.warn("No wallet row found for the signed-in user.");
-            return;
+        walletRows = data || [];
+        walletsByCurrency = new Map(walletRows.map(wallet => [wallet.currency, wallet]));
+        const fundedWallets = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
+        const selector = document.getElementById("walletCurrencySelector");
+        if (selector) {
+            selector.replaceChildren();
+            if (!fundedWallets.length) {
+                selector.add(new Option("No funded wallets", ""));
+                selector.disabled = true;
+                renderWalletBalance(null);
+                return;
+            }
+            selector.disabled = false;
+            fundedWallets.forEach(wallet => selector.add(new Option(wallet.currency, wallet.currency)));
+            const selected = fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0];
+            renderWalletBalance(selected);
+        } else {
+            renderWalletBalance(fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0] || null);
         }
-        renderWalletBalance(data);
     }
 
 
