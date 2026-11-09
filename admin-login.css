@@ -1,0 +1,308 @@
+/* =========================================
+   TASKBRIDGE - ADMIN LOGIN
+   Admin dashboard indigo + navy theme
+   The TaskBridge logo keeps its original colors.
+========================================= */
+
+.admin-login-page,
+.admin-login-page * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.admin-login-page {
+    --admin-primary: #4f46e5;
+    --admin-primary-dark: #4338ca;
+    --admin-primary-soft: #eef2ff;
+    --admin-navy: #151d32;
+    --admin-text: #172033;
+    --admin-muted: #7b8497;
+    --admin-border: #e5e8f0;
+    --admin-white: #ffffff;
+
+    min-height: 100vh;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+    color: var(--admin-text);
+    line-height: 1.6;
+    background:
+        radial-gradient(circle at 12% 12%, rgba(99, 91, 240, 0.28), transparent 31%),
+        radial-gradient(circle at 90% 88%, rgba(79, 70, 229, 0.22), transparent 30%),
+        linear-gradient(135deg, #11182b 0%, #1b2540 52%, #151d32 100%);
+}
+
+.admin-login-page a {
+    text-decoration: none;
+}
+
+.admin-login-page button,
+.admin-login-page input {
+    font: inherit;
+}
+
+.admin-login-page .login-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 42px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-login-page .login-container {
+    width: 100%;
+    max-width: 490px;
+    margin: 0 auto;
+}
+
+.admin-login-page .login-brand {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* Keep the original TaskBridge logo colors */
+.admin-login-page .logo {
+    display: inline-block;
+    color: #15803d;
+    font-size: 35px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+}
+
+.admin-login-page .logo span {
+    color: #facc15;
+}
+
+.admin-login-page .login-brand p {
+    margin-top: 5px;
+    color: #c4cadd;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+
+.admin-login-page .login-card {
+    position: relative;
+    overflow: hidden;
+    padding: 39px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
+    background: var(--admin-white);
+    box-shadow: 0 24px 75px rgba(0, 0, 0, 0.28);
+}
+
+.admin-login-page .login-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #4338ca, #7c73f4, #4f46e5);
+}
+
+.admin-login-page .login-heading {
+    text-align: center;
+    margin-bottom: 29px;
+}
+
+.admin-login-page .login-heading::before {
+    content: "SECURE ADMIN PORTAL";
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 6px 11px;
+    border-radius: 30px;
+    background: var(--admin-primary-soft);
+    color: var(--admin-primary-dark);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.15px;
+}
+
+.admin-login-page .login-heading h1 {
+    margin-bottom: 8px;
+    color: var(--admin-text);
+    font-size: 27px;
+    line-height: 1.3;
+    font-weight: 800;
+}
+
+.admin-login-page .login-heading p {
+    color: var(--admin-muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.admin-login-page .form-group {
+    margin-bottom: 19px;
+}
+
+.admin-login-page .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #30394d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-login-page .form-group input {
+    width: 100%;
+    height: 49px;
+    padding: 0 14px;
+    border: 1px solid var(--admin-border);
+    border-radius: 9px;
+    outline: none;
+    background: #fbfcff;
+    color: var(--admin-text);
+    font-size: 13px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-login-page .form-group input::placeholder {
+    color: #a0a7b6;
+}
+
+.admin-login-page .form-group input:focus {
+    border-color: var(--admin-primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.11);
+}
+
+.admin-login-page .login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 24px;
+}
+
+.admin-login-page .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-login-page .remember-me input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--admin-primary);
+    cursor: pointer;
+}
+
+.admin-login-page .remember-me label {
+    color: var(--admin-muted);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.admin-login-page .login-options > a {
+    color: var(--admin-primary-dark);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-login-page .login-options > a:hover {
+    text-decoration: underline;
+}
+
+.admin-login-page .login-message {
+    margin: 0 0 17px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff1f2;
+    color: #b42332;
+    font-size: 12px;
+}
+
+.admin-login-page .login-button {
+    width: 100%;
+    min-height: 50px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--admin-primary), #655cf0);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 750;
+    cursor: pointer;
+    box-shadow: 0 7px 17px rgba(79, 70, 229, 0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.admin-login-page .login-button:hover {
+    background: linear-gradient(135deg, var(--admin-primary-dark), #554be0);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(79, 70, 229, 0.3);
+}
+
+.admin-login-page .login-button:active {
+    transform: translateY(0);
+}
+
+.admin-login-page .register-link {
+    margin-top: 24px;
+    padding-top: 19px;
+    border-top: 1px solid var(--admin-border);
+    text-align: center;
+}
+
+.admin-login-page .register-link p {
+    color: var(--admin-muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.admin-login-page .login-footer {
+    margin-top: 23px;
+    text-align: center;
+}
+
+.admin-login-page .login-footer p {
+    color: #aeb8cd;
+    font-size: 11px;
+}
+
+.admin-login-page a:focus-visible,
+.admin-login-page button:focus-visible,
+.admin-login-page input:focus-visible {
+    outline: 3px solid rgba(139, 132, 255, 0.8);
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .admin-login-page .login-page {
+        padding: 28px 15px;
+    }
+
+    .admin-login-page .login-card {
+        padding: 31px 23px;
+        border-radius: 15px;
+    }
+
+    .admin-login-page .logo {
+        font-size: 31px;
+    }
+
+    .admin-login-page .login-heading h1 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 380px) {
+    .admin-login-page .login-card {
+        padding: 28px 18px;
+    }
+
+    .admin-login-page .login-options {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-login-page *,
+    .admin-login-page *::before,
+    .admin-login-page *::after {
+        transition-duration: 0.01ms !important;
+    }
+}
