@@ -2267,15 +2267,16 @@
     </div>
 
     <div class="finance-modal-backdrop" id="depositModal" hidden>
-        <div class="finance-modal" role="dialog" aria-modal="true" aria-labelledby="depositModalTitle">
+        <div class="finance-modal" role="dialog" aria-modal="true" aria-labelledby="depositSelectedTitle">
             <div class="finance-modal-header">
                 <button type="button" class="finance-modal-close" id="closeDepositModal" aria-label="Close deposit form">← Close</button>
                 <div class="finance-modal-brand">
                     <span class="finance-modal-brand-mark" id="depositModalMark">₮</span>
-                    <div><h3 id="depositModalTitle">Deposit method</h3><p>Payment instructions and request form</p></div>
+                    <div><h3 id="depositSelectedTitle">Deposit method</h3><p>Payment instructions and request form</p></div>
                 </div>
             </div>
             <div class="finance-modal-body">
+                <div id="depositDetailsPanel" hidden>
                 <div id="depositPaymentInstructions" class="deposit-payment-instructions" hidden aria-live="polite"></div>
                 <form id="depositForm">
                     <div class="deposit-entry-fields" id="depositEntryFields">
