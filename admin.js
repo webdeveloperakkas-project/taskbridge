@@ -648,10 +648,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (!session || !session.user) {
 
-            showToast("Please sign in first.");
+            console.error(
+                "Admin authentication diagnostic: no Supabase session found.",
+                {
+                    page: window.location.href,
+                    origin: window.location.origin,
+                    hasLocalStorage: Boolean(localStorage.getItem(
+                        "sb-eboagroxkgpplccufpuk-auth-token"
+                    )),
+                    hasSessionStorage: Boolean(sessionStorage.getItem(
+                        "sb-eboagroxkgpplccufpuk-auth-token"
+                    ))
+                }
+            );
 
-            window.location.href = "./login.html";
+            showToast("No active login session found. Please check Console (F12).");
 
+            // Keep this page open temporarily so the session issue can be diagnosed.
             return false;
 
         }
@@ -676,16 +689,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (isAdmin !== true) {
 
             console.warn(
-                "Admin access denied for authenticated user:",
-                currentAdmin.id
+                "Admin access denied by public.is_admin() for authenticated user:",
+                currentAdmin.id,
+                "Returned value:",
+                isAdmin
             );
 
-            showToast("Access denied. Admin permission required.");
+            showToast("Your session is active, but Admin permission was not confirmed. Check Console (F12).");
 
-            // Do not sign the user out just because the admin check failed.
-            // Preserve the valid session so the issue can be diagnosed.
-            window.location.href = "./login.html";
-
+            // Preserve the session and keep the page open for diagnosis.
             return false;
 
         }
@@ -1926,12 +1938,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     supabaseClient.auth.onAuthStateChange(function (event) {
 
-        if (
-            event === "SIGNED_OUT" &&
-            currentAdmin
-        ) {
+        if (event === "SIGNED_OUT" && currentAdmin) {
 
-            window.location.href = "./login.html";
+            console.warn("Supabase reported SIGNED_OUT while Admin Panel was open.");
+            showToast("Your login session has ended. Please sign in again.");
 
         }
 
