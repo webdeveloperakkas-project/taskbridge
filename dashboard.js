@@ -915,7 +915,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const withdrawAccountLabel = document.getElementById("withdrawAccountLabel");
     const withdrawAccountHint = document.getElementById("withdrawAccountHint");
     const withdrawModalBalance = document.getElementById("withdrawModalBalance");
-    let selectedDepositMethod = "";
+
     let selectedWithdrawMethod = "";
 
     function openFinanceModal(modal) {
