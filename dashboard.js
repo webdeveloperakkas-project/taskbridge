@@ -1095,6 +1095,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const depositMessage = document.getElementById("depositFormMessage");
     const depositSubmitButton = document.getElementById("depositSubmitButton");
     let selectedDepositMethod = "";
+    const depositCurrencyByMethod = {
+        "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
+        "Bank Transfer": "BDT", "Wise (manual transfer)": "USD",
+        "Visa": "USD", "Mastercard": "USD"
+    };
 
     const depositMethodDetails = {
         "bKash": { title: "bKash payment details (demo)", lines: ["Account type: Agent / Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
@@ -1120,6 +1125,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const withdrawModalBalance = document.getElementById("withdrawModalBalance");
 
     let selectedWithdrawMethod = "";
+    const walletCurrencySelector = document.getElementById("walletCurrencySelector");
+    if (walletCurrencySelector) walletCurrencySelector.addEventListener("change", () => {
+        const wallet = walletsByCurrency.get(walletCurrencySelector.value);
+        if (wallet && Number(wallet.available_balance) > 0) renderWalletBalance(wallet);
+    });
 
     function openFinanceModal(modal) {
         if (!modal) return;
@@ -1167,6 +1177,11 @@ document.addEventListener("DOMContentLoaded", function () {
             item.setAttribute("aria-pressed", selected ? "true" : "false");
         });
         if (!selectedDepositMethod || !depositDetailsPanel || !depositInstructions) return;
+        const depositCurrency = depositCurrencyByMethod[selectedDepositMethod] || "USD";
+        const depositAmountLabel = document.querySelector('label[for="depositAmount"]');
+        const depositAmountInput = document.getElementById("depositAmount");
+        if (depositAmountLabel) depositAmountLabel.textContent = "Deposit Amount (" + depositCurrency + ")";
+        if (depositAmountInput) depositAmountInput.placeholder = "Enter amount in " + depositCurrency;
         const chosenCard = card || document.querySelector('.deposit-method-card[data-method="' + CSS.escape(selectedDepositMethod) + '"]');
         setModalBrand(chosenCard, depositModalMark, depositSelectedTitle,
             selectedDepositMethod === "Visa" || selectedDepositMethod === "Mastercard"
@@ -1211,7 +1226,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (depositMessage) depositMessage.textContent = "";
             try {
                 const { error } = await supabaseClient.from("deposits").insert({
-                    user_id: currentUser.id, amount, currency: "USD",
+                    user_id: currentUser.id, amount, currency: depositCurrencyByMethod[method],
                     payment_method: method, transaction_reference: reference, status: "pending"
                 });
                 if (error) throw error;
@@ -1250,15 +1265,19 @@ document.addEventListener("DOMContentLoaded", function () {
             selectedWithdrawMethod = card.dataset.withdrawMethod || "";
             document.querySelectorAll(".withdraw-method-card").forEach(item => item.classList.toggle("active", item === card));
             const meta = withdrawMethodMeta[selectedWithdrawMethod];
-            if (!meta) return;
+            selectedWithdrawCurrency = currencyForWithdrawMethod(selectedWithdrawMethod);
+            const selectedWallet = walletsByCurrency.get(selectedWithdrawCurrency);
+            if (!meta || !selectedWallet || Number(selectedWallet.available_balance) <= 0) return;
             setModalBrand(card, withdrawModalMark, withdrawModalTitle, selectedWithdrawMethod + " withdrawal");
             if (withdrawAccountLabel) withdrawAccountLabel.textContent = meta.label;
             if (withdrawAccountInput) withdrawAccountInput.placeholder = meta.placeholder;
             if (withdrawAccountHint) withdrawAccountHint.textContent = meta.hint;
-            if (withdrawModalBalance) withdrawModalBalance.textContent = document.getElementById("availableBalanceWithdraw")?.textContent || formatWalletMoney(0, walletCurrency);
+            if (withdrawModalBalance) withdrawModalBalance.textContent = formatWalletMoney(selectedWallet.available_balance, selectedWithdrawCurrency);
             if (withdrawAmountInput) {
-                withdrawAmountInput.max = String(walletAvailableBalance);
+                withdrawAmountInput.max = String(Number(selectedWallet.available_balance));
                 withdrawAmountInput.value = "";
+                const amountLabel = document.querySelector('label[for="withdrawAmount"]');
+                if (amountLabel) amountLabel.textContent = "Withdrawal Amount (" + selectedWithdrawCurrency + ")";
             }
             if (withdrawMessage) withdrawMessage.textContent = "";
             openFinanceModal(withdrawModal);
@@ -1272,7 +1291,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!withdrawForm.reportValidity()) return;
             const amount = Number(withdrawAmountInput?.value);
             const paymentAccount = withdrawAccountInput?.value.trim() || "";
-            const available = walletAvailableBalance;
+            const selectedWallet = walletsByCurrency.get(selectedWithdrawCurrency);
+            const available = Math.max(0, Number(selectedWallet?.available_balance || 0));
             if (!selectedWithdrawMethod) { if (withdrawMessage) withdrawMessage.textContent = "Please select a withdrawal method."; return; }
             if (!Number.isFinite(amount) || amount <= 0 || amount > available || !paymentAccount) {
                 if (withdrawMessage) withdrawMessage.textContent = "Enter a valid amount within your available balance and complete the receiving account details.";
@@ -1281,15 +1301,14 @@ document.addEventListener("DOMContentLoaded", function () {
             if (withdrawSubmitButton) { withdrawSubmitButton.disabled = true; withdrawSubmitButton.textContent = "Submitting..."; }
             if (withdrawMessage) withdrawMessage.textContent = "";
             try {
-                const { error } = await supabaseClient.from("withdrawals").insert({
-                    user_id: currentUser.id,
-                    amount,
-                    currency: walletCurrency || "USD",
-                    payment_method: selectedWithdrawMethod,
-                    payment_account: paymentAccount,
-                    status: "pending"
+                const { error } = await supabaseClient.rpc("request_withdrawal", {
+                    p_amount: amount,
+                    p_currency: selectedWithdrawCurrency,
+                    p_payment_method: selectedWithdrawMethod,
+                    p_payment_account: paymentAccount
                 });
                 if (error) throw error;
+                await loadMyWallet();
                 withdrawForm.reset();
                 closeFinanceModal(withdrawModal);
                 selectedWithdrawMethod = "";
