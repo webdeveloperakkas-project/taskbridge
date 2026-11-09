@@ -973,13 +973,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const direction = String(row.direction || "").toLowerCase();
             const isJobPost = text.includes("job") &&
                 (text.includes("post") || text.includes("fund") || text.includes("creat") || text.includes("advertis"));
-            const type = text.includes("deposit") ? "Deposit" :
+            const type = isJobPost ? "Withdraw" :
+                text.includes("deposit") ? "Deposit" :
                 text.includes("withdraw") ? "Withdraw" :
                 (direction === "out" || direction === "debit" ? "Withdraw" :
                 direction === "in" || direction === "credit" ? "Deposit" : "Wallet transaction");
             return {
                 id: row.id, referenceId: row.reference_id, type,
-                method: methodByRequestId.get(row.reference_id) || (isJobPost ? "Post Job" : ""),
+                method: isJobPost ? "Post Job" : (methodByRequestId.get(row.reference_id) || ""),
                 transactionId: transactionIdByRequestId.get(row.reference_id) || "—",
                 amount: Number(row.amount), currency: row.currency || "USD",
                 status: "completed", created_at: row.created_at, direction
