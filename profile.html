@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your TaskBridge profile and account verification.">
+  <title>My Profile & Verification - TaskBridge</title>
+  <link rel="stylesheet" href="./profile.css">
+</head>
+<body>
+  <header class="profile-topbar">
+    <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
+    <div class="topbar-actions">
+      <a class="back-dashboard" href="./dashboard.html">← Dashboard</a>
+      <span class="topbar-avatar" id="topbarAvatar">U</span>
+    </div>
+  </header>
+
+  <main class="profile-shell">
+    <section class="profile-intro">
+      <div>
+        <span class="eyebrow">ACCOUNT CENTER</span>
+        <h1>Profile & Verification</h1>
+        <p>Keep your personal information up to date and verify your identity securely.</p>
+      </div>
+      <div class="overall-status" id="overallStatus"><span class="status-dot"></span><span>Loading status</span></div>
+    </section>
+
+    <nav class="verification-tabs" role="tablist" aria-label="Profile sections">
+      <button class="verification-tab active" type="button" role="tab" aria-selected="true" data-tab="personal">
+        <span class="tab-icon">01</span><span><strong>Personal Details</strong><small>Account information</small></span>
+      </button>
+      <button class="verification-tab" type="button" role="tab" aria-selected="false" data-tab="identity">
+        <span class="tab-icon">02</span><span><strong>ID Verification</strong><small>Identity documents</small></span>
+        <span class="tab-status" id="identityTabStatus">Not submitted</span>
+      </button>
+      <button class="verification-tab" type="button" role="tab" aria-selected="false" data-tab="address">
+        <span class="tab-icon">03</span><span><strong>Address Verification</strong><small>Proof of residence</small></span>
+        <span class="tab-status" id="addressTabStatus">Not submitted</span>
+      </button>
+    </nav>
+
+    <section class="profile-panel active" id="personalPanel" role="tabpanel">
+      <div class="panel-heading"><div><span class="eyebrow">YOUR INFORMATION</span><h2>Personal Details</h2><p>These details are private and visible only to you and authorized administrators.</p></div><span class="panel-icon">♙</span></div>
+      <form id="personalForm" class="form-card">
+        <div class="form-grid">
+          <label class="field wide"><span>Full Name</span><input id="fullName" name="full_name" type="text" maxlength="120" autocomplete="name" placeholder="Enter your full legal name" required></label>
+          <label class="field wide"><span>Email Address</span><input id="emailAddress" type="email" readonly><small>Your sign-in email is managed securely by your account.</small></label>
+          <label class="field"><span>Date of Birth</span><input id="dateOfBirth" name="date_of_birth" type="date"></label>
+          <label class="field"><span>Phone Number</span><input id="phoneNumber" name="phone_number" type="tel" maxlength="30" autocomplete="tel" placeholder="+880 1XXXXXXXXX"></label>
+          <label class="field"><span>Gender <em>Optional</em></span><select id="gender" name="gender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="non_binary">Non-binary</option><option value="other">Other</option></select></label>
+          <label class="field"><span>Country</span><select id="personalCountry" name="country"><option value="">Select country</option></select></label>
+        </div>
+        <div class="form-actions"><p class="form-feedback" id="personalFeedback" aria-live="polite"></p><button class="primary-button" id="savePersonalButton" type="submit">Save Changes</button></div>
+      </form>
+    </section>
+
+    <section class="profile-panel" id="identityPanel" role="tabpanel" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">KNOW YOUR CUSTOMER</span><h2>Identity Verification</h2><p>Submit a valid government-issued ID and a live selfie for review.</p></div><span class="panel-icon">◇</span></div>
+      <div class="notice-card"><span>🔒</span><p>Your documents are stored in private encrypted-access storage. Only you and authorized administrators can access them.</p></div>
+      <form id="identityForm" class="form-card verification-form">
+        <div class="form-grid">
+          <label class="field"><span>ID Document Type</span><select id="idDocumentType" required><option value="">Select ID type</option><option value="national_id">National ID Card</option><option value="passport">Passport</option><option value="driving_license">Driving License</option></select></label>
+          <label class="field"><span>Issuing Country</span><select id="idCountry" required><option value="">Select country</option></select></label>
+        </div>
+        <div class="upload-grid">
+          <div class="upload-card">
+            <div class="upload-card-heading"><span class="upload-step">01</span><div><h3>Front Side</h3><p>Upload a clear image of the front.</p></div></div>
+            <div class="upload-preview" id="frontPreview"><span class="upload-placeholder">▧</span><strong>Front side preview</strong><small>JPG, PNG or WEBP · Max 2 MB</small></div>
+            <input class="file-input" id="frontFile" type="file" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-actions"><label class="secondary-button" for="frontFile">Upload File</label><button type="button" class="secondary-button camera-button" data-camera="front">Take Photo</button></div>
+            <span class="upload-feedback" id="frontFeedback">Not uploaded</span>
+          </div>
+          <div class="upload-card">
+            <div class="upload-card-heading"><span class="upload-step">02</span><div><h3>Back Side</h3><p>Upload the reverse side of your ID.</p></div></div>
+            <div class="upload-preview" id="backPreview"><span class="upload-placeholder">▧</span><strong>Back side preview</strong><small>JPG, PNG or WEBP · Max 2 MB</small></div>
+            <input class="file-input" id="backFile" type="file" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-actions"><label class="secondary-button" for="backFile">Upload File</label><button type="button" class="secondary-button camera-button" data-camera="back">Take Photo</button></div>
+            <span class="upload-feedback" id="backFeedback">Not uploaded</span>
+          </div>
+        </div>
+        <div class="selfie-card">
+          <div class="selfie-copy"><span class="eyebrow">LIVE SELFIE</span><h3>Verify that it is really you</h3><p>Use your device camera. Keep your face inside the guide and capture a clear, well-lit photo.</p><span class="selfie-tip">A live camera capture is required; selecting an existing selfie file is not available.</span></div>
+          <div class="selfie-preview" id="selfiePreview"><div class="selfie-ring"><span>☺</span></div><small>Selfie not captured</small></div>
+          <button type="button" class="primary-button" id="openSelfieCamera">Open Live Camera</button>
+          <span class="upload-feedback" id="selfieFeedback">Not submitted</span>
+        </div>
+        <div class="submission-status" id="identitySubmissionStatus"></div>
+        <div class="form-actions"><p class="form-feedback" id="identityFeedback" aria-live="polite"></p><button class="primary-button" id="submitIdentityButton" type="submit">Submit Identity Verification</button></div>
+      </form>
+    </section>
+
+    <section class="profile-panel" id="addressPanel" role="tabpanel" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">PROOF OF RESIDENCE</span><h2>Address Verification</h2><p>Provide your current residential address and one supporting document.</p></div><span class="panel-icon">⌖</span></div>
+      <div class="notice-card"><span>📄</span><p>Accepted documents: Utility Bill, Bank Statement, Government Address Certificate, Rental Agreement, or National/Voter ID showing your current address. Prefer a document issued within the last 3 months.</p></div>
+      <form id="addressForm" class="form-card verification-form">
+        <div class="form-grid">
+          <label class="field wide"><span>Street Address / House & Building</span><input id="addressLine" type="text" maxlength="240" autocomplete="street-address" required placeholder="House, road, street and area"></label>
+          <label class="field"><span>City</span><input id="addressCity" type="text" maxlength="100" required autocomplete="address-level2"></label>
+          <label class="field"><span>State / Division / Region</span><input id="addressRegion" type="text" maxlength="100" autocomplete="address-level1"></label>
+          <label class="field"><span>Postal Code</span><input id="postalCode" type="text" maxlength="20" autocomplete="postal-code"></label>
+          <label class="field"><span>Country</span><select id="addressCountry" required><option value="">Select country</option></select></label>
+          <label class="field wide"><span>Proof of Address Document</span><select id="addressDocumentType" required><option value="">Choose document type</option><option value="utility_bill">Utility Bill (Electricity / Water / Gas)</option><option value="bank_statement">Bank Statement</option><option value="government_certificate">Government Address Certificate</option><option value="rental_agreement">Rental Agreement</option><option value="national_voter_id">National ID / Voter ID with current address</option></select></label>
+        </div>
+        <div class="upload-card address-upload-card">
+          <div class="upload-card-heading"><span class="upload-step">04</span><div><h3>Address Document</h3><p>Upload a clear scan or photo of your proof of address.</p></div></div>
+          <div class="upload-preview document-preview" id="addressPreview"><span class="upload-placeholder">▤</span><strong>Address document preview</strong><small>JPG, PNG, WEBP or PDF · Max 2 MB</small></div>
+          <input class="file-input" id="addressFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+          <div class="upload-actions"><label class="secondary-button" for="addressFile">Upload Document</label><button type="button" class="secondary-button camera-button" data-camera="address">Take Photo</button></div>
+          <span class="upload-feedback" id="addressUploadFeedback">Not uploaded</span>
+        </div>
+        <div class="submission-status" id="addressSubmissionStatus"></div>
+        <div class="form-actions"><p class="form-feedback" id="addressFeedback" aria-live="polite"></p><button class="primary-button" id="submitAddressButton" type="submit">Submit Address Verification</button></div>
+      </form>
+    </section>
+    <p class="page-footnote">TaskBridge will only use your verification information to protect the marketplace and comply with applicable requirements.</p>
+  </main>
+
+  <div class="camera-modal" id="cameraModal" aria-hidden="true">
+    <div class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="cameraTitle">
+      <div class="camera-header"><div><span class="eyebrow">SECURE CAMERA</span><h2 id="cameraTitle">Camera Capture</h2></div><button type="button" class="camera-close" id="closeCamera" aria-label="Close camera">×</button></div>
+      <div class="camera-stage" id="cameraStage"><video id="cameraVideo" autoplay playsinline muted></video><div class="camera-guide" id="cameraGuide"><span></span></div><div class="camera-glow"></div></div>
+      <p class="camera-instruction" id="cameraInstruction">Position the document clearly inside the frame.</p>
+      <div class="camera-controls"><button type="button" class="secondary-button" id="cancelCamera">Cancel</button><button type="button" class="primary-button" id="capturePhoto">Capture Photo</button></div>
+      <canvas id="cameraCanvas" hidden></canvas>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./profile.js?v=20261110-profile-kyc"></script>
+</body>
+</html>
