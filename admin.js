@@ -1215,7 +1215,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }).join("");
 
         if (expandedLoginUserId) {
-            const selectedUser = allUsers.find(user => user.id === expandedLoginUserId);
+            const selectedUser = filteredUsers.find(user => user.id === expandedLoginUserId);
             if (selectedUser) loadUserLoginHistory(selectedUser);
         }
     }
@@ -1321,7 +1321,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             const userId = pageButton.dataset.loginUser;
             const nextPage = Number(pageButton.dataset.loginPage);
             loginHistoryPages.set(userId, nextPage);
-            const user = allUsers.find(item => item.id === userId);
+            const userPool = loginActivitySearchResults === null ? allUsers : loginActivitySearchResults;
+            const user = userPool.find(item => item.id === userId);
             if (user) loadUserLoginHistory(user);
         }
     });
