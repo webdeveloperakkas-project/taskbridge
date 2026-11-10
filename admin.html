@@ -97,6 +97,12 @@
                     <span class="buyer-nav-tag">BUYERS</span>
                 </a>
 
+                <a href="#loginActivityPanel" class="admin-nav-link login-activity-link"
+                    data-panel="loginActivityPanel">
+                    <span class="nav-icon">◷</span>
+                    <span>Login Activity</span>
+                </a>
+
 
                 <!-- JOBS -->
 
@@ -535,6 +541,40 @@
 
                     </div>
 
+                </section>
+
+
+                <!-- =================================
+                     LOGIN ACTIVITY
+                ================================== -->
+                <section class="admin-panel" id="loginActivityPanel">
+                    <div class="section-intro login-activity-intro">
+                        <div>
+                            <h2>Login Activity</h2>
+                            <p>Review each user's recent sign-in history and device information.</p>
+                        </div>
+                        <button type="button" class="secondary-btn" id="refreshLoginActivity">↻ Refresh</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="filter-toolbar login-activity-toolbar">
+                            <input type="search" id="loginActivitySearch" placeholder="Search name, email or user ID...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table login-activity-users-table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>User ID</th>
+                                        <th>Email</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loginActivityUsersTable">
+                                    <tr><td colspan="4" class="empty-state">Loading users...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
 
 
