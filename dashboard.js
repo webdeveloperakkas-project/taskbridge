@@ -1702,7 +1702,14 @@ document.addEventListener("DOMContentLoaded", function () {
         currentUser = data?.session?.user || null;
         if (!currentUser) { window.location.replace("./login.html"); return; }
 
-        const displayName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "My Account";
+        let displayName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "My Account";
+        try {
+            const { data: profileDetails, error: profileDetailsError } = await supabaseClient
+                .from("user_profile_details").select("full_name").eq("user_id", currentUser.id).maybeSingle();
+            if (!profileDetailsError && profileDetails?.full_name) displayName = profileDetails.full_name;
+        } catch (profileDetailsError) {
+            console.warn("Could not load profile display name:", profileDetailsError);
+        }
         const name = document.querySelector("#profileToggle .profile-info strong");
         const avatar = document.querySelector("#profileToggle .profile-avatar");
         if (name) name.textContent = displayName;
