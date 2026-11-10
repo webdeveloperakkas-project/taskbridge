@@ -1495,6 +1495,83 @@ document.addEventListener("DOMContentLoaded", function () {
         showPageSection("jobDetailsSection");
     }
 
+
+    function renderDashboardRecentJobs(jobs) {
+        const list = document.getElementById("dashboardRecentJobsList");
+        const empty = document.getElementById("dashboardRecentJobsEmpty");
+        if (!list || !empty) return;
+        list.replaceChildren();
+        const rows = Array.isArray(jobs) ? jobs.slice(0, 20) : [];
+        rows.forEach(job => {
+            const category = getJobCategory(job);
+            const row = document.createElement("article");
+            row.className = "dashboard-recent-job-row";
+
+            const titleCell = document.createElement("div");
+            titleCell.className = "dashboard-recent-job-title";
+            const icon = document.createElement("span");
+            icon.className = "dashboard-recent-job-icon";
+            const iconMap = { facebook: "icon-facebook", youtube: "icon-youtube",
+                instagram: "icon-instagram", twitter: "icon-twitter",
+                tiktok: "icon-music", website: "icon-globe" };
+            const use = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            use.setAttribute("class", "icon");
+            const useNode = document.createElementNS("http://www.w3.org/2000/svg", "use");
+            useNode.setAttribute("href", "#" + (iconMap[String(category?.slug || "").toLowerCase()] || "icon-grid"));
+            use.appendChild(useNode);
+            icon.appendChild(use);
+            const title = document.createElement("strong");
+            title.textContent = job.title || "Untitled Job";
+            title.title = title.textContent;
+            const posted = document.createElement("small");
+            posted.textContent = job.created_at ? new Date(job.created_at).toLocaleDateString() : "Recently posted";
+            titleCell.append(icon, document.createElement("span"));
+            const titleCopy = titleCell.lastElementChild;
+            titleCopy.append(title, posted);
+            row.appendChild(titleCell);
+
+            const categoryCell = document.createElement("span");
+            categoryCell.className = "dashboard-recent-job-meta";
+            categoryCell.textContent = category?.name || "Other";
+            row.appendChild(categoryCell);
+
+            const payment = document.createElement("strong");
+            payment.className = "dashboard-recent-job-payment";
+            payment.textContent = formatWalletMoney(job.reward_per_worker, job.currency || "USD");
+            row.appendChild(payment);
+
+            const duration = document.createElement("span");
+            duration.className = "dashboard-recent-job-meta";
+            duration.textContent = formatJobDuration(job.duration_minutes);
+            row.appendChild(duration);
+
+            const workers = document.createElement("span");
+            workers.className = "dashboard-recent-job-meta";
+            workers.textContent = String(Number(job.total_slots) || 0);
+            row.appendChild(workers);
+
+            const action = document.createElement("button");
+            action.type = "button";
+            action.className = "dashboard-recent-job-view";
+            action.dataset.openJob = job.id;
+            action.textContent = "View Details";
+            row.appendChild(action);
+            list.appendChild(row);
+        });
+        empty.hidden = rows.length > 0;
+        if (!rows.length) {
+            list.innerHTML = '<div class="recent-jobs-empty">No recent jobs are available right now. Please check again soon.</div>';
+        }
+    }
+
+    const dashboardRecentJobsList = document.getElementById("dashboardRecentJobsList");
+    if (dashboardRecentJobsList) {
+        dashboardRecentJobsList.addEventListener("click", event => {
+            const trigger = event.target.closest("[data-open-job]");
+            if (trigger) openJobDetails(trigger.dataset.openJob);
+        });
+    }
+
     async function loadFindJobs() {
         const { data, error } = await supabaseClient.from("jobs")
             .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget")
@@ -1503,6 +1580,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .order("created_at", { ascending: false });
         if (error) throw error;
         publicJobs = data || [];
+
+        renderDashboardRecentJobs(publicJobs.slice(0, 20));
         const list = document.getElementById("jobList");
         const empty = document.getElementById("jobEmptyState");
         if (!list || !empty) return;
