@@ -30,7 +30,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
       render();
     }catch(error){console.warn("Header wallet could not load:",error);balance.textContent="—"}
-  }\n  await loadSharedHeader();\n\n  const accountMessage=document.getElementById("accountMessage");
+  }
+  await loadSharedHeader();
+
+  const accountMessage=document.getElementById("accountMessage");
   const securityMessage=document.getElementById("securityMessage");
   const emailInput=document.getElementById("accountEmail");
   const emailForm=document.getElementById("emailForm");
