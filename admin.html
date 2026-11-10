@@ -89,6 +89,13 @@
                     <span>Account Verification</span>
                 </a>
 
+                <a href="#buyer-management" class="admin-nav-link buyer-management-link"
+                    data-panel="buyerManagementPanel">
+                    <span class="nav-icon">♙</span>
+                    <span>Buyer Management</span>
+                    <span class="buyer-nav-tag">BUYERS</span>
+                </a>
+
 
                 <!-- JOBS -->
 
@@ -527,6 +534,38 @@
 
                     </div>
 
+                </section>
+
+
+                <!-- =================================
+                     BUYER MANAGEMENT
+                ================================== -->
+                <section class="admin-panel" id="buyerManagementPanel">
+                    <div class="section-intro buyer-management-intro">
+                        <div><h2>Buyer Management</h2><p>Automatically listed users who have posted at least one job. Review their job activity and wallet balances.</p></div>
+                        <button type="button" class="secondary-btn" id="refreshBuyerManagement">↻ Refresh</button>
+                    </div>
+                    <div class="stats-grid buyer-overview-stats">
+                        <div class="stat-card"><div class="stat-icon users-icon">♙</div><div><p>Total Buyers</p><h3 id="buyerTotalCount">0</h3><span>Users who have posted jobs</span></div></div>
+                        <div class="stat-card"><div class="stat-icon jobs-icon">▤</div><div><p>Total Jobs Posted</p><h3 id="buyerTotalJobs">0</h3><span>Across all buyers</span></div></div>
+                        <div class="stat-card"><div class="stat-icon verified-icon">✓</div><div><p>Running Jobs</p><h3 id="buyerRunningJobs">0</h3><span>Currently active jobs</span></div></div>
+                        <div class="stat-card"><div class="stat-icon pending-icon">◷</div><div><p>Pending Review</p><h3 id="buyerPendingJobs">0</h3><span>Awaiting admin review</span></div></div>
+                        <div class="stat-card"><div class="stat-icon deposit-icon">▣</div><div><p>Completed Jobs</p><h3 id="buyerCompletedJobs">0</h3><span>Successfully completed</span></div></div>
+                        <div class="stat-card"><div class="stat-icon withdraw-icon">×</div><div><p>Closed / Cancelled</p><h3 id="buyerClosedJobs">0</h3><span>Closed or cancelled jobs</span></div></div>
+                    </div>
+                    <div class="filter-toolbar buyer-filter-toolbar">
+                        <input type="search" id="buyerManagementSearch" placeholder="Search buyer name, email or user ID...">
+                        <select id="buyerManagementStatus">
+                            <option value="all">All Buyer Activity</option>
+                            <option value="running">Has Running Jobs</option>
+                            <option value="pending">Has Pending Jobs</option>
+                            <option value="completed">Has Completed Jobs</option>
+                            <option value="closed">Has Closed Jobs</option>
+                        </select>
+                    </div>
+                    <div id="buyerManagementList" class="buyer-management-list">
+                        <div class="admin-card empty-state">Loading buyer accounts...</div>
+                    </div>
                 </section>
 
 
