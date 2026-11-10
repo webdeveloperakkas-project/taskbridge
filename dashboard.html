@@ -453,8 +453,12 @@
                         <button type="button" class="header-balance" id="walletBalanceToggle"
                             aria-label="Available balance and currency wallets" aria-expanded="false"
                             aria-controls="headerWalletMenu">
-                            <span class="balance-icon">
-                                <svg class="icon"><use href="#icon-wallet"></use></svg>
+                            <span class="balance-icon" aria-hidden="true">
+                                <svg class="wallet-header-icon" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v4H6.5A2.5 2.5 0 0 1 4 5.5v13A2.5 2.5 0 0 0 6.5 21H20V8H6.5A2.5 2.5 0 0 1 4 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M20 11h-5a2.5 2.5 0 0 0 0 5h5v-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                                    <circle cx="15.5" cy="13.5" r=".8" fill="currentColor"/>
+                                </svg>
                             </span>
                             <span class="header-balance-copy">
                                 <small>Available Balance</small>
