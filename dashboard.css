@@ -4040,3 +4040,86 @@ button.header-balance {
         max-width: min(210px, calc(100vw - 16px));
     }
 }
+
+
+/* MOBILE HEADER FIX: make the hamburger unmistakable and center the wallet */
+@media (max-width: 600px) {
+    .top-header {
+        position: sticky;
+        isolation: isolate;
+    }
+    .top-header .header-left {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+        margin-right: 0;
+    }
+    .top-header .header-right {
+        position: static;
+        flex: 1 1 auto;
+        min-width: 0;
+        justify-content: flex-end;
+        gap: 7px;
+    }
+    .top-header .wallet-balance-dropdown {
+        position: absolute;
+        z-index: 3;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        max-width: 42%;
+        min-width: 0;
+        flex: none;
+        margin: 0;
+    }
+    .top-header .wallet-balance-dropdown .header-balance {
+        width: auto;
+        max-width: 100%;
+        justify-content: center;
+    }
+    .top-header .notification-dropdown,
+    .top-header .profile-dropdown {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+    }
+    .top-header .menu-toggle {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        padding: 6px;
+        color: #172b21 !important;
+        -webkit-text-fill-color: #172b21;
+    }
+    .top-header .menu-toggle .icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 27px !important;
+        height: 27px !important;
+        color: #172b21 !important;
+        fill: none !important;
+        stroke: #172b21 !important;
+        overflow: visible;
+    }
+    .top-header .menu-toggle .icon use {
+        color: #172b21 !important;
+        stroke: #172b21 !important;
+    }
+    .top-header .menu-toggle .icon path {
+        stroke: #172b21 !important;
+        stroke-width: 2.8 !important;
+        stroke-linecap: round;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .wallet-balance-dropdown { max-width: 40%; }
+    .top-header .wallet-balance-dropdown .header-balance { padding-left: 5px; padding-right: 5px; }
+    .top-header .header-right { gap: 4px; }
+}
