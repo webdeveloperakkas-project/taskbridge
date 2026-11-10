@@ -1345,3 +1345,13 @@ a {
 }
 
 .login-user-agent { display:block; max-width:260px; white-space:normal; overflow-wrap:anywhere; color:var(--muted); font-size:10px; line-height:1.45; }
+
+
+/* Login Activity — explicit search control */
+.login-activity-search-control{position:relative;display:block;width:100%;min-width:0}
+.login-activity-search-control input{display:block;width:100%;min-width:0;box-sizing:border-box;padding-right:132px!important}
+.login-activity-search-btn{position:absolute;top:5px;right:5px;bottom:5px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:112px;padding:0 14px;border:1px solid #0e7490;border-radius:7px;background:linear-gradient(135deg,#22d3ee,#0891b2);color:#083344;font-size:12px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 2px 7px rgba(8,145,178,.18);transition:background .18s ease,box-shadow .18s ease}
+.login-activity-search-btn span{font-size:18px;line-height:1}
+.login-activity-search-btn:hover{background:linear-gradient(135deg,#67e8f9,#06b6d4);box-shadow:0 4px 10px rgba(8,145,178,.25)}
+.login-activity-search-btn:focus-visible{outline:3px solid rgba(8,145,178,.3);outline-offset:2px}
+@media(max-width:650px){.login-activity-search-control{width:100%}.login-activity-search-btn{min-width:100px;padding:0 10px}.login-activity-search-control input{padding-right:116px!important}}
