@@ -1252,3 +1252,46 @@ a {
 .ledger-error[hidden] { display: none; }
 @media (max-width: 1150px) { .administration-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 650px) { .administration-stats-grid { grid-template-columns: 1fr; } .administration-ledger-card { padding: 14px; } }
+
+
+/* =========================================
+   BUYER MANAGEMENT
+========================================= */
+.buyer-management-link{margin-top:7px;color:#c4b5fd;background:rgba(124,91,245,.13);border:1px solid rgba(167,139,250,.22);font-weight:800}
+.buyer-management-link .nav-icon{color:#c4b5fd}
+.buyer-management-link .buyer-nav-tag{margin-left:auto;padding:3px 6px;border-radius:5px;color:#ede9fe;background:rgba(139,92,246,.3);font-size:8px;font-weight:850;letter-spacing:.5px}
+.buyer-management-link:hover,.buyer-management-link.active{color:#fff;background:linear-gradient(100deg,#6d45d8,#5140b8);border-color:transparent}
+.buyer-management-link.active .nav-icon,.buyer-management-link:hover .nav-icon{color:#fff}
+.buyer-management-intro{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.buyer-overview-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+.buyer-management-list{display:grid;gap:16px}
+.buyer-profile-card{margin-top:0;padding:20px;border-left:4px solid #7456dc}
+.buyer-card-top,.buyer-card-footer,.buyer-details-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.buyer-avatar{color:#5b35bd;background:#eee8ff}
+.buyer-role-pill{padding:6px 11px;border-radius:20px;color:#5b35bd;background:#f0eaff;font-size:9px;font-weight:850;letter-spacing:.7px}
+.buyer-metric-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:18px 0}
+.buyer-metric-grid>div{padding:12px;border:1px solid #ece8f8;border-radius:9px;background:#faf9ff}
+.buyer-metric-grid span,.buyer-metric-grid strong{display:block}
+.buyer-metric-grid span{color:var(--muted);font-size:10px}
+.buyer-metric-grid strong{margin-top:6px;color:#3f326b;font-size:20px}
+.buyer-card-lower{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:15px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.buyer-summary-label{display:block;margin-bottom:9px;color:#7b8497;font-size:9px;font-weight:850;letter-spacing:.7px}
+.buyer-category-list{display:flex;flex-wrap:wrap;gap:7px}
+.buyer-category-chip{padding:6px 9px;border-radius:7px;color:#40516b;background:#eef4fb;font-size:10px}
+.buyer-category-chip strong{margin-left:4px;color:#334b73}
+.buyer-balance-currency{display:flex;flex-wrap:wrap;gap:8px 13px;margin:6px 0;padding:8px 10px;border-radius:7px;background:#f3f8f5;font-size:10px}
+.buyer-balance-currency>span{color:#23734d;font-weight:850}
+.buyer-balance-currency strong{color:#344b40;font-weight:700}
+.buyer-muted{color:var(--muted);font-size:10px}
+.buyer-card-footer{padding-top:13px}
+.buyer-id{max-width:65%;color:var(--muted);font-size:9px;overflow-wrap:anywhere}
+.buyer-details-btn{padding:8px 12px;border:0;border-radius:7px;color:#fff;background:#6244c5;font-size:10px;font-weight:750;cursor:pointer}
+.buyer-details-btn:hover{background:#4f35a8}
+.buyer-jobs-details{margin-top:16px;padding-top:15px;border-top:1px solid var(--border)}
+.buyer-jobs-details[hidden]{display:none}
+.buyer-details-heading{margin-bottom:12px;color:var(--text);font-size:12px}
+.buyer-details-heading span{color:var(--muted);font-size:10px}
+.buyer-jobs-table{min-width:850px}
+.buyer-job-subtext{display:block;margin-top:4px;color:var(--muted);font-size:9px}
+@media(max-width:1150px){.buyer-overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.buyer-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.buyer-management-intro{align-items:flex-start;flex-direction:column}.buyer-management-intro button{width:100%}.buyer-overview-stats{grid-template-columns:1fr}.buyer-profile-card{padding:14px}.buyer-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.buyer-card-lower{grid-template-columns:1fr;gap:12px}.buyer-balance-currency{flex-direction:column}.buyer-card-footer{align-items:flex-start;flex-direction:column}.buyer-id{max-width:100%}.buyer-details-btn{width:100%}}
