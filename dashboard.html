@@ -620,30 +620,76 @@
                         </div>
                     </section>
 
-                    <!-- LATEST AVAILABLE JOBS -->
-                    <section class="content-panel dashboard-recent-jobs">
-                        <div class="recent-jobs-heading">
-                            <div class="recent-jobs-title">
-                                <span class="recent-jobs-kicker">FRESH OPPORTUNITIES</span>
-                                <h2>Recent Jobs</h2>
-                                <p>Explore the latest jobs posted by the TaskBridge community.</p>
+                    <!-- RECENT JOBS: MATCH THE FIND A JOB EXPERIENCE -->
+                    <section class="dashboard-recent-jobs-section">
+                        <div class="section-heading">
+                            <div>
+                                <span>WORKER AREA</span>
+                                <h1>Recent Jobs</h1>
+                                <p>Explore the latest 20 available jobs and find your next task.</p>
                             </div>
-                            <a href="#findJobSection" class="recent-jobs-all-link" data-open-section="findJobSection">
-                                <span>All Jobs</span><svg class="icon"><use href="#icon-arrow-right"></use></svg>
-                            </a>
+                            <a href="#findJobSection" class="recent-jobs-all-link" data-open-section="findJobSection">All Jobs</a>
                         </div>
-                        <div class="recent-jobs-table-head" aria-hidden="true">
-                            <span>JOB</span><span>CATEGORY</span><span>PAYMENT</span><span>DURATION</span><span>WORKERS</span><span>ACTION</span>
-                        </div>
-                        <div id="dashboardRecentJobsList" class="dashboard-recent-jobs-list">
-                            <div class="recent-jobs-empty">Loading latest jobs...</div>
-                        </div>
-                        <div id="dashboardRecentJobsEmpty" class="recent-jobs-empty" hidden>
-                            No recent jobs are available right now. Please check again soon.
-                        </div>
-                        <div class="recent-jobs-footer">
-                            <a href="#findJobSection" data-open-section="findJobSection">More Jobs <span aria-hidden="true">→</span></a>
-                        </div>
+
+                        <section class="content-panel job-search-panel dashboard-recent-search-panel">
+                            <div class="panel-heading">
+                                <div><h2>Search Jobs</h2><p>Search recent tasks using keywords.</p></div>
+                            </div>
+                            <div class="job-search-bar">
+                                <div class="job-search-input">
+                                    <svg class="icon"><use href="#icon-search"></use></svg>
+                                    <input type="search" id="dashboardRecentSearchInput" placeholder="Search jobs by title or keyword...">
+                                </div>
+                                <button type="button" id="dashboardRecentSearchButton" class="btn-primary">
+                                    <svg class="icon"><use href="#icon-search"></use></svg><span>Search</span>
+                                </button>
+                            </div>
+                            <div class="job-category-area">
+                                <div class="category-heading">
+                                    <h3>Browse by Category</h3>
+                                    <p>Select a category to explore recent jobs.</p>
+                                </div>
+                                <div class="job-category-grid" id="dashboardRecentCategoryGrid">
+                                    <button type="button" class="job-category-item active" data-recent-category="all"><span class="category-icon"><svg class="icon"><use href="#icon-grid"></use></svg></span><span>All Jobs</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="facebook"><span class="category-icon facebook-icon"><svg class="icon"><use href="#icon-facebook"></use></svg></span><span>Facebook</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="youtube"><span class="category-icon youtube-icon"><svg class="icon"><use href="#icon-youtube"></use></svg></span><span>YouTube</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="instagram"><span class="category-icon instagram-icon"><svg class="icon"><use href="#icon-instagram"></use></svg></span><span>Instagram</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="tiktok"><span class="category-icon tiktok-icon"><svg class="icon"><use href="#icon-music"></use></svg></span><span>TikTok</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="twitter"><span class="category-icon twitter-icon"><svg class="icon"><use href="#icon-twitter"></use></svg></span><span>Twitter / X</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="website"><span class="category-icon website-icon"><svg class="icon"><use href="#icon-globe"></use></svg></span><span>Website</span></button>
+                                    <button type="button" class="job-category-item" data-recent-category="other"><span class="category-icon other-icon"><svg class="icon"><use href="#icon-more-horizontal"></use></svg></span><span>Other</span></button>
+                                </div>
+                            </div>
+                            <div class="job-sort-area">
+                                <label for="dashboardRecentSortFilter"><svg class="icon"><use href="#icon-filter"></use></svg> Sort By</label>
+                                <select id="dashboardRecentSortFilter">
+                                    <option value="newest">Newest First</option>
+                                    <option value="highest">Highest Reward</option>
+                                    <option value="lowest">Lowest Reward</option>
+                                </select>
+                            </div>
+                        </section>
+
+                        <section class="content-panel available-jobs-panel dashboard-recent-list-panel">
+                            <div class="panel-heading">
+                                <div><h2>Latest 20 Jobs</h2><p>Jobs approved and published by advertisers.</p></div>
+                                <span id="dashboardRecentResultsCount" class="job-results-count">0 Jobs</span>
+                            </div>
+                            <div class="job-table-scroll">
+                                <div class="job-table-header" aria-hidden="true">
+                                    <span>Job Name</span><span>Payment</span><span>Success Rate</span><span>TTR</span><span>Completed</span><span>Action</span>
+                                </div>
+                                <div class="job-list job-table-list" id="dashboardRecentJobsList" aria-live="polite"></div>
+                            </div>
+                            <div class="empty-state" id="dashboardRecentJobsEmpty" hidden>
+                                <div class="empty-state-icon"><svg class="icon"><use href="#icon-search"></use></svg></div>
+                                <h3>No Jobs Available</h3>
+                                <p>No jobs match your current search or category. Try another keyword or category.</p>
+                            </div>
+                            <div class="recent-jobs-footer">
+                                <a href="#findJobSection" data-open-section="findJobSection">More Jobs <span aria-hidden="true">→</span></a>
+                            </div>
+                        </section>
                     </section>
 
                     <!-- MY RECENT POSTED JOBS -->
