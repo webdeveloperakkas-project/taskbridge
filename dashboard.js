@@ -1500,107 +1500,45 @@ document.addEventListener("DOMContentLoaded", function () {
         const list = document.getElementById("dashboardRecentJobsList");
         const empty = document.getElementById("dashboardRecentJobsEmpty");
         if (!list || !empty) return;
+
         list.replaceChildren();
         const rows = Array.isArray(jobs) ? jobs.slice(0, 20) : [];
+
         rows.forEach(job => {
-            const category = getJobCategory(job);
             const row = document.createElement("article");
             row.className = "job-table-row job-list-item dashboard-recent-job-row";
             row.dataset.jobId = job.id;
-            row.dataset.title = ((category?.name || "") + " " + (job.title || "")).toLowerCase();
-            row.dataset.category = String(category?.slug || category?.name || "other").toLowerCase();
-            row.dataset.reward = String(Number(job.reward_per_worker) || 0);
-            row.dataset.date = job.created_at || "";
             row.style.setProperty("--job-card-background", "#ffffff");
 
             const nameCell = document.createElement("div");
             nameCell.className = "job-table-cell job-name-cell";
-            const nameButton = document.createElement("button");
-            nameButton.type = "button";
-            nameButton.className = "job-name-link";
-            nameButton.dataset.openJob = job.id;
-            nameButton.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
-            nameButton.title = nameButton.textContent;
-            nameCell.appendChild(nameButton);
+            const name = document.createElement("span");
+            name.className = "job-name-link dashboard-recent-job-name";
+            name.textContent = job.title || "Untitled Job";
+            nameCell.appendChild(name);
             row.appendChild(nameCell);
-            row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
-            row.appendChild(createJobCell("job-success-rate", "—"));
+
+            row.appendChild(createJobCell(
+                "job-payment-cell",
+                formatWalletMoney(job.reward_per_worker, job.currency || "USD")
+            ));
             row.appendChild(createJobCell("", formatJobDuration(job.duration_minutes)));
-            row.appendChild(createJobCell("job-completed-cell", "— / " + Number(job.total_slots || 0)));
+            row.appendChild(createJobCell("job-completed-cell", String(Number(job.total_slots || 0))));
 
             const actionCell = document.createElement("div");
-            actionCell.className = "job-table-cell";
+            actionCell.className = "job-table-cell dashboard-recent-job-action";
             const viewButton = document.createElement("button");
             viewButton.type = "button";
             viewButton.className = "job-view-button";
             viewButton.dataset.openJob = job.id;
-            viewButton.textContent = "View";
+            viewButton.textContent = "View Details";
             actionCell.appendChild(viewButton);
             row.appendChild(actionCell);
+
             list.appendChild(row);
         });
+
         empty.hidden = rows.length > 0;
-        filterDashboardRecentJobs();
-    }
-
-    let selectedDashboardRecentCategory = "all";
-
-    function filterDashboardRecentJobs() {
-        const list = document.getElementById("dashboardRecentJobsList");
-        const empty = document.getElementById("dashboardRecentJobsEmpty");
-        if (!list || !empty) return;
-        const search = (document.getElementById("dashboardRecentSearchInput")?.value || "").trim().toLowerCase();
-        const cards = Array.from(list.querySelectorAll(".job-table-row"));
-        cards.forEach(card => {
-            const matchesSearch = (card.dataset.title || "").includes(search);
-            const matchesCategory = selectedDashboardRecentCategory === "all" ||
-                (card.dataset.category || "") === selectedDashboardRecentCategory;
-            card.hidden = !(matchesSearch && matchesCategory);
-        });
-        const visible = cards.filter(card => !card.hidden).length;
-        const count = document.getElementById("dashboardRecentResultsCount");
-        if (count) count.textContent = visible + (visible === 1 ? " Job" : " Jobs");
-        empty.hidden = visible > 0;
-        const heading = empty.querySelector("h3");
-        const message = empty.querySelector("p");
-        if (heading) heading.textContent = cards.length ? "No Matching Jobs" : "No Jobs Available Yet";
-        if (message) message.textContent = cards.length
-            ? "No jobs match your current search or category. Try another filter."
-            : "There are currently no approved jobs available. Please check back later.";
-    }
-
-    const dashboardRecentSearchInput = document.getElementById("dashboardRecentSearchInput");
-    const dashboardRecentSearchButton = document.getElementById("dashboardRecentSearchButton");
-    if (dashboardRecentSearchInput) dashboardRecentSearchInput.addEventListener("input", filterDashboardRecentJobs);
-    if (dashboardRecentSearchButton) dashboardRecentSearchButton.addEventListener("click", filterDashboardRecentJobs);
-
-    document.querySelectorAll("#dashboardRecentCategoryGrid [data-recent-category]").forEach(button => {
-        button.addEventListener("click", () => {
-            selectedDashboardRecentCategory = String(button.dataset.recentCategory || "all").toLowerCase();
-            document.querySelectorAll("#dashboardRecentCategoryGrid [data-recent-category]").forEach(item => {
-                item.classList.toggle("active", item === button);
-            });
-            filterDashboardRecentJobs();
-        });
-    });
-
-    const dashboardRecentSortFilter = document.getElementById("dashboardRecentSortFilter");
-    if (dashboardRecentSortFilter) {
-        dashboardRecentSortFilter.addEventListener("change", () => {
-            const list = document.getElementById("dashboardRecentJobsList");
-            if (!list) return;
-            const cards = Array.from(list.querySelectorAll(".job-table-row"));
-            const sortType = dashboardRecentSortFilter.value;
-            cards.sort((a, b) => {
-                const rewardA = Number(a.dataset.reward) || 0;
-                const rewardB = Number(b.dataset.reward) || 0;
-                if (sortType === "highest") return rewardB - rewardA;
-                if (sortType === "lowest") return rewardA - rewardB;
-                return new Date(b.dataset.date || 0) - new Date(a.dataset.date || 0);
-            });
-            cards.forEach(card => list.appendChild(card));
-            filterDashboardRecentJobs();
-        });
     }
 
     async function loadFindJobs() {
