@@ -1413,6 +1413,92 @@ document.addEventListener("DOMContentLoaded", function () {
         if (select) {
             select.replaceChildren(new Option("Select Category", ""));
             categoryRows.forEach(row => select.add(new Option(row.name, row.id)));
+            select.addEventListener("change", updateJobTitleOptions);
+            updateJobTitleOptions();
+        }
+    }
+
+    function updateJobTitleOptions() {
+        const categorySelect = document.getElementById("postJobCategory");
+        const titleSelect = document.getElementById("jobTitle");
+        if (!categorySelect || !titleSelect) return;
+
+        const selectedCategory = categoryRows.find(row => row.id === categorySelect.value);
+        titleSelect.replaceChildren();
+
+        if (!selectedCategory) {
+            titleSelect.add(new Option("Select a job category first", ""));
+            titleSelect.disabled = true;
+            return;
+        }
+
+        const categoryKey = String(selectedCategory.slug || selectedCategory.name || "")
+            .toLowerCase().replace(/[^a-z0-9]/g, "");
+
+        const titleOptionsByCategory = {
+            facebook: [
+                "Facebook Page Like",
+                "Facebook Page Follow",
+                "Facebook Post Like",
+                "Facebook Post Comment",
+                "Facebook Post Share",
+                "Facebook Page Review"
+            ],
+            youtube: [
+                "YouTube Video Like",
+                "YouTube Channel Subscribe",
+                "YouTube Video Comment",
+                "YouTube Video View"
+            ],
+            instagram: [
+                "Instagram Account Follow",
+                "Instagram Post Like",
+                "Instagram Post Comment",
+                "Instagram Reel View"
+            ],
+            tiktok: [
+                "TikTok Account Follow",
+                "TikTok Video Like",
+                "TikTok Video Comment",
+                "TikTok Video Share"
+            ],
+            twitter: [
+                "X Account Follow",
+                "X Post Like",
+                "X Post Repost",
+                "X Post Comment"
+            ],
+            x: [
+                "X Account Follow",
+                "X Post Like",
+                "X Post Repost",
+                "X Post Comment"
+            ],
+            website: [
+                "Website Visit",
+                "Website Sign Up",
+                "Email Submit",
+                "Website Feedback"
+            ],
+            other: [
+                "Other Task"
+            ]
+        };
+
+        const options = titleOptionsByCategory[categoryKey] ||
+            (categoryKey.includes("twitter") ? titleOptionsByCategory.twitter :
+            categoryKey.includes("website") ? titleOptionsByCategory.website :
+            categoryKey.includes("facebook") ? titleOptionsByCategory.facebook :
+            categoryKey.includes("youtube") ? titleOptionsByCategory.youtube :
+            categoryKey.includes("instagram") ? titleOptionsByCategory.instagram :
+            categoryKey.includes("tiktok") ? titleOptionsByCategory.tiktok :
+            categoryKey === "other" ? titleOptionsByCategory.other : []);
+
+        titleSelect.add(new Option("Select Job Title", ""));
+        options.forEach(title => titleSelect.add(new Option(title, title)));
+        titleSelect.disabled = options.length === 0;
+        if (!options.length) {
+            titleSelect.replaceChildren(new Option("No job titles available for this category", ""));
         }
     }
 
