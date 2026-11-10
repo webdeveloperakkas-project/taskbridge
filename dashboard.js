@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUser = null;
     let categoryRows = [];
     let postedJobsChannel = null;
+    let submissionsChannel = null;
     let publicJobsChannel = null;
     let publicJobs = [];
     let walletChannel = null;
@@ -926,6 +927,8 @@ document.addEventListener("DOMContentLoaded", function () {
         walletCurrency = wallet?.currency || "USD";
         walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
         const formatted = formatWalletMoney(walletAvailableBalance, walletCurrency);
+        const dashboardWalletCard = document.getElementById("dashboardWalletBalance");
+        if (dashboardWalletCard) dashboardWalletCard.textContent = formatted;
         ["availableBalanceHeader", "availableBalanceOverview",
             "availableBalanceWallet", "availableBalanceWithdraw"].forEach(id => {
             const node = document.getElementById(id);
@@ -1692,7 +1695,32 @@ document.addEventListener("DOMContentLoaded", function () {
         if (error) throw error;
         const jobs = data || [];
         updatePostedJobStats(jobs);
+        const postedCount = document.getElementById("dashboardJobsPosted");
+        if (postedCount) postedCount.textContent = String(jobs.length);
         renderPostedJobs(jobs);
+    }
+
+    async function loadMySubmissions() {
+        const { data, error } = await supabaseClient.from("job_submissions")
+            .select("id,status")
+            .eq("worker_id", currentUser.id);
+        if (error) {
+            console.error("Could not load dashboard submission statistics:", error);
+            const submittedNode = document.getElementById("dashboardJobsSubmitted");
+            const completedNode = document.getElementById("dashboardJobsCompleted");
+            if (submittedNode) submittedNode.textContent = "—";
+            if (completedNode) completedNode.textContent = "—";
+            return;
+        }
+        const submissions = data || [];
+        const submittedNode = document.getElementById("dashboardJobsSubmitted");
+        const completedNode = document.getElementById("dashboardJobsCompleted");
+        if (submittedNode) submittedNode.textContent = String(submissions.length);
+        if (completedNode) {
+            completedNode.textContent = String(submissions.filter(item =>
+                ["approved", "completed"].includes(String(item.status || "").toLowerCase())
+            ).length);
+        }
     }
 
     async function submitNewJob() {
@@ -1772,7 +1800,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (avatar) avatar.textContent = displayName.trim().charAt(0).toUpperCase() || "U";
 
         await loadJobCategories();
-        await Promise.all([loadMyPostedJobs(), loadFindJobs()]);
+        await Promise.all([loadMyPostedJobs(), loadFindJobs(), loadMySubmissions()]);
         await loadMyWallet();
         await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
 
@@ -1814,6 +1842,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 event: "*", schema: "public", table: "jobs",
                 filter: "advertiser_id=eq." + currentUser.id
             }, () => loadMyPostedJobs().catch(err => console.error("Realtime refresh failed:", err)))
+            .subscribe();
+
+        submissionsChannel = supabaseClient.channel("worker-submissions-" + currentUser.id)
+            .on("postgres_changes", {
+                event: "*", schema: "public", table: "job_submissions",
+                filter: "worker_id=eq." + currentUser.id
+            }, () => loadMySubmissions().catch(err => console.error("Submission stats refresh failed:", err)))
             .subscribe();
 
         publicJobsChannel = supabaseClient.channel("public-active-jobs")
