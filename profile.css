@@ -189,3 +189,20 @@ button.profile-header-balance{
  .topbar-avatar{width:31px;height:31px}
  .profile-wallet-menu{left:auto;right:-35px;transform:none;width:min(260px,calc(100vw - 24px))}
 }
+
+
+/* Match the Dashboard header wallet icon exactly */
+.profile-header-wallet-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+}
+.profile-header-wallet-icon .wallet-header-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+}
