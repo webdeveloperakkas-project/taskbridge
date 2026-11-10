@@ -80,13 +80,27 @@ USING (user_id = auth.uid() OR public.is_admin());
 DROP POLICY IF EXISTS "Users submit verification" ON public.user_verification_submissions;
 CREATE POLICY "Users submit verification"
 ON public.user_verification_submissions FOR INSERT TO authenticated
-WITH CHECK (user_id = auth.uid() AND status = 'pending_review');
+WITH CHECK (
+    user_id = auth.uid()
+    AND status = 'pending_review'
+    AND (front_path IS NULL OR front_path LIKE auth.uid()::text || '/identity/%')
+    AND (back_path IS NULL OR back_path LIKE auth.uid()::text || '/identity/%')
+    AND (selfie_path IS NULL OR selfie_path LIKE auth.uid()::text || '/identity/%')
+    AND (address_document_path IS NULL OR address_document_path LIKE auth.uid()::text || '/address/%')
+);
 
 DROP POLICY IF EXISTS "Users resubmit rejected verification" ON public.user_verification_submissions;
 CREATE POLICY "Users resubmit rejected verification"
 ON public.user_verification_submissions FOR UPDATE TO authenticated
 USING (user_id = auth.uid() AND status = 'rejected')
-WITH CHECK (user_id = auth.uid() AND status = 'pending_review');
+WITH CHECK (
+    user_id = auth.uid()
+    AND status = 'pending_review'
+    AND (front_path IS NULL OR front_path LIKE auth.uid()::text || '/identity/%')
+    AND (back_path IS NULL OR back_path LIKE auth.uid()::text || '/identity/%')
+    AND (selfie_path IS NULL OR selfie_path LIKE auth.uid()::text || '/identity/%')
+    AND (address_document_path IS NULL OR address_document_path LIKE auth.uid()::text || '/address/%')
+);
 
 DROP POLICY IF EXISTS "Admins review verification submissions" ON public.user_verification_submissions;
 CREATE POLICY "Admins review verification submissions"
@@ -130,10 +144,4 @@ USING (
     )
 );
 
-DROP POLICY IF EXISTS "Users remove own KYC files" ON storage.objects;
-CREATE POLICY "Users remove own KYC files"
-ON storage.objects FOR DELETE TO authenticated
-USING (
-    bucket_id = 'private-kyc-documents'
-    AND (storage.foldername(name))[1] = auth.uid()::text
-);
+-- KYC uploads are retained for audit; users cannot delete submitted evidence.
