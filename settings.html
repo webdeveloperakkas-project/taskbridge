@@ -42,11 +42,11 @@
           <div class="settings-inline-field"><input id="newEmailAddress" type="email" autocomplete="email" placeholder="Enter your new email address" required><button class="settings-secondary" id="sendEmailCode" type="button">Send Code</button></div>
           <div id="emailOtpArea" class="settings-otp-area" hidden>
             <label for="emailOtp">Verification Code</label>
-            <input id="emailOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter the code sent to your new email">
+            <input id="emailOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter the code sent to your current email">
             <button class="settings-primary" type="submit" id="saveEmailChange">Save</button>
           </div>
           <button class="settings-cancel-button" id="cancelEmailChange" type="button">Cancel</button>
-          <p class="settings-hint">A verification code will be sent to your new email address.</p>
+          <p class="settings-hint">A verification code will be sent to your current email address to verify your identity. After verification, a confirmation message will be sent to your new email address.</p>
         </form>
         <div id="accountMessage" class="settings-message" role="status"></div>
       </section>
