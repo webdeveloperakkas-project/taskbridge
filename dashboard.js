@@ -553,49 +553,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================
-       JOB BUDGET CALCULATOR
+       JOB BUDGET & CARD COLOR CALCULATOR
     ====================================== */
 
     const workerReward = document.getElementById("workerReward");
     const workersRequired = document.getElementById("workersRequired");
     const totalJobBudget = document.getElementById("totalJobBudget");
+    const cardColorFees = {
+        white: 0,
+        blue: 0.10,
+        green: 0.10,
+        yellow: 0.15,
+        orange: 0.15,
+        purple: 0.20,
+        pink: 0.20
+    };
+    const platformFeeRateForPreview = 15;
 
+    function getSelectedCardColor() {
+        return document.querySelector('input[name="cardColor"]:checked')?.value || "white";
+    }
 
     function calculateJobBudget() {
+        if (!workerReward || !workersRequired || !totalJobBudget) return;
 
-        if (!workerReward || !workersRequired || !totalJobBudget) {
-            return;
-        }
+        const reward = Math.max(0, Number.parseFloat(workerReward.value) || 0);
+        const workers = Math.max(0, Number.parseInt(workersRequired.value, 10) || 0);
+        const jobBudget = Math.round((reward * workers + Number.EPSILON) * 100) / 100;
+        const platformFee = Math.round((jobBudget * platformFeeRateForPreview / 100 + Number.EPSILON) * 100) / 100;
+        const colorFee = cardColorFees[getSelectedCardColor()] ?? 0;
+        const total = Math.round((jobBudget + platformFee + colorFee + Number.EPSILON) * 100) / 100;
 
-        const reward = parseFloat(workerReward.value) || 0;
-        const workers = parseInt(workersRequired.value, 10) || 0;
+        const money = value => "$" + value.toFixed(2);
+        const jobBudgetNode = document.getElementById("jobBudgetAmount");
+        const platformFeeNode = document.getElementById("platformFeeAmount");
+        const colorFeeNode = document.getElementById("cardColorFeeAmount");
+        if (jobBudgetNode) jobBudgetNode.textContent = money(jobBudget);
+        if (platformFeeNode) platformFeeNode.textContent = money(platformFee);
+        if (colorFeeNode) colorFeeNode.textContent = money(colorFee);
+        totalJobBudget.textContent = money(total);
 
-        const total = reward * workers;
-
-        totalJobBudget.textContent = "$" + total.toFixed(2);
-
+        document.querySelectorAll(".card-color-option").forEach(option => {
+            const input = option.querySelector('input[name="cardColor"]');
+            option.classList.toggle("selected", Boolean(input?.checked));
+        });
     }
 
-
-    if (workerReward) {
-
-        workerReward.addEventListener(
-            "input",
-            calculateJobBudget
-        );
-
-    }
-
-
-    if (workersRequired) {
-
-        workersRequired.addEventListener(
-            "input",
-            calculateJobBudget
-        );
-
-    }
-
+    if (workerReward) workerReward.addEventListener("input", calculateJobBudget);
+    if (workersRequired) workersRequired.addEventListener("input", calculateJobBudget);
+    document.querySelectorAll('input[name="cardColor"]').forEach(input => {
+        input.addEventListener("change", calculateJobBudget);
+    });
 
     calculateJobBudget();
 
@@ -1642,7 +1650,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 p_extra_instructions: null,
                 p_reward_per_worker: reward,
                 p_total_slots: slots,
-                p_duration_minutes: duration
+                p_duration_minutes: duration,
+                p_card_color: getSelectedCardColor()
             });
             if (error) throw error;
             showJobFormMessage("Job submitted. It is pending admin review. Reference: " + data, "success");
