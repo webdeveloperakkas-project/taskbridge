@@ -1369,9 +1369,16 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             renderLoginActivityUsers();
         } catch (error) {
-            console.error("Login Activity user search failed:", error);
+            console.error("Login Activity user search failed:", {
+                message: error?.message || String(error),
+                code: error?.code || null,
+                details: error?.details || null,
+                hint: error?.hint || null,
+                error
+            });
             if (requestId === loginActivitySearchRequest && tbody) {
-                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Could not search users. Check the admin profile permissions.</td></tr>';
+                const detail = error?.message || "Unknown database error";
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state login-history-error">Search failed: ' + escapeHTML(detail) + '</td></tr>';
             }
         }
     }
