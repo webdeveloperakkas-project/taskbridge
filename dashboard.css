@@ -3680,3 +3680,20 @@ button.header-balance {
         width: 100%;
     }
 }
+
+/* Keep the task guide in a natural reading order on every screen. */
+#jobDetailsSection .job-details-content {
+    display: block;
+}
+#jobDetailsSection .job-details-content h3 {
+    margin: 22px 0 9px;
+}
+#jobDetailsSection .job-details-content h3:first-child {
+    margin-top: 0;
+}
+#jobDetailsSection .job-details-content > p,
+#jobDetailsSection .job-details-content > ol,
+#jobDetailsSection .job-details-content > a,
+#jobDetailsSection .job-details-content > .job-proof-box {
+    max-width: 100%;
+}
