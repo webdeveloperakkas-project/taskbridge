@@ -2481,8 +2481,9 @@ button.header-balance {
 
 .job-table-scroll {
     width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
+    max-height: min(72vh, 760px);
+    overflow: auto;
+    overscroll-behavior: contain;
     border-radius: 12px;
     scrollbar-width: thin;
 }
