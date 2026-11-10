@@ -305,3 +305,32 @@ button.profile-header-balance{
   .profile-intro-copy{flex:1 1 auto;text-align:center}
   .profile-intro .overall-status{margin-left:8px}
 }
+
+
+/* Green selected state for the three profile navigation tabs */
+.verification-tab.active,
+.verification-tab[aria-selected="true"]{
+  border-color:#20a36b;
+  background:linear-gradient(135deg,#dff7e9 0%,#effbf3 100%);
+  color:#145b3b;
+  box-shadow:0 6px 18px rgba(16,145,88,.14),inset 0 0 0 1px rgba(32,163,107,.12);
+}
+.verification-tab.active strong,
+.verification-tab[aria-selected="true"] strong{color:#12633e}
+.verification-tab.active small,
+.verification-tab[aria-selected="true"] small{color:#438264}
+.verification-tab.active .tab-icon,
+.verification-tab[aria-selected="true"] .tab-icon{
+  background:#bcebd0;
+  color:#087344;
+}
+.verification-tab.active .tab-status,
+.verification-tab[aria-selected="true"] .tab-status{color:#168052}
+.verification-tab:not(.active):not([aria-selected="true"]){
+  background:#fff;
+  color:#334155;
+}
+.verification-tab:not(.active):not([aria-selected="true"]) .tab-icon{
+  background:#f1f5f9;
+  color:#64748b;
+}
