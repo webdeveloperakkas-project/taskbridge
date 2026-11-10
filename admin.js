@@ -1272,18 +1272,22 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <div class="table-responsive">
                     <table class="admin-table login-history-table">
                         <thead><tr>
-                            <th>Login Time</th><th>IP Address</th><th>Device</th>
-                            <th>Browser</th><th>Operating System</th><th>Timezone</th>
+                            <th>Login Time (UTC)</th><th>Logout Time (UTC)</th><th>IP Address</th>
+                            <th>Device</th><th>Browser</th><th>Operating System</th>
+                            <th>Device Timezone</th><th>User Agent</th><th>Record ID</th>
                         </tr></thead>
                         <tbody>
                             ${records.map(record => `
                                 <tr>
-                                    <td>${escapeHTML(new Date(record.login_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "medium", timeZone: "UTC" }))} <small class="login-timezone-note">UTC</small></td>
+                                    <td>${escapeHTML(new Date(record.login_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "medium", timeZone: "UTC" }))}</td>
+                                    <td>${record.logout_at ? escapeHTML(new Date(record.logout_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "medium", timeZone: "UTC" })) : "—"}</td>
                                     <td><span class="user-id">${escapeHTML(record.ip_address || "Unavailable")}</span></td>
                                     <td>${escapeHTML(record.device_type || "Unknown")}</td>
                                     <td>${escapeHTML(record.browser || "Unknown")}</td>
                                     <td>${escapeHTML(record.operating_system || "Unknown")}</td>
                                     <td>${escapeHTML(record.device_timezone || "Unknown")}</td>
+                                    <td><span class="login-user-agent">${escapeHTML(record.user_agent || "Unavailable")}</span></td>
+                                    <td><span class="user-id">${escapeHTML(record.id)}</span></td>
                                 </tr>
                             `).join("")}
                         </tbody>
