@@ -10,15 +10,20 @@
 <body>
   <header class="profile-topbar">
     <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
-    <div class="topbar-actions">
-      <div class="profile-header-balance" aria-label="Available wallet balance">
-        <span class="profile-header-wallet-icon" aria-hidden="true">▱</span>
-        <div class="profile-header-balance-copy">
+    <div class="profile-header-wallet-dropdown">
+      <button type="button" class="profile-header-balance" id="profileWalletToggle" aria-label="Available balance and currency wallets" aria-expanded="false" aria-controls="profileWalletMenu">
+        <span class="profile-header-wallet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H21v15H5.5A2.5 2.5 0 0 1 3 17.5z"/><path d="M3 8h15M17 13h4"/><path d="M6 5V3h12v2"/></svg>
+        </span>
+        <span class="profile-header-balance-copy">
           <span class="profile-header-balance-label">Available Balance</span>
-          <div class="profile-header-balance-value"><strong id="profileAvailableBalance">—</strong><select id="profileWalletCurrency" aria-label="Wallet currency"><option>Loading</option></select></div>
-        </div>
-        <span class="profile-header-balance-chevron" aria-hidden="true">⌄</span>
-      </div>
+          <strong id="profileAvailableBalance">Loading...</strong>
+        </span>
+        <svg class="profile-header-balance-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="profile-wallet-menu" id="profileWalletMenu" aria-label="Available currency wallets"></div>
+    </div>
+    <div class="topbar-actions">
       <a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a>
       <span class="topbar-avatar" id="topbarAvatar">U</span>
     </div>
