@@ -9,42 +9,134 @@ document.addEventListener("DOMContentLoaded", async () => {
   const client = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storage:authStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
   const {data,error}=await client.auth.getSession();
   if(error||!data.session){window.location.replace("./login.html");return}
-  const user=data.session.user;
+  let user=data.session.user;
+
+  const accountMessage=document.getElementById("accountMessage");
+  const securityMessage=document.getElementById("securityMessage");
   const emailInput=document.getElementById("accountEmail");
+  const emailForm=document.getElementById("emailForm");
+  const newEmailInput=document.getElementById("newEmailAddress");
+  const emailOtp=document.getElementById("emailOtp");
+  const emailOtpArea=document.getElementById("emailOtpArea");
+  const sendEmailCode=document.getElementById("sendEmailCode");
+  const saveEmailChange=document.getElementById("saveEmailChange");
+  const showEmailChange=document.getElementById("showEmailChange");
+  const cancelEmailChange=document.getElementById("cancelEmailChange");
+  let pendingEmail="";
+
   emailInput.value=user.email||"";
+  const showMessage=(element,message,isError=false)=>{
+    element.textContent=message;
+    element.className="settings-message"+(isError?" error":"");
+  };
+
+  showEmailChange.addEventListener("click",()=>{
+    emailForm.hidden=false;
+    showEmailChange.hidden=true;
+    newEmailInput.focus();
+    showMessage(accountMessage,"");
+  });
+  cancelEmailChange.addEventListener("click",()=>{
+    emailForm.reset();
+    emailForm.hidden=true;
+    emailOtpArea.hidden=true;
+    sendEmailCode.disabled=false;
+    sendEmailCode.textContent="Send Code";
+    pendingEmail="";
+    showEmailChange.hidden=false;
+    showMessage(accountMessage,"");
+  });
+
+  sendEmailCode.addEventListener("click",async()=>{
+    const nextEmail=newEmailInput.value.trim().toLowerCase();
+    showMessage(accountMessage,"");
+    if(!nextEmail||!newEmailInput.checkValidity()){
+      showMessage(accountMessage,"Please enter a valid new email address.",true);return;
+    }
+    if(nextEmail===String(user.email||"").toLowerCase()){
+      showMessage(accountMessage,"Please enter an email address different from your current one.",true);return;
+    }
+    sendEmailCode.disabled=true;
+    sendEmailCode.textContent="Sending...";
+    const result=await client.auth.updateUser({email:nextEmail});
+    sendEmailCode.disabled=false;
+    sendEmailCode.textContent="Send Code";
+    if(result.error){showMessage(accountMessage,result.error.message,true);return}
+    pendingEmail=nextEmail;
+    emailOtpArea.hidden=false;
+    emailOtp.focus();
+    showMessage(accountMessage,"Verification code sent. Check your new email address.");
+  });
+
+  emailForm.addEventListener("submit",async event=>{
+    event.preventDefault();
+    const token=emailOtp.value.trim();
+    if(!pendingEmail){showMessage(accountMessage,"Please send a verification code first.",true);return}
+    if(!token){showMessage(accountMessage,"Please enter the verification code.",true);return}
+    saveEmailChange.disabled=true;
+    saveEmailChange.textContent="Verifying...";
+    const result=await client.auth.verifyOtp({email:pendingEmail,token,type:"email_change"});
+    saveEmailChange.disabled=false;
+    saveEmailChange.textContent="Save";
+    if(result.error){showMessage(accountMessage,"Verification failed: "+result.error.message,true);return}
+    user=result.data.user||user;
+    emailInput.value=user.email||pendingEmail;
+    emailForm.reset();
+    emailForm.hidden=true;
+    emailOtpArea.hidden=true;
+    showEmailChange.hidden=false;
+    pendingEmail="";
+    showMessage(accountMessage,"Your email address has been changed successfully.");
+  });
+
   const prefs={news_updates:true,payment_received:true,payment_receipts:true,deposit_updates:true,withdrawal_updates:true,job_updates:true,submission_updates:true,job_status_updates:true,security_alerts:true,...(user.user_metadata?.notification_preferences||{})};
   document.querySelectorAll("[data-notification-pref]").forEach(input=>{
     const key=input.dataset.notificationPref;
     input.checked=prefs[key]!==false;
     input.addEventListener("change",async()=>{
-      const next={...prefs,[key]:input.checked};
+      const previous=input.checked;
+      const next={...prefs,[key]:previous};
       input.disabled=true;
       const result=await client.auth.updateUser({data:{notification_preferences:next}});
       input.disabled=false;
       const message=document.getElementById("notificationMessage");
-      if(result.error){input.checked=!input.checked;message.textContent=result.error.message;message.classList.add("error");return}
-      Object.assign(prefs,next);message.textContent="Notification preference saved.";message.classList.remove("error");
+      if(result.error){input.checked=!previous;showMessage(message,result.error.message,true);return}
+      Object.assign(prefs,next);
+      showMessage(message,"Notification preference saved.");
     });
   });
+
   document.querySelectorAll("[data-settings-tab]").forEach(button=>button.addEventListener("click",()=>{
     document.querySelectorAll("[data-settings-tab]").forEach(item=>item.classList.toggle("active",item===button));
     document.querySelectorAll("[data-settings-panel]").forEach(panel=>panel.classList.toggle("active",panel.dataset.settingsPanel===button.dataset.settingsTab));
   }));
-  document.getElementById("emailForm").addEventListener("submit",async event=>{
-    event.preventDefault();const message=document.getElementById("accountMessage");message.className="settings-message";
-    const nextEmail=emailInput.value.trim();if(!nextEmail)return;
-    const result=await client.auth.updateUser({email:nextEmail});
-    message.textContent=result.error?result.error.message:"Email update requested. Check your inbox to confirm the new address.";
-    if(result.error)message.classList.add("error");
-  });
+
   document.getElementById("passwordForm").addEventListener("submit",async event=>{
-    event.preventDefault();const message=document.getElementById("securityMessage");message.className="settings-message";
+    event.preventDefault();
+    const form=event.currentTarget;
+    const currentPassword=document.getElementById("currentPassword").value;
     const password=document.getElementById("newPassword").value;
     const confirm=document.getElementById("confirmPassword").value;
-    if(password!==confirm){message.textContent="The passwords do not match.";message.classList.add("error");return}
-    const result=await client.auth.updateUser({password});
-    message.textContent=result.error?result.error.message:"Password updated successfully.";
-    if(result.error)message.classList.add("error");
-    else event.target.reset();
+    showMessage(securityMessage,"");
+    if(password.length<8){showMessage(securityMessage,"New password must be at least 8 characters.",true);return}
+    if(password!==confirm){showMessage(securityMessage,"The new passwords do not match.",true);return}
+    if(password===currentPassword){showMessage(securityMessage,"Your new password must be different from your current password.",true);return}
+    const submit=form.querySelector('button[type="submit"]');
+    submit.disabled=true;
+    submit.textContent="Verifying...";
+    try{
+      const verification=await client.auth.signInWithPassword({email:user.email,password:currentPassword});
+      if(verification.error){showMessage(securityMessage,"Current password is incorrect. Password was not changed.",true);return}
+      submit.textContent="Updating...";
+      const update=await client.auth.updateUser({password});
+      if(update.error){showMessage(securityMessage,update.error.message,true);return}
+      form.reset();
+      showMessage(securityMessage,"Password updated successfully.");
+    }catch(err){
+      showMessage(securityMessage,err.message||"Unable to update password. Please try again.",true);
+    }finally{
+      submit.disabled=false;
+      submit.textContent="Update Password";
+    }
   });
 });
