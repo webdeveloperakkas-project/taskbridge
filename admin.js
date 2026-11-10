@@ -1476,8 +1476,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function reviewKyc(submissionId, approve) {
         const row = allKycSubmissions.find(item => item.id === submissionId);
         if (!row) return;
-        const note = approve ? (window.prompt("Optional approval note:", "") || "") : window.prompt("Please enter the reason for rejection:", "");
-        if (!approve && !note.trim()) { showToast("A rejection reason is required."); return; }
+        const noteInput = window.prompt(approve ? "Optional approval note:" : "Please enter the reason for rejection:", "");
+        if (noteInput === null) return;
+        const note = noteInput.trim();
+        if (!approve && !note) { showToast("A rejection reason is required."); return; }
         const {error}=await supabaseClient.from("user_verification_submissions").update({
             status: approve ? "approved" : "rejected",
             admin_note: note.trim() || null,
