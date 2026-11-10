@@ -1471,30 +1471,6 @@ document.addEventListener("DOMContentLoaded", function () {
         setText("detailProofTitle", "Proof Requirements");
         setText("detailProofDescription", job.proof_requirements);
         setText("detailJobExtraInstructions", job.extra_instructions);
-        const instructionList = document.getElementById("detailJobInstructions");
-        if (instructionList) {
-            instructionList.replaceChildren();
-            String(job.instructions || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
-                const item = document.createElement("li");
-                item.textContent = line;
-                instructionList.appendChild(item);
-            });
-            if (!instructionList.children.length) {
-                const item = document.createElement("li");
-                item.textContent = "No additional step-by-step instructions provided.";
-                instructionList.appendChild(item);
-            }
-        }
-        const targetLink = document.getElementById("detailJobTargetLink");
-        if (targetLink) {
-            if (job.target_url) {
-                targetLink.href = job.target_url;
-                targetLink.hidden = false;
-            } else {
-                targetLink.removeAttribute("href");
-                targetLink.hidden = true;
-            }
-        }
         showPageSection("jobDetailsSection");
     }
 
@@ -1727,8 +1703,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const categoryId = document.getElementById("postJobCategory")?.value;
         const title = document.getElementById("jobTitle")?.value.trim();
         const description = document.getElementById("jobDescription")?.value.trim();
-        const instructions = document.getElementById("jobInstructions")?.value.trim();
-        const targetUrl = document.getElementById("targetUrl")?.value.trim();
         const reward = Number(document.getElementById("workerReward")?.value);
         const slots = Number.parseInt(document.getElementById("workersRequired")?.value, 10);
         const duration = Number.parseInt(document.getElementById("jobDuration")?.value, 10);
@@ -1736,7 +1710,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const proofDetails = document.getElementById("proofInstructions")?.value.trim();
 
         if (!categoryRows.some(c => c.id === categoryId) || !title || !description ||
-            !instructions || !proofType || !Number.isFinite(reward) || reward <= 0 ||
+            !proofType || !Number.isFinite(reward) || reward <= 0 ||
             !Number.isInteger(slots) || slots <= 0 || !Number.isInteger(duration) || duration <= 0) {
             showJobFormMessage("Please complete all required fields with valid values.", "error");
             return;
@@ -1750,8 +1724,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 p_category_id: categoryId,
                 p_title: title,
                 p_description: description,
-                p_instructions: instructions,
-                p_target_url: targetUrl || null,
+                // Keep the legacy database field populated from the single Job Details box.
+                p_instructions: description,
+                p_target_url: null,
                 p_proof_requirements: proofRequirements,
                 p_extra_instructions: null,
                 p_reward_per_worker: reward,
