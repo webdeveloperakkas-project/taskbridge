@@ -45,6 +45,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     let toastTimer = null;
     let buyerSearchQuery = "";
     let expandedLoginUserId = null;
+    let loginActivitySearchResults = null;
+    let loginActivitySearchRequest = 0;
     const loginHistoryPages = new Map();
     const LOGIN_HISTORY_PAGE_SIZE = 20;
 
@@ -1167,12 +1169,9 @@ document.addEventListener("DOMContentLoaded", async function () {
         const tbody = $("#loginActivityUsersTable");
         if (!tbody) return;
 
-        const search = ($("#loginActivitySearch")?.value || "").trim().toLowerCase();
-        const filteredUsers = allUsers.filter(user =>
-            [user.full_name, user.email, user.id].some(value =>
-                String(value || "").toLowerCase().includes(search)
-            )
-        );
+        const filteredUsers = loginActivitySearchResults === null
+            ? allUsers
+            : loginActivitySearchResults;
 
         if (!filteredUsers.length) {
             tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No matching users found.</td></tr>';
@@ -1328,14 +1327,79 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     const loginActivitySearch = $("#loginActivitySearch");
-    if (loginActivitySearch) loginActivitySearch.addEventListener("input", renderLoginActivityUsers);
+    const loginActivitySearchButton = $("#loginActivitySearchButton");
+
+    async function searchLoginActivityUsers() {
+        const query = (loginActivitySearch?.value || "").trim();
+        const requestId = ++loginActivitySearchRequest;
+
+        if (!query) {
+            loginActivitySearchResults = null;
+            expandedLoginUserId = null;
+            renderLoginActivityUsers();
+            return;
+        }
+
+        const tbody = $("#loginActivityUsersTable");
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Searching users...</td></tr>';
+        }
+
+        try {
+            const pattern = `%${query}%`;
+            const searches = await Promise.all([
+                supabaseClient.from("profiles").select("*").ilike("email", pattern).limit(50),
+                supabaseClient.from("profiles").select("*").ilike("full_name", pattern).limit(50)
+            ]);
+
+            if (requestId !== loginActivitySearchRequest) return;
+
+            const failedSearch = searches.find(result => result.error);
+            if (failedSearch) throw failedSearch.error;
+
+            const uniqueUsers = new Map();
+            searches.forEach(result => (result.data || []).forEach(user => {
+                uniqueUsers.set(user.id, user);
+            }));
+
+            loginActivitySearchResults = Array.from(uniqueUsers.values());
+            if (expandedLoginUserId && !uniqueUsers.has(expandedLoginUserId)) {
+                expandedLoginUserId = null;
+            }
+
+            renderLoginActivityUsers();
+        } catch (error) {
+            console.error("Login Activity user search failed:", error);
+            if (requestId === loginActivitySearchRequest && tbody) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Could not search users. Check the admin profile permissions.</td></tr>';
+            }
+        }
+    }
+
+    if (loginActivitySearchButton) {
+        loginActivitySearchButton.addEventListener("click", searchLoginActivityUsers);
+    }
+
+    if (loginActivitySearch) {
+        loginActivitySearch.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchLoginActivityUsers();
+            }
+        });
+    }
 
     const refreshLoginActivity = $("#refreshLoginActivity");
     if (refreshLoginActivity) refreshLoginActivity.addEventListener("click", async function() {
         refreshLoginActivity.disabled = true;
         try {
             await loadAdminData();
-            renderLoginActivityUsers();
+            if ((loginActivitySearch?.value || "").trim()) {
+                await searchLoginActivityUsers();
+            } else {
+                loginActivitySearchResults = null;
+                renderLoginActivityUsers();
+            }
             showToast("Login Activity refreshed.");
         } finally {
             refreshLoginActivity.disabled = false;
