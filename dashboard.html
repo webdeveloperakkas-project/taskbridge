@@ -1281,20 +1281,7 @@
                         <form id="postJobForm">
 
 
-                            <div class="form-group">
-
-                                <label for="jobTitle">Job Title</label>
-
-                                <input type="text"
-                                    id="jobTitle"
-                                    name="jobTitle"
-                                    placeholder="Enter a clear job title"
-                                    required>
-
-                            </div>
-
-
-                            <div class="form-group">
+                            <div class="form-group job-category-select-group">
 
                                 <label for="postJobCategory">Job Category</label>
 
@@ -1303,6 +1290,21 @@
                                     required>
 
                                     <option value="">Loading categories...</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="form-group job-title-select-group">
+
+                                <label for="jobTitle">Job Title</label>
+
+                                <select id="jobTitle"
+                                    name="jobTitle"
+                                    required
+                                    disabled>
+
+                                    <option value="">Select a job category first</option>
 
                                 </select>
 
