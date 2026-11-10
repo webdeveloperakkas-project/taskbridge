@@ -1294,3 +1294,13 @@ a {
 .buyer-job-subtext{display:block;margin-top:4px;color:var(--muted);font-size:9px}
 @media(max-width:1150px){.buyer-overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.buyer-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.buyer-management-intro{align-items:flex-start;flex-direction:column}.buyer-management-intro button{width:100%}.buyer-overview-stats{grid-template-columns:1fr}.buyer-profile-card{padding:14px}.buyer-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.buyer-card-lower{grid-template-columns:1fr;gap:12px}.buyer-balance-currency{flex-direction:column}.buyer-card-footer{align-items:flex-start;flex-direction:column}.buyer-id{max-width:100%}.buyer-details-btn{width:100%}}
+
+/* Buyer Management — explicit, highlighted search */
+.buyer-filter-toolbar{display:grid;grid-template-columns:minmax(260px,1fr) minmax(190px,240px);gap:12px;align-items:center}
+.buyer-search-control{display:flex;min-width:0;gap:9px}
+.buyer-search-control input{flex:1;min-width:0}
+.buyer-search-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:112px;padding:11px 18px;border:1px solid #eab308;border-radius:8px;background:linear-gradient(135deg,#facc15,#eab308);color:#422006;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 3px 9px rgba(234,179,8,.2);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.buyer-search-btn span{font-size:18px;line-height:1}
+.buyer-search-btn:hover{background:linear-gradient(135deg,#fde047,#f59e0b);box-shadow:0 5px 13px rgba(234,179,8,.28);transform:translateY(-1px)}
+.buyer-search-btn:focus-visible{outline:3px solid rgba(234,179,8,.35);outline-offset:2px}
+@media(max-width:650px){.buyer-filter-toolbar{grid-template-columns:1fr}.buyer-search-control{width:100%}.buyer-search-btn{min-width:100px;padding:10px 13px}}
