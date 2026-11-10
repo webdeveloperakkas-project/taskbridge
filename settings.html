@@ -24,21 +24,33 @@
     <section class="settings-content">
       <section class="settings-panel active" data-settings-panel="account">
         <div class="settings-panel-heading"><div><h2>Account Settings</h2><p>Update the email address connected to your account.</p></div></div>
-        <form id="emailForm" class="settings-form">
-          <label for="accountEmail">Email Address</label>
-          <input id="accountEmail" type="email" autocomplete="email" required>
-          <button class="settings-primary" type="submit">Update Email</button>
-          <p class="settings-hint">You may need to confirm the new email address before it becomes active.</p>
+        <div class="settings-email-row">
+          <div class="settings-email-current"><label for="accountEmail">Email Address</label><input id="accountEmail" type="email" autocomplete="email" readonly></div>
+          <button class="settings-change-button" id="showEmailChange" type="button">Change</button>
+        </div>
+        <form id="emailForm" class="settings-form settings-email-change" hidden>
+          <label for="newEmailAddress">Enter Your New Email Address</label>
+          <div class="settings-inline-field"><input id="newEmailAddress" type="email" autocomplete="email" placeholder="Enter your new email address" required><button class="settings-secondary" id="sendEmailCode" type="button">Send Code</button></div>
+          <div id="emailOtpArea" class="settings-otp-area" hidden>
+            <label for="emailOtp">Verification Code</label>
+            <input id="emailOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter the code sent to your new email">
+            <button class="settings-primary" type="submit" id="saveEmailChange">Save</button>
+          </div>
+          <button class="settings-cancel-button" id="cancelEmailChange" type="button">Cancel</button>
+          <p class="settings-hint">A verification code will be sent to your new email address.</p>
         </form>
         <div id="accountMessage" class="settings-message" role="status"></div>
       </section>
       <section class="settings-panel" data-settings-panel="security">
         <div class="settings-panel-heading"><div><h2>Security &amp; Privacy</h2><p>Keep your account secure by changing your password.</p></div></div>
         <form id="passwordForm" class="settings-form">
+          <label for="currentPassword">Current Password</label>
+          <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Enter your current password" required>
           <label for="newPassword">New Password</label>
           <input id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
           <label for="confirmPassword">Confirm New Password</label>
-          <input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Enter the password again" required>
+          <input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Enter the new password again" required>
+          <a class="settings-forgot-link" href="./forgot-password.html">Forgot Password?</a>
           <button class="settings-primary" type="submit">Update Password</button>
         </form>
         <div class="settings-privacy-note"><strong>Privacy</strong><p>Your account information and activity are used to provide TaskBridge services. Never share your password or verification codes.</p></div>
