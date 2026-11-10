@@ -89,6 +89,12 @@
                     <span>Account Verification</span>
                 </a>
 
+                <a href="#kycVerificationPanel" class="admin-nav-link"
+                    data-panel="kycVerificationPanel">
+                    <span class="nav-icon">▣</span>
+                    <span>ID & Address Review</span>
+                </a>
+
                 <a href="#buyerManagementPanel" class="admin-nav-link buyer-management-link"
                     data-panel="buyerManagementPanel">
                     <span class="nav-icon">♙</span>
@@ -662,6 +668,40 @@
 
                     </div>
 
+                </section>
+
+
+                <!-- =================================
+                     ID & ADDRESS KYC REVIEW
+                ================================== -->
+
+                <section class="admin-panel" id="kycVerificationPanel">
+                    <div class="section-intro">
+                        <h2>ID & Address Verification</h2>
+                        <p>Review private identity documents, live selfies and proof-of-address submissions.</p>
+                    </div>
+                    <div class="filter-toolbar">
+                        <select id="kycStatusFilter">
+                            <option value="pending_review">Pending Review</option>
+                            <option value="all">All Submissions</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <select id="kycTypeFilter">
+                            <option value="all">All Verification Types</option>
+                            <option value="identity">Identity</option>
+                            <option value="address">Address</option>
+                        </select>
+                        <button type="button" class="secondary-btn" id="refreshKyc">↻ Refresh</button>
+                    </div>
+                    <div class="admin-card">
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead><tr><th>User</th><th>Type</th><th>Document</th><th>Country</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="kycVerificationTable"><tr><td colspan="7" class="empty-state">Loading verification submissions...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
 
 
@@ -1333,6 +1373,21 @@
 
         </div>
 
+    </div>
+
+
+    <!-- =================================
+         PRIVATE KYC DOCUMENT REVIEW MODAL
+    ================================== -->
+    <div class="admin-modal" id="kycDetailsModal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-content kyc-review-modal">
+            <div class="modal-header">
+                <div><h2>Verification Documents</h2><p>Private links expire after five minutes.</p></div>
+                <button type="button" class="modal-close" data-close-modal>&times;</button>
+            </div>
+            <div class="modal-body" id="kycDetailsContent">Loading secure document links...</div>
+        </div>
     </div>
 
 
