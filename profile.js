@@ -140,7 +140,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("personalForm").addEventListener("submit",async e=>{
     e.preventDefault();setButton("savePersonalButton",true,"Save Changes");feedback("personalFeedback","Saving your details...");
     const payload={user_id:user.id,full_name:$("fullName").value.trim(),date_of_birth:$("dateOfBirth").value||null,phone_number:$("phoneNumber").value.trim()||null,gender:$("gender").value||null,country:$("personalCountry").value||null,updated_at:new Date().toISOString()};
-    try{const {error}=await client.from("user_profile_details").upsert(payload,{onConflict:"user_id"});if(error)throw error;feedback("personalFeedback","Your personal details have been saved.","success");}
+    try{
+      const {error}=await client.from("user_profile_details").upsert(payload,{onConflict:"user_id"});if(error)throw error;
+      const {error:metadataError}=await client.auth.updateUser({data:{full_name:payload.full_name}});
+      if(metadataError)console.warn("Could not update account display name metadata:",metadataError);
+      $("topbarAvatar").textContent=payload.full_name.charAt(0).toUpperCase()||"U";
+      feedback("personalFeedback","Your personal details have been saved.","success");
+    }
     catch(error){console.error(error);feedback("personalFeedback",error.message||"Could not save personal details.","error");}
     finally{setButton("savePersonalButton",false,"Save Changes");}
   });
@@ -170,7 +176,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadData() {
     const {data:sessionData,error:sessionError}=await client.auth.getSession();if(sessionError)throw sessionError;
     user=sessionData?.session?.user;if(!user){window.location.replace("./login.html");return;}
-    $("emailAddress").value=user.email||"";$("topbarAvatar").textContent=(user.email||"U").charAt(0).toUpperCase();
+    $("emailAddress").value=user.email||"";
+    const initialName=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
+    $("topbarAvatar").textContent=initialName.trim().charAt(0).toUpperCase()||"U";
+    try {
+      const {data:wallets,error:walletError}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
+      if(walletError)throw walletError;
+      const selector=$("profileWalletCurrency"),funded=(wallets||[]).filter(row=>Number(row.available_balance)>0);
+      selector.replaceChildren();
+      (funded.length?funded:(wallets||[])).forEach(row=>selector.add(new Option(row.currency,row.currency)));
+      const updateBalance=()=>{const row=(wallets||[]).find(item=>item.currency===selector.value);const amount=Number(row?.available_balance||0);try{$("profileAvailableBalance").textContent=new Intl.NumberFormat(undefined,{style:"currency",currency:row?.currency||"USD"}).format(amount);}catch{$("profileAvailableBalance").textContent=(row?.currency||"USD")+" "+amount.toFixed(2);}};
+      if(!selector.options.length)selector.add(new Option("USD","USD"));
+      selector.addEventListener("change",updateBalance);updateBalance();
+    } catch(walletError) { console.warn("Could not load profile header wallet:",walletError);$("profileAvailableBalance").textContent="—"; }
     const [{data:profile,error:profileError},{data:rows,error:rowsError}]=await Promise.all([
       client.from("user_profile_details").select("*").eq("user_id",user.id).maybeSingle(),
       client.from("user_verification_submissions").select("*").eq("user_id",user.id)
@@ -182,6 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("phoneNumber").value=details.phone_number||"";
     $("gender").value=details.gender||"";
     $("personalCountry").value=details.country||"";
+    if(details.full_name)$("topbarAvatar").textContent=details.full_name.trim().charAt(0).toUpperCase()||"U";
     identityRow=rows?.find(row=>row.verification_type==="identity")||null;
     addressRow=rows?.find(row=>row.verification_type==="address")||null;
     if(identityRow){$("idDocumentType").value=identityRow.document_type||"";$("idCountry").value=identityRow.country||"";}
