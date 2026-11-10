@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskBridge - Settings</title>
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./settings.css">
+</head>
+<body class="settings-page">
+<header class="settings-topbar">
+  <a class="settings-brand" href="./dashboard.html"><span>TB</span> TaskBridge</a>
+  <a class="settings-back" href="./dashboard.html">← Back to Dashboard</a>
+</header>
+<main class="settings-shell">
+  <div class="settings-heading"><div><p class="settings-eyebrow">ACCOUNT PREFERENCES</p><h1>Settings</h1><p>Manage your account, security and notification preferences.</p></div></div>
+  <div class="settings-layout">
+    <nav class="settings-nav" aria-label="Settings sections">
+      <button class="settings-nav-item active" type="button" data-settings-tab="account"><span>♙</span> Account Settings</button>
+      <button class="settings-nav-item" type="button" data-settings-tab="security"><span>♧</span> Security &amp; Privacy</button>
+      <button class="settings-nav-item" type="button" data-settings-tab="notifications"><span>♧</span> Notifications</button>
+    </nav>
+    <section class="settings-content">
+      <section class="settings-panel active" data-settings-panel="account">
+        <div class="settings-panel-heading"><div><h2>Account Settings</h2><p>Update the email address connected to your account.</p></div></div>
+        <form id="emailForm" class="settings-form">
+          <label for="accountEmail">Email Address</label>
+          <input id="accountEmail" type="email" autocomplete="email" required>
+          <button class="settings-primary" type="submit">Update Email</button>
+          <p class="settings-hint">You may need to confirm the new email address before it becomes active.</p>
+        </form>
+        <div id="accountMessage" class="settings-message" role="status"></div>
+      </section>
+      <section class="settings-panel" data-settings-panel="security">
+        <div class="settings-panel-heading"><div><h2>Security &amp; Privacy</h2><p>Keep your account secure by changing your password.</p></div></div>
+        <form id="passwordForm" class="settings-form">
+          <label for="newPassword">New Password</label>
+          <input id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
+          <label for="confirmPassword">Confirm New Password</label>
+          <input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Enter the password again" required>
+          <button class="settings-primary" type="submit">Update Password</button>
+        </form>
+        <div class="settings-privacy-note"><strong>Privacy</strong><p>Your account information and activity are used to provide TaskBridge services. Never share your password or verification codes.</p></div>
+        <div id="securityMessage" class="settings-message" role="status"></div>
+      </section>
+      <section class="settings-panel" data-settings-panel="notifications">
+        <div class="settings-panel-heading"><div><h2>Notification Preferences</h2><p>Choose which updates you want to receive. Turn any notification on or off.</p></div></div>
+        <div class="notification-preference-list">
+          <div class="notification-group-title">GENERAL UPDATES</div>
+          <label class="notification-preference"><span><strong>News &amp; Updates</strong><small>Product news, announcements and important updates.</small></span><input type="checkbox" data-notification-pref="news_updates"><i></i></label>
+          <div class="notification-group-title">PAYMENTS &amp; WALLET</div>
+          <label class="notification-preference"><span><strong>Payment Received</strong><small>When a buyer pays you or money is credited to your wallet.</small></span><input type="checkbox" data-notification-pref="payment_received"><i></i></label>
+          <label class="notification-preference"><span><strong>Payment Receipts</strong><small>Receipts and confirmations for deposits and payments.</small></span><input type="checkbox" data-notification-pref="payment_receipts"><i></i></label>
+          <label class="notification-preference"><span><strong>Deposit Updates</strong><small>When a deposit is submitted, approved or rejected.</small></span><input type="checkbox" data-notification-pref="deposit_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Withdrawal Updates</strong><small>When a withdrawal is processed, approved or rejected.</small></span><input type="checkbox" data-notification-pref="withdrawal_updates"><i></i></label>
+          <div class="notification-group-title">JOB ACTIVITY</div>
+          <label class="notification-preference"><span><strong>Job Updates</strong><small>Changes to jobs you posted or are working on.</small></span><input type="checkbox" data-notification-pref="job_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Submission &amp; Review Updates</strong><small>When a submission is received, reviewed or needs attention.</small></span><input type="checkbox" data-notification-pref="submission_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Job Approval &amp; Rejection</strong><small>When your posted job is approved or rejected.</small></span><input type="checkbox" data-notification-pref="job_status_updates"><i></i></label>
+          <div class="notification-group-title">ACCOUNT SECURITY</div>
+          <label class="notification-preference"><span><strong>Security Alerts</strong><small>Important account and security-related notifications.</small></span><input type="checkbox" data-notification-pref="security_alerts"><i></i></label>
+        </div>
+        <div id="notificationMessage" class="settings-message" role="status"></div>
+      </section>
+    </section>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./settings.js"></script>
+</body>
+</html>
