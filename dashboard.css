@@ -2663,3 +2663,244 @@ button.header-balance {
         padding: 0 12px;
     }
 }
+
+
+/* =========================================
+   JOB CARD COLOR PICKER & COST BREAKDOWN
+========================================= */
+
+.card-color-section {
+    margin: 4px 0 20px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.card-color-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 13px;
+}
+
+.card-color-heading label {
+    display: block;
+    margin: 0 0 4px;
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.card-color-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.optional-tag {
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .06em;
+}
+
+.card-color-options {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.card-color-option {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+    padding: 7px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.card-color-option:hover {
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+
+.card-color-option.selected {
+    border: 2px solid #2563eb;
+    padding: 6px;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .09);
+}
+
+.card-color-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.card-color-option:focus-within {
+    outline: 3px solid rgba(37, 99, 235, .25);
+    outline-offset: 2px;
+}
+
+.card-color-preview {
+    position: relative;
+    display: flex;
+    min-height: 68px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px;
+    overflow: hidden;
+    border: 1px solid var(--swatch-border);
+    border-radius: 7px;
+    background: var(--swatch-bg);
+    color: var(--swatch-text);
+}
+
+.card-color-preview strong {
+    max-width: 100%;
+    overflow: hidden;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 850;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-color-preview small {
+    color: inherit;
+    font-size: 10px;
+    font-weight: 650;
+    opacity: .82;
+}
+
+.card-color-check {
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    display: none;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border-radius: 50%;
+    background: #1d4ed8;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.card-color-option.selected .card-color-check {
+    display: grid;
+}
+
+.card-color-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    color: #334155;
+    font-size: 10px;
+}
+
+.card-color-meta strong {
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.card-color-meta small {
+    color: #047857;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.budget-summary {
+    padding: 15px 17px;
+}
+
+.budget-summary-heading,
+.budget-line,
+.budget-total-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.budget-summary-heading {
+    margin-bottom: 10px;
+}
+
+.budget-summary-heading span {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.budget-summary-heading small,
+.budget-summary-note {
+    color: #64748b;
+    font-size: 10px;
+}
+
+.budget-line {
+    padding: 5px 0;
+    color: #475569;
+    font-size: 11px;
+}
+
+.budget-line strong {
+    color: #334155;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.budget-total-line {
+    margin-top: 8px;
+    padding-top: 11px;
+    border-top: 1px solid #cbd5e1;
+}
+
+.budget-total-line span {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.budget-total-line strong {
+    color: #047857;
+    font-size: 23px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
+
+.budget-summary-note {
+    display: block;
+    margin-top: 7px;
+    line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+    .card-color-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .card-color-section {
+        padding: 12px;
+    }
+}
