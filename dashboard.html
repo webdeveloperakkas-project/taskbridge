@@ -1579,17 +1579,74 @@
                             </div>
 
 
+                            <section class="card-color-section" aria-labelledby="cardColorHeading">
+                                <div class="card-color-heading">
+                                    <div>
+                                        <label id="cardColorHeading">Choose a Job Card Color</label>
+                                        <p>Select one optional color to highlight your job. White is free.</p>
+                                    </div>
+                                    <span class="optional-tag">OPTIONAL</span>
+                                </div>
+
+                                <div class="card-color-options" role="radiogroup" aria-labelledby="cardColorHeading">
+                                    <label class="card-color-option selected" style="--swatch-bg:#ffffff;--swatch-text:#111827;--swatch-border:#cbd5e1;">
+                                        <input type="radio" name="cardColor" value="white" checked>
+                                        <span class="card-color-preview">
+                                            <span class="card-color-check" aria-hidden="true">✓</span>
+                                            <strong>Job Title</strong>
+                                            <small>White</small>
+                                        </span>
+                                        <span class="card-color-meta"><strong>White</strong><small>$0.00</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#dbeafe;--swatch-text:#1e3a8a;--swatch-border:#93c5fd;">
+                                        <input type="radio" name="cardColor" value="blue">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Blue</small></span>
+                                        <span class="card-color-meta"><strong>Blue</strong><small>$0.10</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#dcfce7;--swatch-text:#14532d;--swatch-border:#86efac;">
+                                        <input type="radio" name="cardColor" value="green">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Green</small></span>
+                                        <span class="card-color-meta"><strong>Green</strong><small>$0.10</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#fef3c7;--swatch-text:#78350f;--swatch-border:#fcd34d;">
+                                        <input type="radio" name="cardColor" value="yellow">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Yellow</small></span>
+                                        <span class="card-color-meta"><strong>Yellow</strong><small>$0.15</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#ffedd5;--swatch-text:#9a3412;--swatch-border:#fdba74;">
+                                        <input type="radio" name="cardColor" value="orange">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Orange</small></span>
+                                        <span class="card-color-meta"><strong>Orange</strong><small>$0.15</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#ede9fe;--swatch-text:#4c1d95;--swatch-border:#c4b5fd;">
+                                        <input type="radio" name="cardColor" value="purple">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Purple</small></span>
+                                        <span class="card-color-meta"><strong>Purple</strong><small>$0.20</small></span>
+                                    </label>
+
+                                    <label class="card-color-option" style="--swatch-bg:#fce7f3;--swatch-text:#831843;--swatch-border:#f9a8d4;">
+                                        <input type="radio" name="cardColor" value="pink">
+                                        <span class="card-color-preview"><span class="card-color-check" aria-hidden="true">✓</span><strong>Job Title</strong><small>Pink</small></span>
+                                        <span class="card-color-meta"><strong>Pink</strong><small>$0.20</small></span>
+                                    </label>
+                                </div>
+                            </section>
+
                             <div class="budget-summary">
-
-                                <span>Estimated Total Budget</span>
-
-                                <strong id="totalJobBudget">$0.00</strong>
-
-                                <small>
-                                    Reward per worker × Total workers.
-                                    Platform fees may apply.
-                                </small>
-
+                                <div class="budget-summary-heading">
+                                    <span>Estimated Cost Breakdown</span>
+                                    <small>All amounts in USD</small>
+                                </div>
+                                <div class="budget-line"><span>Job Budget</span><strong id="jobBudgetAmount">$0.00</strong></div>
+                                <div class="budget-line"><span>Platform Fee (15%)</span><strong id="platformFeeAmount">$0.00</strong></div>
+                                <div class="budget-line"><span>Card Color Fee</span><strong id="cardColorFeeAmount">$0.00</strong></div>
+                                <div class="budget-total-line"><span>Total Cost</span><strong id="totalJobBudget">$0.00</strong></div>
+                                <small class="budget-summary-note">The platform fee and selected color fee are added to your job budget. Final charges are calculated securely.</small>
                             </div>
 
 
