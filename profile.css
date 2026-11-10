@@ -277,3 +277,31 @@ button.profile-header-balance{
   .profile-intro h1{font-size:19px}
   .profile-intro p{font-size:9px}
 }
+
+
+/* Keep the intro copy centered while the verification status stays at the right edge */
+.profile-intro{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.profile-intro-copy{
+  flex:1 1 auto;
+  text-align:center;
+}
+.profile-intro-copy .eyebrow,
+.profile-intro-copy h1,
+.profile-intro-copy p{
+  text-align:center;
+  margin-left:auto;
+  margin-right:auto;
+}
+.profile-intro .overall-status{
+  flex:0 0 auto;
+  margin-left:16px;
+}
+@media(max-width:760px){
+  .profile-intro{align-items:center}
+  .profile-intro-copy{flex:1 1 auto;text-align:center}
+  .profile-intro .overall-status{margin-left:8px}
+}
