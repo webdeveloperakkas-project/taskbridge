@@ -3697,3 +3697,50 @@ button.header-balance {
 #jobDetailsSection .job-details-content > .job-proof-box {
     max-width: 100%;
 }
+
+/* MOBILE HEADER NAVIGATION BUTTON — positioned beside the profile avatar */
+@media (min-width: 901px) {
+    .top-header .menu-toggle { display: none !important; }
+}
+@media (max-width: 900px) {
+    .top-header .header-right {
+        margin-left: auto;
+        gap: 10px;
+    }
+    .top-header .menu-toggle {
+        order: 3;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        padding: 0;
+        border: 1px solid #d7e9de;
+        border-radius: 12px;
+        background: linear-gradient(145deg, #f0fbf4, #ffffff);
+        color: #087d4b;
+        box-shadow: 0 3px 10px rgba(16, 120, 75, .08);
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+    }
+    .top-header .menu-toggle:hover {
+        background: #e4f7eb;
+        box-shadow: 0 5px 13px rgba(16, 120, 75, .13);
+    }
+    .top-header .menu-toggle:active { transform: scale(.96); }
+    .top-header .menu-toggle .icon {
+        width: 21px;
+        height: 21px;
+    }
+    .top-header .profile-dropdown { order: 4; }
+}
+@media (max-width: 600px) {
+    .top-header .header-right { gap: 7px; }
+    .top-header .menu-toggle {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+        border-radius: 10px;
+    }
+}
