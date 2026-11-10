@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help &amp; Support - TaskBridge</title>
+  <link rel="stylesheet" href="./profile.css">
+  <link rel="stylesheet" href="./support.css">
+</head>
+<body class="support-page">
+  <header class="profile-topbar">
+    <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
+    <div class="profile-header-wallet-dropdown">
+      <button type="button" class="profile-header-balance" id="profileWalletToggle" aria-label="Available balance and currency wallets" aria-expanded="false" aria-controls="profileWalletMenu">
+        <span class="profile-header-wallet-icon" aria-hidden="true"><svg class="wallet-header-icon" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v4H6.5A2.5 2.5 0 0 1 4 5.5v13A2.5 2.5 0 0 0 6.5 21H20V8H6.5A2.5 2.5 0 0 1 4 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 11h-5a2.5 2.5 0 0 0 0 5h5v-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="15.5" cy="13.5" r=".8" fill="currentColor"/></svg></span>
+        <span class="profile-header-balance-copy"><span class="profile-header-balance-label">Available Balance</span><strong id="profileAvailableBalance">Loading...</strong></span>
+        <svg class="profile-header-balance-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="profile-wallet-menu" id="profileWalletMenu" aria-label="Available currency wallets"></div>
+    </div>
+    <div class="topbar-actions"><a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a><span class="topbar-avatar" id="topbarAvatar">U</span></div>
+  </header>
+  <main class="shared-page-shell">
+    <a class="profile-back-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span> Back to Dashboard</a>
+    <section class="shared-page-intro">
+      <div><span class="eyebrow">TASKBRIDGE ASSISTANCE</span><h1>Help &amp; Support</h1><p>Find guidance and assistance for using your TaskBridge account.</p></div>
+    </section>
+    <section class="support-content">
+      <div class="support-content-heading"><span class="support-icon">?</span><div><h2>How can we help?</h2><p>Choose a topic to find the right guidance.</p></div></div>
+      <div class="support-topic-grid">
+        <article class="support-topic"><span>♙</span><div><h3>Account &amp; Profile</h3><p>Account details, password, email and identity verification.</p></div></article>
+        <article class="support-topic"><span>◈</span><div><h3>Payments &amp; Wallet</h3><p>Deposits, withdrawals, balances and payment records.</p></div></article>
+        <article class="support-topic"><span>▣</span><div><h3>Jobs &amp; Submissions</h3><p>Posting jobs, completing tasks and submission reviews.</p></div></article>
+        <article class="support-topic"><span>♧</span><div><h3>Safety &amp; Security</h3><p>Privacy, account security and reporting a concern.</p></div></article>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./support.js"></script>
+</body>
+</html>
