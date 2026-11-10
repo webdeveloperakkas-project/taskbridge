@@ -1667,6 +1667,14 @@ document.addEventListener("DOMContentLoaded", function () {
         filterAvailableJobs();
     }
 
+    const dashboardRecentJobsList = document.getElementById("dashboardRecentJobsList");
+    if (dashboardRecentJobsList) {
+        dashboardRecentJobsList.addEventListener("click", event => {
+            const trigger = event.target.closest("[data-open-job]");
+            if (trigger) openJobDetails(trigger.dataset.openJob);
+        });
+    }
+
     const findJobsList = document.getElementById("jobList");
     if (findJobsList) {
         findJobsList.addEventListener("click", event => {
