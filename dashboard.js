@@ -1559,9 +1559,6 @@ document.addEventListener("DOMContentLoaded", function () {
             list.appendChild(row);
         });
         empty.hidden = rows.length > 0;
-        if (!rows.length) {
-            list.innerHTML = '<div class="recent-jobs-empty">No recent jobs are available right now. Please check again soon.</div>';
-        }
     }
 
     const dashboardRecentJobsList = document.getElementById("dashboardRecentJobsList");
