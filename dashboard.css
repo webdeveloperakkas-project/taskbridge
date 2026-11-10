@@ -3003,3 +3003,16 @@ button.header-balance {
     .recent-jobs-title p { max-width:220px; }
     .recent-jobs-all-link { padding:8px 10px; }
 }
+
+
+/* Dashboard Recent Jobs reuses the Find a Job search, category, sorting and table system */
+.dashboard-recent-jobs-section { display:flex; flex-direction:column; gap:18px; }
+.dashboard-recent-jobs-section > .section-heading { margin-bottom:0; }
+.dashboard-recent-search-panel { margin-bottom:0; }
+.dashboard-recent-list-panel { margin-top:0; }
+.dashboard-recent-job-row[hidden] { display:none !important; }
+.dashboard-recent-list-panel .recent-jobs-footer { border-top:1px solid #edf1f5; }
+@media(max-width:700px) {
+    .dashboard-recent-jobs-section { gap:13px; }
+    .dashboard-recent-jobs-section > .section-heading { align-items:flex-start; }
+}
