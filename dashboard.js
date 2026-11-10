@@ -1702,11 +1702,11 @@ document.addEventListener("DOMContentLoaded", function () {
         currentUser = data?.session?.user || null;
         if (!currentUser) { window.location.replace("./login.html"); return; }
 
-        const email = currentUser.email || "Account";
+        const displayName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "My Account";
         const name = document.querySelector("#profileToggle .profile-info strong");
         const avatar = document.querySelector("#profileToggle .profile-avatar");
-        if (name) name.textContent = email;
-        if (avatar) avatar.textContent = email.charAt(0).toUpperCase();
+        if (name) name.textContent = displayName;
+        if (avatar) avatar.textContent = displayName.trim().charAt(0).toUpperCase() || "U";
 
         await loadJobCategories();
         await Promise.all([loadMyPostedJobs(), loadFindJobs()]);
