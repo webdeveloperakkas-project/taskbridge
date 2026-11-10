@@ -42,6 +42,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let feeLedgerLoadError = null;
     let realtimeChannel = null;
     let toastTimer = null;
+    let buyerSearchQuery = "";
 
 
     /* =====================================
@@ -1948,7 +1949,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 pending: jobs.filter(pending).length,
                 completed: jobs.filter(completed).length,
                 closed: jobs.filter(closed).length };
-        }).sort((a,b) => b.jobs.length-a.jobs.length);
+        }).sort((a, b) => {
+            const latestA = Math.max(...a.jobs.map(job => new Date(job.created_at || 0).getTime()));
+            const latestB = Math.max(...b.jobs.map(job => new Date(job.created_at || 0).getTime()));
+            return latestB - latestA;
+        });
 
         const all = allJobs;
         const set = (id,value) => { const el=document.getElementById(id); if(el) el.textContent=String(value); };
@@ -1959,13 +1964,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         set("buyerCompletedJobs", all.filter(completed).length);
         set("buyerClosedJobs", all.filter(closed).length);
 
-        const search = ($("#buyerManagementSearch")?.value || "").trim().toLowerCase();
+        const search = buyerSearchQuery.toLowerCase();
         const filter = $("#buyerManagementStatus")?.value || "all";
         const filtered = buyers.filter(b => {
-            const p=b.profile;
-            const match=[p.full_name,p.email,b.id].some(v=>String(v||"").toLowerCase().includes(search));
-            const stateMatch=filter==="all" || (filter==="running"&&b.running>0) || (filter==="pending"&&b.pending>0) || (filter==="completed"&&b.completed>0) || (filter==="closed"&&b.closed>0);
-            return match&&stateMatch;
+            const p = b.profile;
+            const searchable = [p.full_name, p.email, b.id].map(value => String(value || "").toLowerCase());
+            const match = !search || searchable.some(value => value.includes(search));
+            const stateMatch = filter === "all" ||
+                (filter === "running" && b.running > 0) ||
+                (filter === "pending" && b.pending > 0) ||
+                (filter === "completed" && b.completed > 0) ||
+                (filter === "closed" && b.closed > 0);
+            return match && stateMatch;
+        }).sort((a, b) => {
+            if (!search) return 0;
+            const rank = buyer => {
+                const values = [buyer.id, buyer.profile.email, buyer.profile.full_name]
+                    .map(value => String(value || "").toLowerCase());
+                if (values.some(value => value === search)) return 0;
+                if (values.some(value => value.startsWith(search))) return 1;
+                return 2;
+            };
+            return rank(a) - rank(b);
         });
         if (!filtered.length) {
             container.innerHTML='<div class="admin-card empty-state">'+(buyers.length?"No buyers match your search or filter.":"No buyers yet. Users will appear here automatically after posting their first job.")+'</div>';
@@ -2274,7 +2294,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (walletSearch) walletSearch.addEventListener("input", renderWallets);
 
     const buyerSearch = $("#buyerManagementSearch");
-    if (buyerSearch) buyerSearch.addEventListener("input", renderBuyerManagement);
+    const buyerSearchButton = $("#buyerManagementSearchButton");
+    const applyBuyerSearch = () => {
+        buyerSearchQuery = (buyerSearch?.value || "").trim();
+        renderBuyerManagement();
+    };
+    if (buyerSearchButton) buyerSearchButton.addEventListener("click", applyBuyerSearch);
+    if (buyerSearch) buyerSearch.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            applyBuyerSearch();
+        }
+    });
     const buyerFilter = $("#buyerManagementStatus");
     if (buyerFilter) buyerFilter.addEventListener("change", renderBuyerManagement);
     document.addEventListener("click", function(event) {
