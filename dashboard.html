@@ -1212,21 +1212,6 @@
             <h3>Job Description</h3>
             <p id="detailJobDescription"></p>
 
-            <h3>Task Instructions</h3>
-            <ol id="detailJobInstructions"></ol>
-
-            <h3>Target URL</h3>
-            <a href="#"
-               target="_blank"
-               rel="noopener noreferrer"
-               id="detailJobTargetLink"
-               class="job-target-link">
-                Open Target Page
-                <svg class="icon">
-                    <use href="#icon-external-link"></use>
-                </svg>
-            </a>
-
             <h3>Proof Requirements</h3>
             <div class="job-proof-box">
                 <svg class="icon">
@@ -1327,40 +1312,20 @@
 
                             <div class="form-group">
 
-                                <label for="jobDescription">
-                                    Job Description & Instructions
-                                </label>
+                                <label for="jobDescription">Job Details</label>
 
                                 <textarea id="jobDescription"
                                     name="description"
-                                    rows="6"
-                                    placeholder="Explain exactly what workers need to do..."
+                                    rows="8"
+                                    placeholder="Describe the complete task: where workers need to go, what they need to do, and any required URL or other details..."
                                     required></textarea>
 
-                            </div>
-
-
-                            <div class="form-group">
-                                <label for="jobInstructions">Worker Instructions</label>
-                                <textarea id="jobInstructions" name="instructions" rows="4"
-                                    placeholder="Step-by-step instructions workers must follow..." required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="jobDuration">Estimated Completion Time (minutes)</label>
                                 <input type="number" id="jobDuration" name="durationMinutes"
                                     min="1" step="1" value="5" required>
                             </div>
-
-                            <div class="form-group">
-                            <label for="targetUrl">Target URL</label>
-
-                                <input type="url"
-                                    id="targetUrl"
-                                    name="targetUrl"
-                                    placeholder="https://example.com">
-
-                            </div>
-
 
                             <div class="form-row">
 
