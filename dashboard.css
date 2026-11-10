@@ -3793,3 +3793,139 @@ button.header-balance {
         max-width: none;
     }
 }
+
+
+/* MOBILE HEADER: KEEP WALLET VISIBLE + HIGH-CONTRAST MENU BUTTON */
+@media (max-width: 900px) {
+    .top-header .header-right {
+        min-width: 0;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+    }
+
+    .top-header .wallet-balance-dropdown {
+        display: block !important;
+        flex: 0 1 auto;
+        min-width: 0;
+        order: 1;
+    }
+
+    .top-header .wallet-balance-dropdown .header-balance {
+        display: inline-flex !important;
+        visibility: visible !important;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .top-header .notification-dropdown { order: 2; }
+    .top-header .menu-toggle { order: 3; }
+    .top-header .profile-dropdown { order: 4; }
+
+    .top-header .menu-toggle {
+        background: linear-gradient(145deg, #fff7bf 0%, #fde047 100%);
+        border: 1px solid #eab308;
+        color: #713f12;
+        box-shadow: 0 3px 10px rgba(202, 138, 4, .20);
+    }
+
+    .top-header .menu-toggle:hover,
+    .top-header .menu-toggle:focus-visible {
+        background: linear-gradient(145deg, #fef08a 0%, #facc15 100%);
+        border-color: #ca8a04;
+        box-shadow: 0 0 0 3px rgba(234, 179, 8, .20), 0 4px 12px rgba(202, 138, 4, .22);
+    }
+
+    .top-header .menu-toggle .icon {
+        display: block;
+        width: 23px;
+        height: 23px;
+        stroke: currentColor;
+        stroke-width: 2.6;
+    }
+}
+
+@media (max-width: 600px) {
+    .top-header {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .top-header .header-left {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
+    .top-header .header-welcome h2 {
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .top-header .header-right {
+        gap: 6px;
+    }
+
+    .top-header .wallet-balance-dropdown {
+        flex: 0 1 132px;
+        min-width: 92px;
+    }
+
+    .top-header .wallet-balance-dropdown .header-balance {
+        width: 100%;
+        min-width: 0;
+        padding: 6px 7px;
+        gap: 5px;
+        border-radius: 9px;
+        overflow: hidden;
+    }
+
+    .top-header .header-balance-copy {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .top-header .header-balance-copy small {
+        display: none;
+    }
+
+    .top-header .header-balance-copy strong {
+        display: block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 11px;
+    }
+
+    .top-header .header-balance .balance-icon,
+    .top-header .header-balance .wallet-header-icon {
+        width: 18px;
+        height: 18px;
+        flex-basis: 18px;
+    }
+
+    .top-header .wallet-balance-chevron {
+        width: 18px;
+        height: 18px;
+        flex-basis: 18px;
+        padding: 3px;
+    }
+
+    .top-header .menu-toggle {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        border-radius: 10px;
+    }
+
+    .top-header .menu-toggle .icon {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media (max-width: 380px) {
+    .top-header .header-welcome h2 { font-size: 12px; }
+    .top-header .wallet-balance-dropdown { flex-basis: 112px; min-width: 82px; }
+    .top-header .header-right { gap: 4px; }
+    .top-header .menu-toggle { width: 35px; height: 35px; flex-basis: 35px; }
+}
