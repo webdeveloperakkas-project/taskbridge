@@ -2914,3 +2914,7 @@ button.header-balance {
         padding: 12px;
     }
 }
+
+
+/* Profile header: never expose the account email in the dashboard header */
+.profile-info strong { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
