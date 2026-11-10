@@ -1505,67 +1505,101 @@ document.addEventListener("DOMContentLoaded", function () {
         rows.forEach(job => {
             const category = getJobCategory(job);
             const row = document.createElement("article");
-            row.className = "dashboard-recent-job-row";
+            row.className = "job-table-row job-list-item dashboard-recent-job-row";
+            row.dataset.jobId = job.id;
+            row.dataset.title = ((category?.name || "") + " " + (job.title || "")).toLowerCase();
+            row.dataset.category = String(category?.slug || category?.name || "other").toLowerCase();
+            row.dataset.reward = String(Number(job.reward_per_worker) || 0);
+            row.dataset.date = job.created_at || "";
+            row.style.setProperty("--job-card-background", "#ffffff");
 
-            const titleCell = document.createElement("div");
-            titleCell.className = "dashboard-recent-job-title";
-            const icon = document.createElement("span");
-            icon.className = "dashboard-recent-job-icon";
-            const iconMap = { facebook: "icon-facebook", youtube: "icon-youtube",
-                instagram: "icon-instagram", twitter: "icon-twitter",
-                tiktok: "icon-music", website: "icon-globe" };
-            const use = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            use.setAttribute("class", "icon");
-            const useNode = document.createElementNS("http://www.w3.org/2000/svg", "use");
-            useNode.setAttribute("href", "#" + (iconMap[String(category?.slug || "").toLowerCase()] || "icon-grid"));
-            use.appendChild(useNode);
-            icon.appendChild(use);
-            const title = document.createElement("strong");
-            title.textContent = job.title || "Untitled Job";
-            title.title = title.textContent;
-            const posted = document.createElement("small");
-            posted.textContent = job.created_at ? new Date(job.created_at).toLocaleDateString() : "Recently posted";
-            titleCell.append(icon, document.createElement("span"));
-            const titleCopy = titleCell.lastElementChild;
-            titleCopy.append(title, posted);
-            row.appendChild(titleCell);
+            const nameCell = document.createElement("div");
+            nameCell.className = "job-table-cell job-name-cell";
+            const nameButton = document.createElement("button");
+            nameButton.type = "button";
+            nameButton.className = "job-name-link";
+            nameButton.dataset.openJob = job.id;
+            nameButton.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
+            nameButton.title = nameButton.textContent;
+            nameCell.appendChild(nameButton);
+            row.appendChild(nameCell);
+            row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
+            row.appendChild(createJobCell("job-success-rate", "—"));
+            row.appendChild(createJobCell("", formatJobDuration(job.duration_minutes)));
+            row.appendChild(createJobCell("job-completed-cell", "— / " + Number(job.total_slots || 0)));
 
-            const categoryCell = document.createElement("span");
-            categoryCell.className = "dashboard-recent-job-meta";
-            categoryCell.textContent = category?.name || "Other";
-            row.appendChild(categoryCell);
-
-            const payment = document.createElement("strong");
-            payment.className = "dashboard-recent-job-payment";
-            payment.textContent = formatWalletMoney(job.reward_per_worker, job.currency || "USD");
-            row.appendChild(payment);
-
-            const duration = document.createElement("span");
-            duration.className = "dashboard-recent-job-meta";
-            duration.textContent = formatJobDuration(job.duration_minutes);
-            row.appendChild(duration);
-
-            const workers = document.createElement("span");
-            workers.className = "dashboard-recent-job-meta";
-            workers.textContent = String(Number(job.total_slots) || 0);
-            row.appendChild(workers);
-
-            const action = document.createElement("button");
-            action.type = "button";
-            action.className = "dashboard-recent-job-view";
-            action.dataset.openJob = job.id;
-            action.textContent = "View Details";
-            row.appendChild(action);
+            const actionCell = document.createElement("div");
+            actionCell.className = "job-table-cell";
+            const viewButton = document.createElement("button");
+            viewButton.type = "button";
+            viewButton.className = "job-view-button";
+            viewButton.dataset.openJob = job.id;
+            viewButton.textContent = "View";
+            actionCell.appendChild(viewButton);
+            row.appendChild(actionCell);
             list.appendChild(row);
         });
         empty.hidden = rows.length > 0;
+        filterDashboardRecentJobs();
     }
 
-    const dashboardRecentJobsList = document.getElementById("dashboardRecentJobsList");
-    if (dashboardRecentJobsList) {
-        dashboardRecentJobsList.addEventListener("click", event => {
-            const trigger = event.target.closest("[data-open-job]");
-            if (trigger) openJobDetails(trigger.dataset.openJob);
+    let selectedDashboardRecentCategory = "all";
+
+    function filterDashboardRecentJobs() {
+        const list = document.getElementById("dashboardRecentJobsList");
+        const empty = document.getElementById("dashboardRecentJobsEmpty");
+        if (!list || !empty) return;
+        const search = (document.getElementById("dashboardRecentSearchInput")?.value || "").trim().toLowerCase();
+        const cards = Array.from(list.querySelectorAll(".job-table-row"));
+        cards.forEach(card => {
+            const matchesSearch = (card.dataset.title || "").includes(search);
+            const matchesCategory = selectedDashboardRecentCategory === "all" ||
+                (card.dataset.category || "") === selectedDashboardRecentCategory;
+            card.hidden = !(matchesSearch && matchesCategory);
+        });
+        const visible = cards.filter(card => !card.hidden).length;
+        const count = document.getElementById("dashboardRecentResultsCount");
+        if (count) count.textContent = visible + (visible === 1 ? " Job" : " Jobs");
+        empty.hidden = visible > 0;
+        const heading = empty.querySelector("h3");
+        const message = empty.querySelector("p");
+        if (heading) heading.textContent = cards.length ? "No Matching Jobs" : "No Jobs Available Yet";
+        if (message) message.textContent = cards.length
+            ? "No jobs match your current search or category. Try another filter."
+            : "There are currently no approved jobs available. Please check back later.";
+    }
+
+    const dashboardRecentSearchInput = document.getElementById("dashboardRecentSearchInput");
+    const dashboardRecentSearchButton = document.getElementById("dashboardRecentSearchButton");
+    if (dashboardRecentSearchInput) dashboardRecentSearchInput.addEventListener("input", filterDashboardRecentJobs);
+    if (dashboardRecentSearchButton) dashboardRecentSearchButton.addEventListener("click", filterDashboardRecentJobs);
+
+    document.querySelectorAll("#dashboardRecentCategoryGrid [data-recent-category]").forEach(button => {
+        button.addEventListener("click", () => {
+            selectedDashboardRecentCategory = String(button.dataset.recentCategory || "all").toLowerCase();
+            document.querySelectorAll("#dashboardRecentCategoryGrid [data-recent-category]").forEach(item => {
+                item.classList.toggle("active", item === button);
+            });
+            filterDashboardRecentJobs();
+        });
+    });
+
+    const dashboardRecentSortFilter = document.getElementById("dashboardRecentSortFilter");
+    if (dashboardRecentSortFilter) {
+        dashboardRecentSortFilter.addEventListener("change", () => {
+            const list = document.getElementById("dashboardRecentJobsList");
+            if (!list) return;
+            const cards = Array.from(list.querySelectorAll(".job-table-row"));
+            const sortType = dashboardRecentSortFilter.value;
+            cards.sort((a, b) => {
+                const rewardA = Number(a.dataset.reward) || 0;
+                const rewardB = Number(b.dataset.reward) || 0;
+                if (sortType === "highest") return rewardB - rewardA;
+                if (sortType === "lowest") return rewardA - rewardB;
+                return new Date(b.dataset.date || 0) - new Date(a.dataset.date || 0);
+            });
+            cards.forEach(card => list.appendChild(card));
+            filterDashboardRecentJobs();
         });
     }
 
