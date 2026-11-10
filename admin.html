@@ -557,7 +557,12 @@
                     </div>
                     <div class="admin-card">
                         <div class="filter-toolbar login-activity-toolbar">
-                            <input type="search" id="loginActivitySearch" placeholder="Search name, email or user ID...">
+                            <div class="login-activity-search-control">
+                                <input type="search" id="loginActivitySearch" placeholder="Enter user email or name..." aria-label="Search Login Activity by email or name">
+                                <button type="button" class="login-activity-search-btn" id="loginActivitySearchButton">
+                                    <span aria-hidden="true">⌕</span> Search
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="admin-table login-activity-users-table">
