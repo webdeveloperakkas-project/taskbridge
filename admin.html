@@ -555,7 +555,12 @@
                         <div class="stat-card"><div class="stat-icon withdraw-icon">×</div><div><p>Closed / Cancelled</p><h3 id="buyerClosedJobs">0</h3><span>Closed or cancelled jobs</span></div></div>
                     </div>
                     <div class="filter-toolbar buyer-filter-toolbar">
-                        <input type="search" id="buyerManagementSearch" placeholder="Search buyer name, email or user ID...">
+                        <div class="buyer-search-control">
+                            <input type="search" id="buyerManagementSearch" placeholder="Enter Buyer User ID or Email..." aria-label="Search buyer by user ID or email">
+                            <button type="button" class="buyer-search-btn" id="buyerManagementSearchButton">
+                                <span aria-hidden="true">⌕</span> Search
+                            </button>
+                        </div>
                         <select id="buyerManagementStatus">
                             <option value="all">All Buyer Activity</option>
                             <option value="running">Has Running Jobs</option>
