@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     let realtimeChannel = null;
     let toastTimer = null;
     let buyerSearchQuery = "";
+    let expandedLoginUserId = null;
+    const loginHistoryPages = new Map();
+    const LOGIN_HISTORY_PAGE_SIZE = 20;
 
 
     /* =====================================
@@ -67,8 +70,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         "support_tickets",
         "platform_settings",
         "administration_fee_ledger",
-        "notifications",
-        "user_login_history"
+        "notifications"
     ];
 
 
@@ -96,6 +98,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         buyerManagementPanel: {
             title: "Buyer Management",
             subtitle: "Review buyer job statistics and wallet balances."
+        },
+
+        loginActivityPanel: {
+            title: "Login Activity",
+            subtitle: "Review user sign-in history and device information."
         },
 
         jobsPanel: {
@@ -1153,6 +1160,186 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     /* =====================================
+       LOGIN ACTIVITY
+    ====================================== */
+
+    function renderLoginActivityUsers() {
+        const tbody = $("#loginActivityUsersTable");
+        if (!tbody) return;
+
+        const search = ($("#loginActivitySearch")?.value || "").trim().toLowerCase();
+        const filteredUsers = allUsers.filter(user =>
+            [user.full_name, user.email, user.id].some(value =>
+                String(value || "").toLowerCase().includes(search)
+            )
+        );
+
+        if (!filteredUsers.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No matching users found.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filteredUsers.map(user => {
+            const userId = escapeHTML(user.id);
+            const isExpanded = expandedLoginUserId === user.id;
+            const initial = (user.full_name || user.email || "U").charAt(0).toUpperCase();
+            return `
+                <tr class="login-user-row">
+                    <td>
+                        <div class="table-user">
+                            <div class="table-user-avatar">${escapeHTML(initial)}</div>
+                            <div><strong>${escapeHTML(user.full_name || "Unnamed User")}</strong></div>
+                        </div>
+                    </td>
+                    <td><span class="user-id">${userId}</span></td>
+                    <td>${escapeHTML(user.email || "—")}</td>
+                    <td>
+                        <button type="button" class="action-btn login-details-btn"
+                            data-login-details="${userId}" aria-expanded="${isExpanded}">
+                            ${isExpanded ? "Hide Details" : "Details"}
+                        </button>
+                    </td>
+                </tr>
+                ${isExpanded ? `
+                    <tr class="login-history-expanded-row">
+                        <td colspan="4">
+                            <div class="login-history-panel" id="loginHistoryPanel-${userId}">
+                                <div class="login-history-heading">
+                                    <div><strong>Login History</strong><span>Latest 100 records · 20 per page</span></div>
+                                    <span class="login-history-loading">Loading...</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                ` : ""}
+            `;
+        }).join("");
+
+        if (expandedLoginUserId) {
+            const selectedUser = allUsers.find(user => user.id === expandedLoginUserId);
+            if (selectedUser) loadUserLoginHistory(selectedUser);
+        }
+    }
+
+    async function loadUserLoginHistory(user) {
+        const panel = document.getElementById("loginHistoryPanel-" + user.id);
+        if (!panel) return;
+
+        const page = loginHistoryPages.get(user.id) || 1;
+        const from = (page - 1) * LOGIN_HISTORY_PAGE_SIZE;
+        const to = from + LOGIN_HISTORY_PAGE_SIZE - 1;
+
+        panel.innerHTML = `
+            <div class="login-history-heading">
+                <div><strong>${escapeHTML(user.full_name || user.email || "User")} — Login History</strong>
+                <span>Page ${page} · Latest 100 records</span></div>
+                <span class="login-history-loading">Loading records...</span>
+            </div>
+        `;
+
+        try {
+            const { data, error, count } = await supabaseClient
+                .from("user_login_history")
+                .select("id, ip_address, device_type, browser, operating_system, user_agent, device_timezone, login_at, logout_at, created_at", { count: "exact" })
+                .eq("user_id", user.id)
+                .order("login_at", { ascending: false })
+                .range(from, to);
+
+            if (error) throw error;
+
+            const records = data || [];
+            const total = Math.min(count || 0, 100);
+            const totalPages = Math.max(1, Math.ceil(total / LOGIN_HISTORY_PAGE_SIZE));
+
+            if (!records.length) {
+                panel.innerHTML = `
+                    <div class="login-history-heading">
+                        <div><strong>${escapeHTML(user.full_name || user.email || "User")} — Login History</strong>
+                        <span>0 records</span></div>
+                    </div>
+                    <p class="login-history-empty">No login records found for this user.</p>
+                `;
+                return;
+            }
+
+            panel.innerHTML = `
+                <div class="login-history-heading">
+                    <div>
+                        <strong>${escapeHTML(user.full_name || user.email || "User")} — Login History</strong>
+                        <span>${total} saved records · Page ${page} of ${totalPages}</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table login-history-table">
+                        <thead><tr>
+                            <th>Login Time</th><th>IP Address</th><th>Device</th>
+                            <th>Browser</th><th>Operating System</th><th>Timezone</th>
+                        </tr></thead>
+                        <tbody>
+                            ${records.map(record => `
+                                <tr>
+                                    <td>${escapeHTML(new Date(record.login_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "medium", timeZone: "UTC" }))} <small class="login-timezone-note">UTC</small></td>
+                                    <td><span class="user-id">${escapeHTML(record.ip_address || "Unavailable")}</span></td>
+                                    <td>${escapeHTML(record.device_type || "Unknown")}</td>
+                                    <td>${escapeHTML(record.browser || "Unknown")}</td>
+                                    <td>${escapeHTML(record.operating_system || "Unknown")}</td>
+                                    <td>${escapeHTML(record.device_timezone || "Unknown")}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="login-history-pagination">
+                    <span>Showing ${from + 1}–${Math.min(from + records.length, total)} of ${total}</span>
+                    <div>
+                        <button type="button" class="secondary-btn" data-login-page="${page - 1}" data-login-user="${escapeHTML(user.id)}" ${page <= 1 ? "disabled" : ""}>Previous</button>
+                        <button type="button" class="secondary-btn" data-login-page="${page + 1}" data-login-user="${escapeHTML(user.id)}" ${page >= totalPages ? "disabled" : ""}>Next</button>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            console.error("Could not load user login history:", error);
+            panel.innerHTML = '<p class="login-history-error">Could not load login history. Check the admin permissions and database policy.</p>';
+        }
+    }
+
+    document.addEventListener("click", function(event) {
+        const detailsButton = event.target.closest("[data-login-details]");
+        if (detailsButton) {
+            const userId = detailsButton.dataset.loginDetails;
+            expandedLoginUserId = expandedLoginUserId === userId ? null : userId;
+            if (expandedLoginUserId) loginHistoryPages.set(userId, 1);
+            renderLoginActivityUsers();
+            return;
+        }
+
+        const pageButton = event.target.closest("[data-login-page]");
+        if (pageButton && !pageButton.disabled) {
+            const userId = pageButton.dataset.loginUser;
+            const nextPage = Number(pageButton.dataset.loginPage);
+            loginHistoryPages.set(userId, nextPage);
+            const user = allUsers.find(item => item.id === userId);
+            if (user) loadUserLoginHistory(user);
+        }
+    });
+
+    const loginActivitySearch = $("#loginActivitySearch");
+    if (loginActivitySearch) loginActivitySearch.addEventListener("input", renderLoginActivityUsers);
+
+    const refreshLoginActivity = $("#refreshLoginActivity");
+    if (refreshLoginActivity) refreshLoginActivity.addEventListener("click", async function() {
+        refreshLoginActivity.disabled = true;
+        try {
+            await loadAdminData();
+            renderLoginActivityUsers();
+            showToast("Login Activity refreshed.");
+        } finally {
+            refreshLoginActivity.disabled = false;
+        }
+    });
+
+
+    /* =====================================
        VERIFICATION TABLE
     ====================================== */
 
@@ -2150,6 +2337,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             updateOverview(data);
 
             renderUsers();
+            renderLoginActivityUsers();
             renderVerification();
             renderBuyerManagement();
             renderJobs();
