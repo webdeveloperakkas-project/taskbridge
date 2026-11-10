@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded",async()=>{
   const SUPABASE_URL="https://eboagroxkgpplccufpuk.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY="sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
@@ -8,6 +7,9 @@ document.addEventListener("DOMContentLoaded",async()=>{
   if(error||!data.session){window.location.replace("./login.html");return}
   const user=data.session.user,name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
   document.getElementById("topbarAvatar").textContent=name.trim().charAt(0).toUpperCase()||"U";
+  const nameInput=document.getElementById("supportName"),emailInput=document.getElementById("supportEmail");
+  nameInput.value=user.user_metadata?.full_name||user.user_metadata?.name||"";
+  emailInput.value=user.email||"";
   const toggle=document.getElementById("profileWalletToggle"),menu=document.getElementById("profileWalletMenu"),balance=document.getElementById("profileAvailableBalance");
   try{
     const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});if(error)throw error;
@@ -18,4 +20,20 @@ document.addEventListener("DOMContentLoaded",async()=>{
     document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
     render();
   }catch(err){console.warn("Header wallet could not load:",err);balance.textContent="—"}
+
+  const form=document.getElementById("supportMessageForm"),send=document.getElementById("supportSendButton"),status=document.getElementById("supportFormStatus");
+  form.addEventListener("submit",async event=>{
+    event.preventDefault();status.textContent="";status.className="support-form-status";
+    const payload={name:nameInput.value.trim(),email:emailInput.value.trim(),subject:document.getElementById("supportSubject").value.trim(),message:document.getElementById("supportMessage").value.trim()};
+    if(!payload.name||!payload.email||!payload.subject||!payload.message){status.textContent="Please complete all fields.";status.classList.add("error");return}
+    send.disabled=true;send.querySelector("span").textContent="Sending...";
+    try{
+      const {data:result,error:sendError}=await client.functions.invoke("send-support-message",{body:payload});
+      if(sendError)throw sendError;
+      if(result?.error)throw new Error(result.error);
+      form.reset();nameInput.value=user.user_metadata?.full_name||user.user_metadata?.name||"";emailInput.value=user.email||"";
+      status.textContent="Your message has been sent to TaskBridge Support. Thank you!";status.classList.add("success");
+    }catch(err){console.error("Support message failed:",err);status.textContent=err.message||"Could not send your message. Please try again later.";status.classList.add("error")}
+    finally{send.disabled=false;send.querySelector("span").textContent="Send Message"}
+  });
 });
