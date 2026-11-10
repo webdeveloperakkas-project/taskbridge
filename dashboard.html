@@ -9,7 +9,7 @@
     <title>TaskBridge - User Dashboard</title>
 
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./dashboard.css?v=20261110-mobile-wallet-menu">
+    <link rel="stylesheet" href="./dashboard.css?v=20261110-header-left-compact-wallet">
 
 </head>
 
@@ -422,13 +422,16 @@
 
                 <div class="header-left">
 
-                    <div class="header-welcome">
-
-                        <h2>Dashboard</h2>
-
-                        <p>Welcome back! Here's your overview.</p>
-
-                    </div>
+                    <button type="button"
+                        class="menu-toggle"
+                        id="menuToggle"
+                        aria-label="Open navigation menu"
+                        aria-controls="sidebar"
+                        aria-expanded="false">
+                        <svg class="icon" aria-hidden="true">
+                            <use href="#icon-menu"></use>
+                        </svg>
+                    </button>
 
                 </div>
 
@@ -493,20 +496,6 @@
                         </div>
 
                     </div>
-
-
-                    <button type="button"
-                        class="menu-toggle"
-                        id="menuToggle"
-                        aria-label="Open navigation menu"
-                        aria-controls="sidebar"
-                        aria-expanded="false">
-
-                        <svg class="icon" aria-hidden="true">
-                            <use href="#icon-menu"></use>
-                        </svg>
-
-                    </button>
 
 
                     <!-- PROFILE DROPDOWN -->
