@@ -135,6 +135,12 @@
                     <span>Wallet Management</span>
                 </a>
 
+                <a href="#administration-account" class="admin-nav-link"
+                    data-panel="administrationAccountPanel">
+                    <span class="nav-icon">＄</span>
+                    <span>Administration Account</span>
+                </a>
+
 
                 <!-- SUPPORT -->
 
@@ -968,6 +974,49 @@
                         </div>
                     </div>
 
+                </section>
+
+
+                <!-- =================================
+                     ADMINISTRATION ACCOUNT
+                ================================== -->
+
+                <section class="admin-panel" id="administrationAccountPanel">
+
+                    <div class="section-intro">
+                        <h2>Administration Account</h2>
+                        <p>Track administration fees, one-time color fees, refundable fees and earned revenue for every job.</p>
+                    </div>
+
+                    <div class="stats-grid administration-stats-grid">
+                        <div class="stat-card"><div class="stat-icon users-icon">%</div><div><p>Total Administration Fees</p><h3 id="adminTotalAdministrationFees">0.00</h3><span>All posted job fees, including refunded records</span></div></div>
+                        <div class="stat-card"><div class="stat-icon verified-icon">▧</div><div><p>Total Color Fees</p><h3 id="adminTotalColorFees">0.00</h3><span>One-time fees per job</span></div></div>
+                        <div class="stat-card"><div class="stat-icon pending-icon">◷</div><div><p>Total Refundable Fees</p><h3 id="adminTotalRefundableFees">0.00</h3><span>Jobs awaiting admin review</span></div></div>
+                        <div class="stat-card"><div class="stat-icon deposit-icon">$</div><div><p>Total Earned Revenue</p><h3 id="adminTotalEarnedRevenue">0.00</h3><span>Fees locked in after job approval</span></div></div>
+                    </div>
+
+                    <div class="admin-card administration-ledger-card">
+                        <div class="card-heading">
+                            <div><h3>Job Fee Ledger</h3><p>Every job is listed separately with its fee breakdown and refund status.</p></div>
+                            <button type="button" class="secondary-btn" id="refreshAdministrationAccount">↻ Refresh</button>
+                        </div>
+                        <div class="filter-toolbar">
+                            <input type="search" id="administrationFeeSearch" placeholder="Search job title, buyer or job ID...">
+                            <select id="administrationFeeStatusFilter">
+                                <option value="all">All Fee Statuses</option>
+                                <option value="pending">Refundable</option>
+                                <option value="earned">Earned</option>
+                                <option value="refunded">Refunded</option>
+                            </select>
+                        </div>
+                        <div id="administrationFeeLoadError" class="ledger-error" hidden></div>
+                        <div class="table-responsive">
+                            <table class="admin-table administration-ledger-table">
+                                <thead><tr><th>Job</th><th>Buyer</th><th>Job Status</th><th>Card Color</th><th>Administration Fee</th><th>Color Fee</th><th>Total Admin Fees</th><th>Fee Status</th><th>Posted</th></tr></thead>
+                                <tbody id="administrationFeeLedgerTable"><tr><td colspan="9" class="empty-state">Loading administration account...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
 
 
