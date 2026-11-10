@@ -1326,7 +1326,7 @@ a {
 .login-history-heading strong { color:var(--text); font-size:13px; }
 .login-history-heading span { margin-top:4px; color:var(--muted); font-size:10px; }
 .login-history-loading { color:var(--muted); }
-.login-history-table { min-width: 920px; }
+.login-history-table { min-width: 1450px; }
 .login-history-table td { vertical-align:middle; }
 .login-timezone-note { display:block; margin-top:3px; color:var(--muted); font-size:9px; }
 .login-history-pagination { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:14px; color:var(--muted); font-size:11px; }
@@ -1343,3 +1343,5 @@ a {
     .login-history-pagination > div { width:100%; }
     .login-history-pagination button { flex:1; }
 }
+
+.login-user-agent { display:block; max-width:260px; white-space:normal; overflow-wrap:anywhere; color:var(--muted); font-size:10px; line-height:1.45; }
