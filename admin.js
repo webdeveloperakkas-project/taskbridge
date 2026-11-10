@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     let allDeposits = [];
     let allWithdrawals = [];
     let allWallets = [];
+    let allFeeLedger = [];
+    let feeLedgerLoadError = null;
     let realtimeChannel = null;
     let toastTimer = null;
 
@@ -62,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         "admin_logs",
         "support_tickets",
         "platform_settings",
+        "administration_fee_ledger",
         "notifications",
         "user_login_history"
     ];
@@ -116,6 +119,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         walletsPanel: {
             title: "Wallet Management",
             subtitle: "View user wallet balances and account details."
+        },
+
+        administrationAccountPanel: {
+            title: "Administration Account",
+            subtitle: "Review job administration fees, color fees, refunds and earned revenue."
         },
 
         reportsPanel: {
@@ -744,8 +752,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 error.message
             );
 
+            if (tableName === "administration_fee_ledger") {
+                feeLedgerLoadError = error.message;
+            }
+
             return [];
 
+        }
+
+        if (tableName === "administration_fee_ledger") {
+            feeLedgerLoadError = null;
         }
 
         return data || [];
@@ -1889,6 +1905,88 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     /* =====================================
+       ADMINISTRATION ACCOUNT / FEE LEDGER
+    ====================================== */
+
+    function renderAdministrationAccount() {
+        const tbody = $("#administrationFeeLedgerTable");
+        if (!tbody) return;
+
+        const errorBox = $("#administrationFeeLoadError");
+        if (errorBox) {
+            errorBox.hidden = !feeLedgerLoadError;
+            errorBox.textContent = feeLedgerLoadError
+                ? "Could not load the Administration Fee Ledger: " + feeLedgerLoadError
+                : "";
+        }
+
+        const jobsById = new Map(allJobs.map(job => [job.id, job]));
+        const usersById = new Map(allUsers.map(user => [user.id, user]));
+        const statusFilter = $("#administrationFeeStatusFilter")?.value || "all";
+        const search = ($("#administrationFeeSearch")?.value || "").trim().toLowerCase();
+        const amount = value => Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        const groupedTotal = (rows, selector) => {
+            const totals = {};
+            rows.forEach(row => {
+                const currency = String(row.currency || "USD").toUpperCase();
+                totals[currency] = (totals[currency] || 0) + Number(selector(row) || 0);
+            });
+            return Object.keys(totals).length
+                ? Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([currency, value]) => currency + " " + amount(value)).join(" · ")
+                : "0.00";
+        };
+
+        const pendingRows = allFeeLedger.filter(row => String(row.status || "").toLowerCase() === "pending");
+        const earnedRows = allFeeLedger.filter(row => String(row.status || "").toLowerCase() === "earned");
+        const setText = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value; };
+
+        setText("adminTotalAdministrationFees", groupedTotal(allFeeLedger, row => row.administration_fee));
+        setText("adminTotalColorFees", groupedTotal(allFeeLedger, row => row.color_fee));
+        setText("adminTotalRefundableFees", groupedTotal(pendingRows, row => row.total_fee));
+        setText("adminTotalEarnedRevenue", groupedTotal(earnedRows, row => row.total_fee));
+
+        const filtered = allFeeLedger.filter(row => {
+            const status = String(row.status || "").toLowerCase();
+            if (statusFilter !== "all" && status !== statusFilter) return false;
+            const job = jobsById.get(row.job_id) || {};
+            const buyer = usersById.get(row.advertiser_id) || {};
+            const haystack = [job.title, row.job_id, row.advertiser_id, buyer.full_name, buyer.email, job.status, job.card_color, row.status].join(" ").toLowerCase();
+            return haystack.includes(search);
+        }).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+
+        if (!filtered.length) {
+            const message = feeLedgerLoadError
+                ? "Fee ledger data is unavailable. Check the table Admin SELECT policy and reload."
+                : allFeeLedger.length ? "No fee records match your search or status filter." : "No administration fee records found yet.";
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">' + escapeHTML(message) + '</td></tr>';
+            return;
+        }
+
+        const colorStyles = { white: ["#ffffff", "#111827"], blue: ["#dbeafe", "#1e3a8a"], green: ["#dcfce7", "#14532d"], yellow: ["#fef3c7", "#78350f"], orange: ["#ffedd5", "#9a3412"], purple: ["#ede9fe", "#4c1d95"], pink: ["#fce7f3", "#831843"] };
+        tbody.innerHTML = filtered.map(row => {
+            const job = jobsById.get(row.job_id) || {};
+            const buyer = usersById.get(row.advertiser_id) || {};
+            const currency = String(row.currency || "USD").toUpperCase();
+            const color = String(job.card_color || "white").toLowerCase();
+            const palette = colorStyles[color] || colorStyles.white;
+            const status = String(row.status || "unknown").toLowerCase();
+            const statusLabel = status === "pending" ? "Refundable" : status === "earned" ? "Earned" : status === "refunded" ? "Refunded" : status;
+            const feeTotal = row.total_fee ?? (Number(row.administration_fee || 0) + Number(row.color_fee || 0));
+            return '<tr>' +
+                '<td><strong>' + escapeHTML(job.title || ("Job " + String(row.job_id || "").slice(0, 8))) + '</strong><small class="ledger-subtext">' + escapeHTML(String(row.job_id || "")) + '</small></td>' +
+                '<td><strong>' + escapeHTML(buyer.full_name || "Unknown Buyer") + '</strong><small class="ledger-subtext">' + escapeHTML(buyer.email || String(row.advertiser_id || "")) + '</small></td>' +
+                '<td>' + statusBadge(job.status || "unknown") + '</td>' +
+                '<td><span class="ledger-color-chip" style="background:' + palette[0] + ';color:' + palette[1] + '">' + escapeHTML(color) + '</span></td>' +
+                '<td>' + escapeHTML(currency + " " + amount(row.administration_fee)) + '</td>' +
+                '<td>' + escapeHTML(currency + " " + amount(row.color_fee)) + '</td>' +
+                '<td><strong>' + escapeHTML(currency + " " + amount(feeTotal)) + '</strong></td>' +
+                '<td><span class="ledger-fee-status ledger-fee-' + escapeHTML(status) + '">' + escapeHTML(statusLabel) + '</span></td>' +
+                '<td>' + escapeHTML(formatDate(row.created_at)) + '</td></tr>';
+        }).join("");
+    }
+
+    /* =====================================
        LOAD ALL ADMIN DATA
     ====================================== */
 
@@ -1915,6 +2013,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             allDeposits = data.deposits || [];
             allWithdrawals = data.withdrawals || [];
             allWallets = data.wallets || [];
+            allFeeLedger = data.administration_fee_ledger || [];
 
 
             // Attach roles to user profiles
@@ -1946,6 +2045,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderDeposits();
             renderWithdrawals();
             renderWallets();
+            renderAdministrationAccount();
 
 
             // Render deposit/withdraw requests and remaining wallet ledger entries.
@@ -2087,6 +2187,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const walletSearch = $("#walletSearch");
     if (walletSearch) walletSearch.addEventListener("input", renderWallets);
 
+    const administrationFeeSearch = $("#administrationFeeSearch");
+    if (administrationFeeSearch) administrationFeeSearch.addEventListener("input", renderAdministrationAccount);
+
+    const administrationFeeStatusFilter = $("#administrationFeeStatusFilter");
+    if (administrationFeeStatusFilter) administrationFeeStatusFilter.addEventListener("change", renderAdministrationAccount);
+
     const submissionFilter = $("#submissionStatusFilter");
 
     if (submissionFilter) {
@@ -2119,7 +2225,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         "refreshSubmissions",
         "refreshDeposits",
         "refreshWithdrawals",
-        "refreshWallets"
+        "refreshWallets",
+        "refreshAdministrationAccount"
 
     ];
 
