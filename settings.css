@@ -1,3 +1,4 @@
+
 :root{--settings-green:#12834b;--settings-green-dark:#09663a;--settings-bg:#f6faf7;--settings-border:#e4ebe6}
 .settings-page{min-height:100vh;background:var(--settings-bg);color:#172b21}
 .settings-topbar{height:70px;padding:0 max(24px,calc((100vw - 1180px)/2));display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid var(--settings-border)}
