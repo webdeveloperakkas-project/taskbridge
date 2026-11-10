@@ -277,6 +277,21 @@ console.log("TaskBridge User Login System Initialized.");
                 "TaskBridge User Login Successful."
             );
 
+            // Record this successful sign-in. Logging must never block dashboard access.
+            try {
+                const userAgent = navigator.userAgent || "";
+                const { error: loginLogError } = await supabaseClient.functions.invoke("log-login", {
+                    body: {
+                        device_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+                        user_agent: userAgent
+                    }
+                });
+                if (loginLogError) {
+                    console.warn("Login activity could not be recorded:", loginLogError);
+                }
+            } catch (loginLogError) {
+                console.warn("Login activity logging request failed:", loginLogError);
+            }
 
             // -----------------------------
             // USER DASHBOARD REDIRECT
