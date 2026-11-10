@@ -11,7 +11,6 @@
   <header class="profile-topbar">
     <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
     <div class="topbar-actions">
-      <a class="back-dashboard" href="./dashboard.html">← Dashboard</a>
       <label class="topbar-balance"><span>Available Balance</span><select id="profileWalletCurrency" aria-label="Wallet currency"><option>Loading</option></select><strong id="profileAvailableBalance">—</strong></label>
       <a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a>
       <span class="topbar-avatar" id="topbarAvatar">U</span>
@@ -19,8 +18,9 @@
   </header>
 
   <main class="profile-shell">
+    <a class="profile-back-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span> Back</a>
     <section class="profile-intro">
-      <div>
+      <div class="profile-intro-copy">
         <span class="eyebrow">ACCOUNT CENTER</span>
         <h1>Profile & Verification</h1>
         <p>Keep your personal information up to date and verify your identity securely.</p>
