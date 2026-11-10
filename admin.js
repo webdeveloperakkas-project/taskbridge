@@ -71,7 +71,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         "support_tickets",
         "platform_settings",
         "administration_fee_ledger",
-        "notifications"
+        "notifications",
+        "user_verification_submissions"
     ];
 
 
@@ -94,6 +95,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         verificationPanel: {
             title: "Account Verification",
             subtitle: "Review account verification status."
+        },
+
+        kycVerificationPanel: {
+            title: "ID & Address Review",
+            subtitle: "Securely review identity and proof-of-address documents."
         },
 
         buyerManagementPanel: {
@@ -1415,6 +1421,88 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     /* =====================================
+       IDENTITY & ADDRESS KYC REVIEW
+    ====================================== */
+
+    let allKycSubmissions = [];
+
+    function renderKycSubmissions() {
+        const tbody = $("#kycVerificationTable");
+        if (!tbody) return;
+        const status = $("#kycStatusFilter")?.value || "pending_review";
+        const type = $("#kycTypeFilter")?.value || "all";
+        const rows = allKycSubmissions.filter(row =>
+            (status === "all" || row.status === status) &&
+            (type === "all" || row.verification_type === type)
+        ).sort((a,b) => new Date(b.submitted_at) - new Date(a.submitted_at));
+
+        if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No matching verification submissions.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = rows.map(row => {
+            const user = allUsers.find(item => item.id === row.user_id);
+            const documentName = row.verification_type === "identity"
+                ? (row.document_type || "Identity document").replaceAll("_"," ")
+                : (row.address_document_type || "Address document").replaceAll("_"," ");
+            const country = row.country || row.address_country || "—";
+            const actions = row.status === "pending_review"
+                ? '<button type="button" class="action-btn" data-kyc-details="'+escapeHTML(row.id)+'">View Documents</button> <button type="button" class="action-btn kyc-approve-btn" data-kyc-approve="'+escapeHTML(row.id)+'">Approve</button> <button type="button" class="action-btn kyc-reject-btn" data-kyc-reject="'+escapeHTML(row.id)+'">Reject</button>'
+                : '<button type="button" class="action-btn" data-kyc-details="'+escapeHTML(row.id)+'">View Documents</button>';
+            return '<tr><td>'+escapeHTML(user?.full_name || user?.email || row.user_id)+'</td><td>'+escapeHTML(row.verification_type)+'</td><td>'+escapeHTML(documentName)+'</td><td>'+escapeHTML(country)+'</td><td>'+escapeHTML(formatDate(row.submitted_at))+'</td><td>'+statusBadge(row.status)+'</td><td class="kyc-actions">'+actions+'</td></tr>';
+        }).join("");
+    }
+
+    async function showKycDocuments(submissionId) {
+        const row = allKycSubmissions.find(item => item.id === submissionId);
+        const content = $("#kycDetailsContent");
+        if (!row || !content) return;
+        openModal($("#kycDetailsModal"));
+        content.innerHTML = '<p class="empty-state">Creating secure document links...</p>';
+        const paths = row.verification_type === "identity"
+            ? [["ID Front",row.front_path],["ID Back",row.back_path],["Live Selfie",row.selfie_path]]
+            : [["Address Proof",row.address_document_path]];
+        const links = await Promise.all(paths.filter(item => item[1]).map(async ([label,path]) => {
+            const {data,error}=await supabaseClient.storage.from("private-kyc-documents").createSignedUrl(path,300);
+            if(error) return '<div class="kyc-document-link"><strong>'+escapeHTML(label)+'</strong><span>Could not create secure link: '+escapeHTML(error.message)+'</span></div>';
+            return '<div class="kyc-document-link"><strong>'+escapeHTML(label)+'</strong><a href="'+escapeHTML(data.signedUrl)+'" target="_blank" rel="noopener">Open secure document ↗</a></div>';
+        }));
+        const details = row.verification_type === "identity"
+            ? [["Document Type",row.document_type],["Issuing Country",row.country]]
+            : [["Document Type",row.address_document_type],["Address",row.address_line],["City",row.city],["Region",row.region],["Postal Code",row.postal_code],["Country",row.address_country]];
+        content.innerHTML = '<div class="kyc-detail-grid">'+details.map(([label,value])=>'<div><small>'+escapeHTML(label)+'</small><strong>'+escapeHTML(value||"—")+'</strong></div>').join("")+'</div><div class="kyc-document-list">'+links.join("")+'</div>'+(row.admin_note?'<p class="admin-kyc-note"><strong>Previous review note:</strong> '+escapeHTML(row.admin_note)+'</p>':"");
+    }
+
+    async function reviewKyc(submissionId, approve) {
+        const row = allKycSubmissions.find(item => item.id === submissionId);
+        if (!row) return;
+        const note = approve ? (window.prompt("Optional approval note:", "") || "") : window.prompt("Please enter the reason for rejection:", "");
+        if (!approve && !note.trim()) { showToast("A rejection reason is required."); return; }
+        const {error}=await supabaseClient.from("user_verification_submissions").update({
+            status: approve ? "approved" : "rejected",
+            admin_note: note.trim() || null,
+            reviewed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        }).eq("id",submissionId);
+        if(error){console.error("KYC review failed:",error);showToast(error.message||"Could not update verification status.");return;}
+        showToast(approve ? "Verification approved." : "Verification rejected.");
+        await loadAdminData();
+    }
+
+    $("#kycStatusFilter")?.addEventListener("change",renderKycSubmissions);
+    $("#kycTypeFilter")?.addEventListener("change",renderKycSubmissions);
+    $("#refreshKyc")?.addEventListener("click",async()=>{await loadAdminData();showToast("Verification submissions refreshed.");});
+    document.addEventListener("click",event=>{
+        const details=event.target.closest("[data-kyc-details]");
+        const approve=event.target.closest("[data-kyc-approve]");
+        const reject=event.target.closest("[data-kyc-reject]");
+        if(details) showKycDocuments(details.dataset.kycDetails).catch(error=>{console.error(error);showToast("Could not open verification documents.");});
+        if(approve) reviewKyc(approve.dataset.kycApprove,true);
+        if(reject) reviewKyc(reject.dataset.kycReject,false);
+    });
+
+
+    /* =====================================
        VERIFICATION TABLE
     ====================================== */
 
@@ -2387,6 +2475,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             allWithdrawals = data.withdrawals || [];
             allWallets = data.wallets || [];
             allFeeLedger = data.administration_fee_ledger || [];
+            allKycSubmissions = data.user_verification_submissions || [];
 
 
             // Attach roles to user profiles
@@ -2414,6 +2503,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             renderUsers();
             renderLoginActivityUsers();
             renderVerification();
+            renderKycSubmissions();
             renderBuyerManagement();
             renderJobs();
             renderSubmissions();
