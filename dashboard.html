@@ -1276,11 +1276,13 @@
 
         <!-- JOB CARDS -->
 
-        <div class="job-table-header" aria-hidden="true">
-            <span>Job Name</span><span>Payment</span><span>Success Rate</span>
-            <span>TTR</span><span>Completed</span><span>Action</span>
+        <div class="job-table-scroll">
+            <div class="job-table-header" aria-hidden="true">
+                <span>Job Name</span><span>Payment</span><span>Success Rate</span>
+                <span>TTR</span><span>Completed</span><span>Action</span>
+            </div>
+            <div class="job-list job-table-list" id="jobList" aria-live="polite"></div>
         </div>
-        <div class="job-list job-table-list" id="jobList" aria-live="polite"></div>
 
 
         <!-- EMPTY STATE -->
@@ -1752,10 +1754,12 @@
                             <p>You haven't posted any jobs yet. Create your first job to get started.</p>
                             <a href="#postJobSection" class="primary-button" data-open-section="postJobSection">Create Your First Job</a>
                         </div>
-                        <div class="job-table-header posted-job-table-header" aria-hidden="true">
-                            <span>Job Name</span><span>Payment</span><span>Completed</span><span>Status</span>
+                        <div class="job-table-scroll posted-job-table-scroll">
+                            <div class="job-table-header posted-job-table-header" aria-hidden="true">
+                                <span>Job Name</span><span>Payment</span><span>Completed</span><span>Status</span>
+                            </div>
+                            <div id="postedJobsList" class="job-list" aria-live="polite"></div>
                         </div>
-                        <div id="postedJobsList" class="job-list" aria-live="polite"></div>
 
                     </section>
 
