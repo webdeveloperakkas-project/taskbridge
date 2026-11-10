@@ -654,10 +654,20 @@ document.addEventListener("DOMContentLoaded", function () {
             const matchesCategory = selectedFindCategory === "all" || category === selectedFindCategory;
             card.hidden = !(matchesSearch && matchesCategory);
         });
-        const visibleCount = Array.from(document.querySelectorAll("#findJobSection .job-table-row"))
-            .filter(card => !card.hidden).length;
+        const rows = Array.from(document.querySelectorAll("#findJobSection .job-table-row"));
+        const visibleCount = rows.filter(card => !card.hidden).length;
         const countNode = document.getElementById("jobResultsCount");
         if (countNode) countNode.textContent = visibleCount + (visibleCount === 1 ? " Job" : " Jobs");
+        const empty = document.getElementById("jobEmptyState");
+        if (empty) {
+            empty.hidden = visibleCount !== 0;
+            const heading = empty.querySelector("h3");
+            const message = empty.querySelector("p");
+            if (heading) heading.textContent = publicJobs.length ? "No Matching Jobs" : "No Jobs Available Yet";
+            if (message) message.textContent = publicJobs.length
+                ? "No jobs match your current search or category. Try another filter."
+                : "There are currently no approved jobs available. Please check back later.";
+        }
     }
 
     if (jobSearchInput) jobSearchInput.addEventListener("input", filterAvailableJobs);
