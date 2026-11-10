@@ -91,6 +91,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             subtitle: "Review account verification status."
         },
 
+        buyerManagementPanel: {
+            title: "Buyer Management",
+            subtitle: "Review buyer job statistics and wallet balances."
+        },
+
         jobsPanel: {
             title: "Job Management",
             subtitle: "Manage all platform job listings."
@@ -1905,6 +1910,85 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     /* =====================================
+       BUYER MANAGEMENT
+    ====================================== */
+
+    function renderBuyerManagement() {
+        const container = $("#buyerManagementList");
+        if (!container) return;
+        const amount = value => Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const state = job => String(job.status || "").toLowerCase();
+        const running = job => ["active", "running"].includes(state(job));
+        const pending = job => ["pending", "pending_review"].includes(state(job));
+        const completed = job => state(job) === "completed";
+        const closed = job => ["cancelled", "canceled", "closed", "rejected", "expired"].includes(state(job));
+        const grouped = new Map();
+        allJobs.forEach(job => {
+            if (!job.advertiser_id) return;
+            if (!grouped.has(job.advertiser_id)) grouped.set(job.advertiser_id, []);
+            grouped.get(job.advertiser_id).push(job);
+        });
+        const buyers = Array.from(grouped.entries()).map(([id, jobs]) => {
+            const profile = allUsers.find(user => user.id === id) || {};
+            const balances = {};
+            allWallets.filter(wallet => wallet.user_id === id).forEach(wallet => {
+                const currency = String(wallet.currency || "USD").toUpperCase();
+                if (!balances[currency]) balances[currency] = { available: 0, held: 0 };
+                balances[currency].available += Number(wallet.available_balance || 0);
+                balances[currency].held += Number(wallet.held_balance || 0);
+            });
+            const categories = {};
+            jobs.forEach(job => {
+                const category = allCategories.find(item => item.id === job.category_id);
+                const name = category?.name || "Uncategorized";
+                categories[name] = (categories[name] || 0) + 1;
+            });
+            return { id, profile, jobs, balances, categories,
+                running: jobs.filter(running).length,
+                pending: jobs.filter(pending).length,
+                completed: jobs.filter(completed).length,
+                closed: jobs.filter(closed).length };
+        }).sort((a,b) => b.jobs.length-a.jobs.length);
+
+        const all = allJobs;
+        const set = (id,value) => { const el=document.getElementById(id); if(el) el.textContent=String(value); };
+        set("buyerTotalCount", buyers.length);
+        set("buyerTotalJobs", all.length);
+        set("buyerRunningJobs", all.filter(running).length);
+        set("buyerPendingJobs", all.filter(pending).length);
+        set("buyerCompletedJobs", all.filter(completed).length);
+        set("buyerClosedJobs", all.filter(closed).length);
+
+        const search = ($("#buyerManagementSearch")?.value || "").trim().toLowerCase();
+        const filter = $("#buyerManagementStatus")?.value || "all";
+        const filtered = buyers.filter(b => {
+            const p=b.profile;
+            const match=[p.full_name,p.email,b.id].some(v=>String(v||"").toLowerCase().includes(search));
+            const stateMatch=filter==="all" || (filter==="running"&&b.running>0) || (filter==="pending"&&b.pending>0) || (filter==="completed"&&b.completed>0) || (filter==="closed"&&b.closed>0);
+            return match&&stateMatch;
+        });
+        if (!filtered.length) {
+            container.innerHTML='<div class="admin-card empty-state">'+(buyers.length?"No buyers match your search or filter.":"No buyers yet. Users will appear here automatically after posting their first job.")+'</div>';
+            return;
+        }
+        container.innerHTML=filtered.map(b=>{
+            const p=b.profile, name=p.full_name||p.email||"Buyer", detailsId="buyerJobs-"+b.id;
+            const categoryHtml=Object.entries(b.categories).sort((a,z)=>z[1]-a[1]).map(([n,count])=>'<span class="buyer-category-chip">'+escapeHTML(n)+' <strong>'+count+'</strong></span>').join("");
+            const balanceHtml=Object.entries(b.balances).sort(([a],[z])=>a.localeCompare(z)).map(([currency,v])=>'<div class="buyer-balance-currency"><span>'+escapeHTML(currency)+'</span><strong>Available '+amount(v.available)+'</strong><strong>Held '+amount(v.held)+'</strong></div>').join("");
+            const rows=b.jobs.slice().sort((a,z)=>new Date(z.created_at||0)-new Date(a.created_at||0)).map(job=>{
+                const cat=allCategories.find(x=>x.id===job.category_id);
+                return '<tr><td>'+escapeHTML(job.title||"Untitled Job")+'<small class="buyer-job-subtext">'+escapeHTML(cat?.name||"Uncategorized")+'</small></td><td>'+statusBadge(job.status)+'</td><td>'+escapeHTML(String(job.total_slots??"—"))+'</td><td>'+escapeHTML(String(job.completed_slots??"—"))+'</td><td>'+escapeHTML(String(job.currency||"USD").toUpperCase())+' '+amount(job.remaining_budget??0)+'</td><td>'+formatDate(job.created_at)+'</td></tr>';
+            }).join("");
+            return '<article class="admin-card buyer-profile-card"><div class="buyer-card-top"><div class="table-user"><div class="table-user-avatar buyer-avatar">'+escapeHTML(name.charAt(0).toUpperCase())+'</div><div><strong>'+escapeHTML(name)+'</strong><small>'+escapeHTML(p.email||b.id)+'</small></div></div><span class="buyer-role-pill">BUYER</span></div>'+
+                '<div class="buyer-metric-grid"><div><span>Total Jobs</span><strong>'+b.jobs.length+'</strong></div><div><span>Running</span><strong>'+b.running+'</strong></div><div><span>Completed</span><strong>'+b.completed+'</strong></div><div><span>Pending</span><strong>'+b.pending+'</strong></div><div><span>Closed</span><strong>'+b.closed+'</strong></div></div>'+
+                '<div class="buyer-card-lower"><div><span class="buyer-summary-label">JOB CATEGORIES</span><div class="buyer-category-list">'+(categoryHtml||'<span class="buyer-muted">No category data</span>')+'</div></div><div><span class="buyer-summary-label">WALLET BALANCES</span>'+(balanceHtml||'<span class="buyer-muted">No wallet record</span>')+'</div></div>'+
+                '<div class="buyer-card-footer"><span class="buyer-id">ID: '+escapeHTML(b.id)+'</span><button type="button" class="buyer-details-btn" data-buyer-details="'+escapeHTML(detailsId)+'">View All Jobs <span>→</span></button></div>'+
+                '<div class="buyer-jobs-details" id="'+escapeHTML(detailsId)+'" hidden><div class="buyer-details-heading"><strong>All Jobs by '+escapeHTML(name)+'</strong><span>'+b.jobs.length+' total</span></div><div class="table-responsive"><table class="admin-table buyer-jobs-table"><thead><tr><th>Job / Category</th><th>Status</th><th>Total Slots</th><th>Completed Slots</th><th>Remaining Held</th><th>Posted</th></tr></thead><tbody>'+rows+'</tbody></table></div></div></article>';
+        }).join("");
+    }
+
+
+    /* =====================================
        ADMINISTRATION ACCOUNT / FEE LEDGER
     ====================================== */
 
@@ -2040,6 +2124,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             renderUsers();
             renderVerification();
+            renderBuyerManagement();
             renderJobs();
             renderSubmissions();
             renderDeposits();
@@ -2187,6 +2272,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     const walletSearch = $("#walletSearch");
     if (walletSearch) walletSearch.addEventListener("input", renderWallets);
 
+    const buyerSearch = $("#buyerManagementSearch");
+    if (buyerSearch) buyerSearch.addEventListener("input", renderBuyerManagement);
+    const buyerFilter = $("#buyerManagementStatus");
+    if (buyerFilter) buyerFilter.addEventListener("change", renderBuyerManagement);
+    document.addEventListener("click", function(event) {
+        const button = event.target.closest("[data-buyer-details]");
+        if (!button) return;
+        const panel = document.getElementById(button.dataset.buyerDetails);
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        button.innerHTML = panel.hidden ? 'View All Jobs <span>→</span>' : 'Hide Jobs <span>↑</span>';
+    });
+
     const administrationFeeSearch = $("#administrationFeeSearch");
     if (administrationFeeSearch) administrationFeeSearch.addEventListener("input", renderAdministrationAccount);
 
@@ -2221,6 +2319,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const refreshButtons = [
 
         "refreshUsers",
+        "refreshBuyerManagement",
         "refreshJobs",
         "refreshSubmissions",
         "refreshDeposits",
