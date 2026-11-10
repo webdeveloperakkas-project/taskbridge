@@ -1988,7 +1988,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             return rank(a) - rank(b);
         });
         if (!filtered.length) {
-            container.innerHTML='<div class="admin-card empty-state">'+(buyers.length?"No buyers match your search or filter.":"No buyers yet. Users will appear here automatically after posting their first job.")+'</div>';
+            const emptyMessage = search
+                ? "No buyer available. No Buyer found for this User ID or Email."
+                : (buyers.length
+                    ? "No buyers match the selected activity filter."
+                    : "No buyers yet. Users will appear here automatically after posting their first job.");
+            container.innerHTML = '<div class="admin-card empty-state buyer-no-results"><strong>' + escapeHTML(emptyMessage) + '</strong></div>';
             return;
         }
         container.innerHTML=filtered.map(b=>{
