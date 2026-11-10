@@ -601,23 +601,31 @@
                     </section>
 
                     <!-- DASHBOARD OVERVIEW CARDS -->
-                    <section class="stats-grid">
-                        <div class="stat-card">
+                    <section class="stats-grid dashboard-stats-grid" aria-label="Account overview">
+                        <article class="stat-card dashboard-stat-card dashboard-stat-wallet">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-wallet"></use></svg></div>
-                            <p>Wallet Balance</p><h3>—</h3>
-                        </div>
-                        <div class="stat-card">
+                            <p>Wallet Balance</p>
+                            <h3 id="dashboardWalletBalance">Loading...</h3>
+                            <span class="dashboard-stat-caption">Available balance</span>
+                        </article>
+                        <article class="stat-card dashboard-stat-card dashboard-stat-completed">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
-                            <p>Jobs Completed</p><h3>—</h3>
-                        </div>
-                        <div class="stat-card">
+                            <p>Jobs Completed</p>
+                            <h3 id="dashboardJobsCompleted">—</h3>
+                            <span class="dashboard-stat-caption">Approved submissions</span>
+                        </article>
+                        <article class="stat-card dashboard-stat-card dashboard-stat-submitted">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
-                            <p>Jobs Submitted</p><h3>—</h3>
-                        </div>
-                        <div class="stat-card">
+                            <p>Jobs Submitted</p>
+                            <h3 id="dashboardJobsSubmitted">—</h3>
+                            <span class="dashboard-stat-caption">Your total submissions</span>
+                        </article>
+                        <article class="stat-card dashboard-stat-card dashboard-stat-posted">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-briefcase"></use></svg></div>
-                            <p>Active Posted Jobs</p><h3>—</h3>
-                        </div>
+                            <p>Jobs Posted</p>
+                            <h3 id="dashboardJobsPosted">—</h3>
+                            <span class="dashboard-stat-caption">All your posted jobs</span>
+                        </article>
                     </section>
 
                     <!-- RECENT JOBS -->
