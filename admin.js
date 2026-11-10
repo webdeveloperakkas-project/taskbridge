@@ -1457,7 +1457,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const row = allKycSubmissions.find(item => item.id === submissionId);
         const content = $("#kycDetailsContent");
         if (!row || !content) return;
-        openModal($("#kycDetailsModal"));
+        openModal("kycDetailsModal");
         content.innerHTML = '<p class="empty-state">Creating secure document links...</p>';
         const paths = row.verification_type === "identity"
             ? [["ID Front",row.front_path],["ID Back",row.back_path],["Live Selfie",row.selfie_path]]
