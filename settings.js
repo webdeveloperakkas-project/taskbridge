@@ -71,44 +71,64 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   sendEmailCode.addEventListener("click",async()=>{
     const nextEmail=newEmailInput.value.trim().toLowerCase();
+    const currentEmail=String(user.email||"").trim().toLowerCase();
     showMessage(accountMessage,"");
     if(!nextEmail||!newEmailInput.checkValidity()){
       showMessage(accountMessage,"Please enter a valid new email address.",true);return;
     }
-    if(nextEmail===String(user.email||"").toLowerCase()){
+    if(!currentEmail){
+      showMessage(accountMessage,"Your current account email could not be identified. Please sign in again.",true);return;
+    }
+    if(nextEmail===currentEmail){
       showMessage(accountMessage,"Please enter an email address different from your current one.",true);return;
     }
     sendEmailCode.disabled=true;
     sendEmailCode.textContent="Sending...";
-    const result=await client.auth.updateUser({email:nextEmail});
-    sendEmailCode.disabled=false;
-    sendEmailCode.textContent="Send Code";
-    if(result.error){showMessage(accountMessage,result.error.message,true);return}
-    pendingEmail=nextEmail;
-    emailOtpArea.hidden=false;
-    emailOtp.focus();
-    showMessage(accountMessage,"Verification code sent. Check your new email address.");
+    try{
+      const result=await client.auth.signInWithOtp({
+        email:currentEmail,
+        options:{shouldCreateUser:false}
+      });
+      if(result.error)throw result.error;
+      pendingEmail=nextEmail;
+      emailOtpArea.hidden=false;
+      emailOtp.focus();
+      showMessage(accountMessage,"A verification code has been sent to your current email address: "+currentEmail+".");
+    }catch(error){
+      showMessage(accountMessage,error.message||"Could not send a verification code to your current email.",true);
+    }finally{
+      sendEmailCode.disabled=false;
+      sendEmailCode.textContent="Send Code";
+    }
   });
 
   emailForm.addEventListener("submit",async event=>{
     event.preventDefault();
     const token=emailOtp.value.trim();
+    const currentEmail=String(user.email||"").trim().toLowerCase();
     if(!pendingEmail){showMessage(accountMessage,"Please send a verification code first.",true);return}
-    if(!token){showMessage(accountMessage,"Please enter the verification code.",true);return}
+    if(!token){showMessage(accountMessage,"Please enter the verification code sent to your current email.",true);return}
     saveEmailChange.disabled=true;
     saveEmailChange.textContent="Verifying...";
-    const result=await client.auth.verifyOtp({email:pendingEmail,token,type:"email_change"});
-    saveEmailChange.disabled=false;
-    saveEmailChange.textContent="Save";
-    if(result.error){showMessage(accountMessage,"Verification failed: "+result.error.message,true);return}
-    user=result.data.user||user;
-    emailInput.value=user.email||pendingEmail;
-    emailForm.reset();
-    emailForm.hidden=true;
-    emailOtpArea.hidden=true;
-    showEmailChange.hidden=false;
-    pendingEmail="";
-    showMessage(accountMessage,"Your email address has been changed successfully.");
+    try{
+      const verification=await client.auth.verifyOtp({email:currentEmail,token,type:"email"});
+      if(verification.error)throw verification.error;
+      user=verification.data.user||user;
+      saveEmailChange.textContent="Updating...";
+      const update=await client.auth.updateUser({email:pendingEmail});
+      if(update.error)throw update.error;
+      emailForm.reset();
+      emailForm.hidden=true;
+      emailOtpArea.hidden=true;
+      showEmailChange.hidden=false;
+      pendingEmail="";
+      showMessage(accountMessage,"Your current email has been verified. A confirmation message has been sent to your new email address. Complete that confirmation to finish changing your email.");
+    }catch(error){
+      showMessage(accountMessage,"Email change could not be completed: "+(error.message||"Please check the code and try again."),true);
+    }finally{
+      saveEmailChange.disabled=false;
+      saveEmailChange.textContent="Save";
+    }
   });
 
   const prefs={news_updates:true,payment_received:true,payment_receipts:true,deposit_updates:true,withdrawal_updates:true,job_updates:true,submission_updates:true,job_status_updates:true,security_alerts:true,...(user.user_metadata?.notification_preferences||{})};
