@@ -559,6 +559,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const workerReward = document.getElementById("workerReward");
     const workersRequired = document.getElementById("workersRequired");
     const totalJobBudget = document.getElementById("totalJobBudget");
+    const cardColorOptions = document.querySelector(".card-color-options");
     const cardColorFees = {
         white: 0,
         blue: 0.10,
@@ -575,7 +576,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function calculateJobBudget() {
-        if (!workerReward || !workersRequired || !totalJobBudget) return;
+        const jobBudgetNode = document.getElementById("jobBudgetAmount");
+        const platformFeeNode = document.getElementById("platformFeeAmount");
+        const colorFeeNode = document.getElementById("cardColorFeeAmount");
+
+        if (!workerReward || !workersRequired || !totalJobBudget ||
+            !jobBudgetNode || !platformFeeNode || !colorFeeNode) return;
 
         const reward = Math.max(0, Number.parseFloat(workerReward.value) || 0);
         const workers = Math.max(0, Number.parseInt(workersRequired.value, 10) || 0);
@@ -583,27 +589,43 @@ document.addEventListener("DOMContentLoaded", function () {
         const platformFee = Math.round((jobBudget * platformFeeRateForPreview / 100 + Number.EPSILON) * 100) / 100;
         const colorFee = cardColorFees[getSelectedCardColor()] ?? 0;
         const total = Math.round((jobBudget + platformFee + colorFee + Number.EPSILON) * 100) / 100;
-
         const money = value => "$" + value.toFixed(2);
-        const jobBudgetNode = document.getElementById("jobBudgetAmount");
-        const platformFeeNode = document.getElementById("platformFeeAmount");
-        const colorFeeNode = document.getElementById("cardColorFeeAmount");
-        if (jobBudgetNode) jobBudgetNode.textContent = money(jobBudget);
-        if (platformFeeNode) platformFeeNode.textContent = money(platformFee);
-        if (colorFeeNode) colorFeeNode.textContent = money(colorFee);
+
+        jobBudgetNode.textContent = money(jobBudget);
+        platformFeeNode.textContent = money(platformFee);
+        colorFeeNode.textContent = money(colorFee);
         totalJobBudget.textContent = money(total);
 
         document.querySelectorAll(".card-color-option").forEach(option => {
             const input = option.querySelector('input[name="cardColor"]');
-            option.classList.toggle("selected", Boolean(input?.checked));
+            const selected = Boolean(input?.checked);
+            option.classList.toggle("selected", selected);
+            option.setAttribute("aria-checked", selected ? "true" : "false");
         });
     }
 
     if (workerReward) workerReward.addEventListener("input", calculateJobBudget);
     if (workersRequired) workersRequired.addEventListener("input", calculateJobBudget);
-    document.querySelectorAll('input[name="cardColor"]').forEach(input => {
-        input.addEventListener("change", calculateJobBudget);
-    });
+
+    if (cardColorOptions) {
+        cardColorOptions.addEventListener("change", event => {
+            if (event.target.matches('input[name="cardColor"]')) calculateJobBudget();
+        });
+
+        // Make the entire color tile reliably selectable, including its preview and fee.
+        cardColorOptions.addEventListener("click", event => {
+            const option = event.target.closest(".card-color-option");
+            const input = option?.querySelector('input[name="cardColor"]');
+            if (!input) return;
+
+            if (!input.checked) {
+                input.checked = true;
+                input.dispatchEvent(new Event("change", { bubbles: true }));
+            } else {
+                calculateJobBudget();
+            }
+        });
+    }
 
     calculateJobBudget();
 
