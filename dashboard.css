@@ -4239,3 +4239,26 @@ button.header-balance {
     .top-header .wallet-balance-dropdown { max-width: 36% !important; }
     .top-header .header-right { gap: 4px !important; }
 }
+
+
+/* MOBILE HEADER SPACING: shift wallet left and evenly space right-side actions */
+@media (max-width: 600px) {
+    .top-header .wallet-balance-dropdown {
+        left: calc(50% - 24px) !important;
+    }
+    .top-header .header-right {
+        gap: 14px !important;
+    }
+    .top-header .notification-dropdown,
+    .top-header .profile-dropdown {
+        margin: 0 !important;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .wallet-balance-dropdown {
+        left: calc(50% - 20px) !important;
+    }
+    .top-header .header-right {
+        gap: 10px !important;
+    }
+}
