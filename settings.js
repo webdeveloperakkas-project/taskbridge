@@ -11,7 +11,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   if(error||!data.session){window.location.replace("./login.html");return}
   let user=data.session.user;
 
-  const accountMessage=document.getElementById("accountMessage");
+  async function loadSharedHeader(){
+    const {data:sessionData,error:sessionError}=await client.auth.getSession();
+    if(sessionError||!sessionData.session){window.location.replace("./login.html");return}
+    const user=sessionData.session.user;
+    const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
+    document.getElementById("topbarAvatar").textContent=name.trim().charAt(0).toUpperCase()||"U";
+    const toggle=document.getElementById("profileWalletToggle"),menu=document.getElementById("profileWalletMenu"),balance=document.getElementById("profileAvailableBalance");
+    try{
+      const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
+      if(error)throw error;
+      const rows=wallets||[],funded=rows.filter(row=>Number(row.available_balance)>0);
+      let selected=funded.find(row=>row.currency==="USD")||funded[0]||rows.find(row=>row.currency==="USD")||rows[0]||{currency:"USD",available_balance:0};
+      const money=(amount,currency)=>{try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency||"USD"}).format(Number(amount)||0)}catch{return (currency||"USD")+" "+(Number(amount)||0).toFixed(2)}};
+      const symbols={BDT:"৳",USD:"$",USDT:"₮"};
+      const render=()=>{balance.textContent=money(selected.available_balance,selected.currency);menu.innerHTML=funded.length?funded.map(row=>'<button type="button" class="wallet-currency-option'+(row.currency===selected.currency?' active':'')+'" data-currency="'+String(row.currency).replace(/[^A-Z0-9]/gi,'')+'"><span class="wallet-currency-option-icon">'+(symbols[row.currency]||row.currency)+'</span><span class="wallet-currency-option-name">'+row.currency+'</span><strong>'+money(row.available_balance,row.currency)+'</strong></button>').join(""):'<p class="profile-wallet-empty">No funded wallets available</p>';menu.querySelectorAll("[data-currency]").forEach(button=>button.addEventListener("click",()=>{selected=funded.find(row=>String(row.currency).replace(/[^A-Z0-9]/gi,'')===button.dataset.currency)||selected;render();menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}))};
+      toggle.addEventListener("click",event=>{event.stopPropagation();const open=menu.classList.contains("show");menu.classList.toggle("show",!open);toggle.setAttribute("aria-expanded",String(!open))});
+      document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
+      render();
+    }catch(error){console.warn("Header wallet could not load:",error);balance.textContent="—"}
+  }\n  await loadSharedHeader();\n\n  const accountMessage=document.getElementById("accountMessage");
   const securityMessage=document.getElementById("securityMessage");
   const emailInput=document.getElementById("accountEmail");
   const emailForm=document.getElementById("emailForm");
