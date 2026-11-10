@@ -587,268 +587,64 @@
                     class="page-section active">
 
 
-                    <!-- DEMO NOTICE -->
-
-                    <div class="demo-notice">
-
-                        <strong>Dashboard Preview</strong>
-
-                        <p>
-                            The information displayed here is sample data.
-                            Your real account information will appear after
-                            backend integration.
-                        </p>
-
-                    </div>
-
-
                     <!-- WELCOME SECTION -->
-
                     <section class="welcome-section">
-
                         <div class="welcome-content">
-
                             <span>YOUR WORKSPACE</span>
-
                             <h1>Welcome to TaskBridge!</h1>
-
-                            <p>
-                                Find opportunities, complete tasks,
-                                or create your own jobs.
-                            </p>
-
+                            <p>Find opportunities, complete tasks, or create your own jobs.</p>
                             <div class="welcome-actions">
-
-                                <a href="#findJobSection"
-                                    class="primary-button"
-                                    data-open-section="findJobSection">
-                                    Find a Job
-                                </a>
-
-                                <a href="#postJobSection"
-                                    class="secondary-button"
-                                    data-open-section="postJobSection">
-                                    Post a Job
-                                </a>
-
+                                <a href="#findJobSection" class="primary-button" data-open-section="findJobSection">Find a Job</a>
+                                <a href="#postJobSection" class="secondary-button" data-open-section="postJobSection">Post a Job</a>
                             </div>
-
                         </div>
-
                     </section>
 
-
-                    <!-- STATISTICS CARDS -->
-
+                    <!-- DASHBOARD OVERVIEW CARDS -->
                     <section class="stats-grid">
-
                         <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <svg class="icon">
-                                    <use href="#icon-wallet"></use>
-                                </svg>
-                            </div>
-                            <p>Wallet Balance</p>
-                            <h3>$25.50</h3>
+                            <div class="stat-card-icon"><svg class="icon"><use href="#icon-wallet"></use></svg></div>
+                            <p>Wallet Balance</p><h3>—</h3>
                         </div>
-
                         <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <svg class="icon">
-                                    <use href="#icon-clipboard"></use>
-                                </svg>
-                            </div>
-                            <p>Jobs Completed</p>
-                            <h3>12</h3>
+                            <div class="stat-card-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
+                            <p>Jobs Completed</p><h3>—</h3>
                         </div>
-
                         <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <svg class="icon">
-                                    <use href="#icon-clipboard"></use>
-                                </svg>
-                            </div>
-                            <p>Jobs Submitted</p>
-                            <h3>8</h3>
+                            <div class="stat-card-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
+                            <p>Jobs Submitted</p><h3>—</h3>
                         </div>
-
                         <div class="stat-card">
-                            <div class="stat-card-icon">
-                                <svg class="icon">
-                                    <use href="#icon-briefcase"></use>
-                                </svg>
-                            </div>
-                            <p>Active Posted Jobs</p>
-                            <h3>2</h3>
+                            <div class="stat-card-icon"><svg class="icon"><use href="#icon-briefcase"></use></svg></div>
+                            <p>Active Posted Jobs</p><h3>—</h3>
                         </div>
-
                     </section>
 
-
-                    <!-- QUICK ACTIONS -->
-
-                    <section class="content-panel quick-actions-panel">
-
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Quick Actions</h2>
-                                <p>Choose what you want to do next.</p>
+                    <!-- LATEST AVAILABLE JOBS -->
+                    <section class="content-panel dashboard-recent-jobs">
+                        <div class="recent-jobs-heading">
+                            <div class="recent-jobs-title">
+                                <span class="recent-jobs-kicker">FRESH OPPORTUNITIES</span>
+                                <h2>Recent Jobs</h2>
+                                <p>Explore the latest jobs posted by the TaskBridge community.</p>
                             </div>
+                            <a href="#findJobSection" class="recent-jobs-all-link" data-open-section="findJobSection">
+                                <span>All Jobs</span><svg class="icon"><use href="#icon-arrow-right"></use></svg>
+                            </a>
                         </div>
-
-                        <div class="quick-actions-grid">
-
-                            <a href="#findJobSection"
-                                class="quick-action-card"
-                                data-open-section="findJobSection">
-
-                                <svg class="icon">
-                                    <use href="#icon-search"></use>
-                                </svg>
-
-                                <strong>Find a Job</strong>
-                                <span>Explore available tasks</span>
-
-                            </a>
-
-
-                            <a href="#postJobSection"
-                                class="quick-action-card"
-                                data-open-section="postJobSection">
-
-                                <svg class="icon">
-                                    <use href="#icon-plus"></use>
-                                </svg>
-
-                                <strong>Post a Job</strong>
-                                <span>Create a new task</span>
-
-                            </a>
-
-
-                            <a href="./deposit.html"
-                                class="quick-action-card">
-
-                                <svg class="icon">
-                                    <use href="#icon-wallet"></use>
-                                </svg>
-
-                                <strong>Deposit</strong>
-                                <span>Add funds to your wallet</span>
-
-                            </a>
-
-
-                            <a href="./withdraw.html"
-                                class="quick-action-card">
-
-                                <svg class="icon">
-                                    <use href="#icon-wallet"></use>
-                                </svg>
-
-                                <strong>Withdraw</strong>
-                                <span>Request a withdrawal</span>
-
-                            </a>
-
+                        <div class="recent-jobs-table-head" aria-hidden="true">
+                            <span>JOB</span><span>CATEGORY</span><span>PAYMENT</span><span>DURATION</span><span>WORKERS</span><span>ACTION</span>
                         </div>
-
+                        <div id="dashboardRecentJobsList" class="dashboard-recent-jobs-list">
+                            <div class="recent-jobs-empty">Loading latest jobs...</div>
+                        </div>
+                        <div id="dashboardRecentJobsEmpty" class="recent-jobs-empty" hidden>
+                            No recent jobs are available right now. Please check again soon.
+                        </div>
+                        <div class="recent-jobs-footer">
+                            <a href="#findJobSection" data-open-section="findJobSection">More Jobs <span aria-hidden="true">→</span></a>
+                        </div>
                     </section>
-
-
-                    <!-- RECENT ACTIVITY -->
-
-                    <section class="content-panel activity-panel">
-
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Recent Activity</h2>
-                                <p>Your latest example account activities.</p>
-                            </div>
-                        </div>
-
-                        <div class="activity-list">
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-clipboard"></use>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <strong>Job submission example</strong>
-                                    <p>Your task submission was received.</p>
-                                    <small>Example activity</small>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-wallet"></use>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <strong>Wallet transaction example</strong>
-                                    <p>A sample wallet transaction is displayed.</p>
-                                    <small>Example activity</small>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <svg class="icon">
-                                        <use href="#icon-briefcase"></use>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <strong>Job listing example</strong>
-                                    <p>Your example job listing is available.</p>
-                                    <small>Example activity</small>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- WALLET SUMMARY -->
-
-                    <section class="content-panel wallet-summary-panel">
-
-                        <div class="panel-heading">
-                            <div>
-                                <h2>Wallet Summary</h2>
-                                <p>Your example wallet overview.</p>
-                            </div>
-
-                            <a href="#walletSection" class="view-all-link" data-section="walletSection">
-                                View Wallet
-                            </a>
-                        </div>
-
-                        <div class="wallet-summary-grid">
-
-                            <div>
-                                <small>Available Balance</small>
-                                <h3 id="availableBalanceOverview">Loading...</h3>
-                            </div>
-
-                            <div>
-                                <small>Total Earnings</small>
-                                <h3>$15.50</h3>
-                            </div>
-
-                            <div>
-                                <small>Total Deposits</small>
-                                <h3>$10.00</h3>
-                            </div>
-
-                        </div>
-
-                    </section>
-
 
                     <!-- MY RECENT POSTED JOBS -->
 
