@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUser = null;
     let categoryRows = [];
     let postedJobsChannel = null;
+    let publicJobsChannel = null;
+    let publicJobs = [];
     let walletChannel = null;
     let walletCurrency = "USD";
     let walletAvailableBalance = 0;
@@ -641,64 +643,34 @@ document.addEventListener("DOMContentLoaded", function () {
     const jobSortFilter = document.getElementById("jobSortFilter");
 
 
+    let selectedFindCategory = "all";
+
     function filterAvailableJobs() {
-
-        const searchTerm = jobSearchInput
-            ? jobSearchInput.value.trim().toLowerCase()
-            : "";
-
-        const selectedCategory = jobCategoryFilter
-            ? jobCategoryFilter.value.toLowerCase()
-            : "all";
-
-
-        const jobCards = document.querySelectorAll(
-            "#findJobSection .job-card"
-        );
-
-
-        jobCards.forEach(function (card) {
-
-            const title = (
-                card.dataset.title ||
-                card.textContent
-            ).toLowerCase();
-
-            const category = (
-                card.dataset.category || ""
-            ).toLowerCase();
-
+        const searchTerm = jobSearchInput ? jobSearchInput.value.trim().toLowerCase() : "";
+        document.querySelectorAll("#findJobSection .job-table-row").forEach(card => {
+            const title = (card.dataset.title || "").toLowerCase();
+            const category = (card.dataset.category || "").toLowerCase();
             const matchesSearch = title.includes(searchTerm);
-
-            const matchesCategory =
-                selectedCategory === "all" ||
-                category === selectedCategory;
-
+            const matchesCategory = selectedFindCategory === "all" || category === selectedFindCategory;
             card.hidden = !(matchesSearch && matchesCategory);
-
         });
-
+        const visibleCount = Array.from(document.querySelectorAll("#findJobSection .job-table-row"))
+            .filter(card => !card.hidden).length;
+        const countNode = document.getElementById("jobResultsCount");
+        if (countNode) countNode.textContent = visibleCount + (visibleCount === 1 ? " Job" : " Jobs");
     }
 
+    if (jobSearchInput) jobSearchInput.addEventListener("input", filterAvailableJobs);
 
-    if (jobSearchInput) {
-
-        jobSearchInput.addEventListener(
-            "input",
-            filterAvailableJobs
-        );
-
-    }
-
-
-    if (jobCategoryFilter) {
-
-        jobCategoryFilter.addEventListener(
-            "change",
-            filterAvailableJobs
-        );
-
-    }
+    document.querySelectorAll("#findJobSection .job-category-item").forEach(button => {
+        button.addEventListener("click", () => {
+            selectedFindCategory = String(button.dataset.category || "all").toLowerCase();
+            document.querySelectorAll("#findJobSection .job-category-item").forEach(item => {
+                item.classList.toggle("active", item === button);
+            });
+            filterAvailableJobs();
+        });
+    });
 
 
     /* =====================================
@@ -716,7 +688,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!jobContainer) return;
 
             const cards = Array.from(
-                jobContainer.querySelectorAll(".job-card")
+                jobContainer.querySelectorAll(".job-table-row")
             );
 
             const sortType = jobSortFilter.value;
@@ -1401,6 +1373,163 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function formatJobDuration(minutes) {
+        const value = Math.max(0, Number(minutes) || 0);
+        if (value < 60) return value + "m";
+        const hours = value / 60;
+        return Number.isInteger(hours) ? hours + "h" : hours.toFixed(1) + "h";
+    }
+
+    function getJobCategory(job) {
+        return categoryRows.find(category => category.id === job.category_id) || null;
+    }
+
+    function createJobCell(className, value) {
+        const cell = document.createElement("span");
+        cell.className = "job-table-cell " + (className || "");
+        cell.textContent = value == null || value === "" ? "—" : String(value);
+        return cell;
+    }
+
+    function openJobDetails(jobId) {
+        const job = publicJobs.find(item => item.id === jobId);
+        if (!job) return;
+        const category = getJobCategory(job);
+        const categoryNode = document.getElementById("detailJobCategory");
+        const titleNode = document.getElementById("detailJobTitle");
+        const subtitleNode = document.getElementById("detailJobSubtitle");
+        const statusNode = document.getElementById("detailJobStatus");
+        const iconNode = document.getElementById("detailJobIcon");
+        if (categoryNode) categoryNode.textContent = category?.name || "Uncategorized";
+        if (titleNode) titleNode.textContent = job.title || "Untitled Job";
+        if (subtitleNode) subtitleNode.textContent =
+            formatWalletMoney(job.reward_per_worker, job.currency || "USD") +
+            " per worker · " + Number(job.total_slots || 0) + " total workers · " +
+            formatJobDuration(job.duration_minutes);
+        if (statusNode) {
+            statusNode.textContent = "Active";
+            statusNode.className = "job-status active";
+        }
+        if (iconNode) {
+            const iconMap = { facebook: "icon-facebook", youtube: "icon-youtube",
+                instagram: "icon-instagram", twitter: "icon-twitter",
+                tiktok: "icon-music", website: "icon-globe" };
+            iconNode.innerHTML = '<use href="#' + (iconMap[String(category?.slug || "").toLowerCase()] || "icon-grid") + '"></use>';
+        }
+        const setText = (id, value) => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = value == null || value === "" ? "—" : String(value);
+        };
+        setText("detailJobReward", formatWalletMoney(job.reward_per_worker, job.currency || "USD"));
+        setText("detailTotalWorkers", Number(job.total_slots || 0));
+        setText("detailCompletedWorkers", "—");
+        setText("detailAvailableSlots", "—");
+        setText("detailJobDescription", job.description);
+        setText("detailProofTitle", "Proof Requirements");
+        setText("detailProofDescription", job.proof_requirements);
+        setText("detailJobExtraInstructions", job.extra_instructions);
+        const instructionList = document.getElementById("detailJobInstructions");
+        if (instructionList) {
+            instructionList.replaceChildren();
+            String(job.instructions || "").split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+                const item = document.createElement("li");
+                item.textContent = line;
+                instructionList.appendChild(item);
+            });
+            if (!instructionList.children.length) {
+                const item = document.createElement("li");
+                item.textContent = "No additional step-by-step instructions provided.";
+                instructionList.appendChild(item);
+            }
+        }
+        const targetLink = document.getElementById("detailJobTargetLink");
+        if (targetLink) {
+            if (job.target_url) {
+                targetLink.href = job.target_url;
+                targetLink.hidden = false;
+            } else {
+                targetLink.removeAttribute("href");
+                targetLink.hidden = true;
+            }
+        }
+        showPageSection("jobDetailsSection");
+    }
+
+    async function loadFindJobs() {
+        const { data, error } = await supabaseClient.from("jobs")
+            .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget")
+            .eq("status", "active")
+            .gt("remaining_budget", 0)
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        publicJobs = data || [];
+        const list = document.getElementById("jobList");
+        const empty = document.getElementById("jobEmptyState");
+        if (!list || !empty) return;
+        list.replaceChildren();
+        publicJobs.forEach(job => {
+            const category = getJobCategory(job);
+            const row = document.createElement("article");
+            row.className = "job-table-row job-list-item";
+            row.dataset.jobId = job.id;
+            row.dataset.title = (category?.name || "") + " " + (job.title || "");
+            row.dataset.category = String(category?.slug || category?.name || "other").toLowerCase();
+            row.dataset.reward = String(Number(job.reward_per_worker) || 0);
+            row.dataset.date = job.created_at || "";
+            row.style.setProperty("--job-card-background", "#ffffff");
+
+            const nameCell = document.createElement("div");
+            nameCell.className = "job-table-cell job-name-cell";
+            const nameButton = document.createElement("button");
+            nameButton.type = "button";
+            nameButton.className = "job-name-link";
+            nameButton.dataset.openJob = job.id;
+            nameButton.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
+            nameButton.title = nameButton.textContent;
+            nameCell.appendChild(nameButton);
+
+            row.appendChild(nameCell);
+            row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
+            row.appendChild(createJobCell("job-success-rate", "—"));
+            row.appendChild(createJobCell("", formatJobDuration(job.duration_minutes)));
+            row.appendChild(createJobCell("job-completed-cell", "— / " + Number(job.total_slots || 0)));
+
+            const actionCell = document.createElement("div");
+            actionCell.className = "job-table-cell";
+            const viewButton = document.createElement("button");
+            viewButton.type = "button";
+            viewButton.className = "job-view-button";
+            viewButton.dataset.openJob = job.id;
+            viewButton.textContent = "View";
+            actionCell.appendChild(viewButton);
+            row.appendChild(actionCell);
+            list.appendChild(row);
+        });
+        empty.hidden = publicJobs.length !== 0;
+        const countNode = document.getElementById("jobResultsCount");
+        if (countNode) countNode.textContent = publicJobs.length + (publicJobs.length === 1 ? " Job" : " Jobs");
+        const availableCount = document.getElementById("availableJobsCount");
+        const totalCount = document.getElementById("totalJobsCount");
+        const completedCount = document.getElementById("completedJobsCount");
+        if (availableCount) availableCount.textContent = String(publicJobs.length);
+        if (totalCount) totalCount.textContent = String(publicJobs.length);
+        if (completedCount) completedCount.textContent = "—";
+        filterAvailableJobs();
+    }
+
+    const findJobsList = document.getElementById("jobList");
+    if (findJobsList) {
+        findJobsList.addEventListener("click", event => {
+            const trigger = event.target.closest("[data-open-job]");
+            if (trigger) openJobDetails(trigger.dataset.openJob);
+        });
+    }
+    ["backToJobsButton", "detailsBackButton"].forEach(id => {
+        const button = document.getElementById(id);
+        if (button) button.addEventListener("click", () => showPageSection("findJobSection"));
+    });
+
+
     function updatePostedJobStats(jobs) {
         const counts = {
             postedTotalCount: jobs.length,
@@ -1422,59 +1551,35 @@ document.addEventListener("DOMContentLoaded", function () {
         list.replaceChildren();
         empty.hidden = jobs.length !== 0;
         jobs.forEach(job => {
-            const card = document.createElement("article");
-            card.className = "job-list-item";
-            card.dataset.status = uiStatus(job.status);
-            const category = categoryRows.find(c => c.id === job.category_id);
-            const categoryHeading = document.createElement("h3");
-            categoryHeading.className = "posted-job-category";
+            const category = getJobCategory(job);
+            const row = document.createElement("article");
+            row.className = "job-table-row posted-job-table-row job-list-item";
+            row.dataset.status = uiStatus(job.status);
+            row.style.setProperty("--job-card-background", "#ffffff");
 
-            if (category?.icon) {
-                const iconValue = String(category.icon).trim();
-                const iconNode = document.createElement(
-                    /^(fa[srb]?\s|fa-)/i.test(iconValue) ? "i" : "span"
-                );
-                if (iconNode.tagName === "I") {
-                    iconNode.className = iconValue;
-                    iconNode.setAttribute("aria-hidden", "true");
-                } else {
-                    iconNode.textContent = iconValue;
-                    iconNode.setAttribute("aria-hidden", "true");
-                }
-                categoryHeading.appendChild(iconNode);
-            }
+            const name = document.createElement("span");
+            name.className = "job-table-cell job-name-cell";
+            name.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
+            name.title = [name.textContent, job.admin_review_note || ""].filter(Boolean).join(" — ");
+            row.appendChild(name);
 
-            const categoryName = document.createElement("span");
-            categoryName.textContent = category?.name || "Uncategorized";
-            categoryHeading.appendChild(categoryName);
+            row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
+            row.appendChild(createJobCell("job-completed-cell", "— / " + Number(job.total_slots || 0)));
 
-            const detail = document.createElement("p");
-            detail.textContent = formatJobMoney(job.reward_per_worker) + " per worker · " +
-                Number(job.total_slots || 0) + " workers";
-            const budget = document.createElement("p");
-            budget.textContent = "Reserved: " + formatJobMoney(job.reserved_budget) +
-                " · Remaining: " + formatJobMoney(job.remaining_budget);
             const status = document.createElement("span");
-            status.className = "status-badge";
-            status.textContent = String(job.status || "").replaceAll("_", " ");
-            const created = document.createElement("small");
-            created.textContent = job.created_at ? new Date(job.created_at).toLocaleString() : "";
-            card.append(categoryHeading, status, detail, budget, created);
-            if (job.admin_review_note) {
-                const note = document.createElement("p");
-                note.textContent = "Admin note: " + job.admin_review_note;
-                card.appendChild(note);
-            }
+            const normalized = uiStatus(job.status);
+            status.className = "posted-job-status " +
+                (normalized === "pending_review" || normalized === "pending" ? "pending" :
+                 normalized === "active" ? "active" :
+                 normalized === "rejected" ? "rejected" : "other");
+            status.textContent = normalized === "pending_review" ? "Pending" :
+                String(normalized || "Unknown").replaceAll("_", " ");
             if (job.status === "rejected") {
-                const support = document.createElement("p");
-                support.append("Your job was rejected. For assistance, please contact TaskBridge Support: ");
-                const email = document.createElement("a");
-                email.href = "mailto:taskbridgesupport@gmail.com";
-                email.textContent = "taskbridgesupport@gmail.com";
-                support.appendChild(email);
-                card.appendChild(support);
+                status.title = (job.admin_review_note || "Job rejected") +
+                    " · Contact taskbridgesupport@gmail.com for assistance.";
             }
-            list.appendChild(card);
+            row.appendChild(status);
+            list.appendChild(row);
         });
         const activeTab = document.querySelector("#myPostedJobsSection .job-tab.active");
         const selected = activeTab?.dataset.status || "all";
@@ -1485,7 +1590,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadMyPostedJobs() {
         const { data, error } = await supabaseClient.from("jobs")
-            .select("id,advertiser_id,category_id,title,reward_per_worker,total_slots,reserved_budget,remaining_budget,status,admin_review_note,created_at")
+            .select("id,advertiser_id,category_id,title,reward_per_worker,total_slots,reserved_budget,remaining_budget,status,admin_review_note,created_at,currency,duration_minutes")
             .eq("advertiser_id", currentUser.id)
             .order("created_at", { ascending: false });
         if (error) throw error;
@@ -1563,7 +1668,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (avatar) avatar.textContent = email.charAt(0).toUpperCase();
 
         await loadJobCategories();
-        await loadMyPostedJobs();
+        await Promise.all([loadMyPostedJobs(), loadFindJobs()]);
         await loadMyWallet();
         await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
 
@@ -1605,6 +1710,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 event: "*", schema: "public", table: "jobs",
                 filter: "advertiser_id=eq." + currentUser.id
             }, () => loadMyPostedJobs().catch(err => console.error("Realtime refresh failed:", err)))
+            .subscribe();
+
+        publicJobsChannel = supabaseClient.channel("public-active-jobs")
+            .on("postgres_changes", {
+                event: "*", schema: "public", table: "jobs"
+            }, () => loadFindJobs().catch(err => console.error("Find Jobs realtime refresh failed:", err)))
             .subscribe();
     }
 
