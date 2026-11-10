@@ -3016,3 +3016,16 @@ button.header-balance {
     .dashboard-recent-jobs-section { gap:13px; }
     .dashboard-recent-jobs-section > .section-heading { align-items:flex-start; }
 }
+
+
+/* Dashboard Recent Jobs: simple list only, no category/search controls */
+.dashboard-recent-list-panel { margin-top: 0; }
+.dashboard-recent-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.dashboard-recent-job-row { grid-template-columns: minmax(220px, 2fr) repeat(3, minmax(90px, 1fr)) minmax(130px, auto); }
+.dashboard-recent-job-name { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left; }
+.dashboard-recent-job-action { display:flex; justify-content:flex-end; }
+.dashboard-recent-job-action .job-view-button { white-space:nowrap; }
+@media(max-width:700px) {
+    .dashboard-recent-heading { align-items:flex-start; }
+    .dashboard-recent-job-row { min-width:720px; }
+}
