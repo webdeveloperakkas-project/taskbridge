@@ -12,7 +12,14 @@
   <header class="profile-topbar">
     <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
     <div class="topbar-actions">
-      <label class="topbar-balance"><span>Available Balance</span><select id="profileWalletCurrency" aria-label="Wallet currency"><option>Loading</option></select><strong id="profileAvailableBalance">—</strong></label>
+      <div class="profile-header-balance" aria-label="Available wallet balance">
+        <span class="profile-header-wallet-icon" aria-hidden="true">▱</span>
+        <div class="profile-header-balance-copy">
+          <span class="profile-header-balance-label">Available Balance</span>
+          <div class="profile-header-balance-value"><strong id="profileAvailableBalance">—</strong><select id="profileWalletCurrency" aria-label="Wallet currency"><option>Loading</option></select></div>
+        </div>
+        <span class="profile-header-balance-chevron" aria-hidden="true">⌄</span>
+      </div>
       <a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a>
       <span class="topbar-avatar" id="topbarAvatar">U</span>
     </div>
