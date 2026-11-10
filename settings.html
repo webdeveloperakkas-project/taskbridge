@@ -5,15 +5,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TaskBridge - Settings</title>
-<link rel="stylesheet" href="./style.css">\n<link rel="stylesheet" href="./profile.css">
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="./profile.css">
 <link rel="stylesheet" href="./settings.css">
 </head>
 <body class="settings-page">
-<header class="settings-topbar">
-  <a class="settings-brand" href="./dashboard.html"><span>TB</span> TaskBridge</a>
-  <a class="settings-back" href="./dashboard.html">← Back to Dashboard</a>
-</header>
-<main class="settings-shell">\n    <a class="profile-back-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span> Back to Dashboard</a>
+  <header class="profile-topbar">
+    <a class="profile-brand" href="./dashboard.html"><span class="brand-mark">TB</span><span>TaskBridge</span></a>
+    <div class="profile-header-wallet-dropdown">
+      <button type="button" class="profile-header-balance" id="profileWalletToggle" aria-label="Available balance and currency wallets" aria-expanded="false" aria-controls="profileWalletMenu">
+        <span class="profile-header-wallet-icon" aria-hidden="true"><svg class="wallet-header-icon" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v4H6.5A2.5 2.5 0 0 1 4 5.5v13A2.5 2.5 0 0 0 6.5 21H20V8H6.5A2.5 2.5 0 0 1 4 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 11h-5a2.5 2.5 0 0 0 0 5h5v-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="15.5" cy="13.5" r=".8" fill="currentColor"/></svg></span>
+        <span class="profile-header-balance-copy"><span class="profile-header-balance-label">Available Balance</span><strong id="profileAvailableBalance">Loading...</strong></span>
+        <svg class="profile-header-balance-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="profile-wallet-menu" id="profileWalletMenu" aria-label="Available currency wallets"></div>
+    </div>
+    <div class="topbar-actions"><a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a><span class="topbar-avatar" id="topbarAvatar">U</span></div>
+  </header>
+<main class="settings-shell">
+    <a class="profile-back-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span> Back to Dashboard</a>
   <div class="settings-heading shared-page-intro"><div><p class="settings-eyebrow">ACCOUNT PREFERENCES</p><h1>Settings</h1><p>Manage your account, security and notification preferences.</p></div></div>
   <div class="settings-layout">
     <nav class="settings-nav" aria-label="Settings sections">
