@@ -53,7 +53,8 @@
 @media(max-width:480px){.settings-email-row{align-items:stretch}.settings-change-button{padding:0 16px}.settings-inline-field{align-items:stretch;flex-direction:column}.settings-secondary{width:max-content}.settings-email-current input{font-size:12px}}
 
 .settings-page [hidden]{display:none!important}
-\n/* Shared Profile-style sticky header */
+
+/* Shared Profile-style sticky header */
 .profile-topbar{height:72px;padding:0 clamp(18px,5vw,72px);display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #e7edf4;position:sticky;top:0;z-index:100;box-shadow:0 3px 18px rgba(15,23,42,.035)}
 .profile-brand{display:flex;align-items:center;gap:11px;color:#17243a;text-decoration:none;font-size:19px;font-weight:850;letter-spacing:-.5px}
 .brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;font-size:14px;box-shadow:0 5px 14px #2563eb33}
