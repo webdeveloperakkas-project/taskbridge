@@ -4342,3 +4342,19 @@ button.header-balance {
 .job-list-item[hidden] {
     display: none !important;
 }
+
+
+/* Dashboard My Recent Posted Jobs reuses the Manage Your Jobs header treatment. */
+.dashboard-my-posted-jobs-header,
+.dashboard-my-posted-job-row {
+    grid-template-columns: minmax(240px, 2fr) minmax(90px, .7fr) minmax(90px, .7fr) minmax(100px, .8fr) minmax(90px, .7fr);
+    min-width: 700px;
+}
+.dashboard-my-posted-job-row {
+    min-height: 52px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+.dashboard-my-posted-job-row .job-view-button {
+    justify-self: start;
+}
