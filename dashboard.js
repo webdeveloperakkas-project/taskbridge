@@ -2311,9 +2311,10 @@ document.addEventListener("DOMContentLoaded", function () {
             row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
 
             const completed = document.createElement("span");
-            completed.className = "job-table-cell job-completed-cell " + (approvedCount > 0 ? "has-approved" : pendingCount > 0 ? "has-pending" : "");
-            completed.textContent = approvedCount + " / " + Number(job.total_slots || 0);
-            completed.title = approvedCount + " approved and paid · " + pendingCount + " awaiting review";
+            const completedCount = approvedCount + pendingCount;
+            completed.className = "job-table-cell job-completed-cell " + (pendingCount > 0 ? "has-pending" : approvedCount > 0 ? "has-approved" : "");
+            completed.textContent = completedCount + " / " + Number(job.total_slots || 0);
+            completed.title = pendingCount + " awaiting advertiser review · " + approvedCount + " approved and paid";
             row.appendChild(completed);
 
             const status = document.createElement("span");
