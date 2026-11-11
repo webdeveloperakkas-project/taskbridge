@@ -159,69 +159,81 @@ Deno.serve(async (request: Request) => {
 
     if (insertError) throw insertError;
 
-    // Refresh the current IP country on every login, but never overwrite a locked KYC country.
-    // IP/country values are derived server-side; none are accepted from the browser body.
-    try {
-      const [ipCountryResult, submissionsResult, existingResult] = await Promise.all([
-        getIpCountry(clientIp),
-        supabaseAdmin.from("user_verification_submissions")
-          .select("verification_type,status,country")
-          .eq("user_id", authData.user.id),
-        supabaseAdmin.from("user_country_verifications")
-          .select("profile_country,verified")
-          .eq("user_id", authData.user.id)
-          .maybeSingle(),
-      ]);
+    // Store the server-derived IP context first. This write is deliberately independent
+    // of KYC queries, so a KYC schema/query problem cannot prevent country data being saved.
+    // Omitted KYC/flag fields are left unchanged on conflict; new rows use DB defaults.
+    const ipCountryResult = await getIpCountry(clientIp);
+    const now = new Date().toISOString();
 
-      if (submissionsResult.error) throw submissionsResult.error;
-      if (existingResult.error) throw existingResult.error;
+    const { error: countryUpsertError } = await supabaseAdmin
+      .from("user_country_verifications")
+      .upsert({
+        user_id: authData.user.id,
+        ip_country: ipCountryResult.country,
+        ip_country_code: ipCountryResult.countryCode,
+        ip_address: clientIp,
+        checked_at: now,
+        updated_at: now,
+      }, { onConflict: "user_id" });
 
-      const submissions = submissionsResult.data || [];
-      const approvedIdentity = submissions.find(row =>
-        row.verification_type === "identity" && row.status === "approved"
-      );
-      const approvedAddress = submissions.find(row =>
-        row.verification_type === "address" && row.status === "approved"
-      );
+    if (countryUpsertError) {
+      // Do not block a valid login, but keep a clear server-side diagnostic.
+      console.error("Could not save IP country verification context:", countryUpsertError);
+    } else {
+      // KYC country locking is a separate operation. It must never overwrite a
+      // country that has already been verified and locked.
+      try {
+        const [submissionsResult, existingResult] = await Promise.all([
+          supabaseAdmin.from("user_verification_submissions")
+            .select("verification_type,status,country")
+            .eq("user_id", authData.user.id),
+          supabaseAdmin.from("user_country_verifications")
+            .select("profile_country,verified")
+            .eq("user_id", authData.user.id)
+            .maybeSingle(),
+        ]);
 
-      const identityDocumentCountry =
-        typeof approvedIdentity?.country === "string"
-          ? approvedIdentity.country.trim()
-          : null;
+        if (submissionsResult.error) throw submissionsResult.error;
+        if (existingResult.error) throw existingResult.error;
 
-      // Both identity and address documents must be approved before locking a country.
-      const newlyVerified = Boolean(
-        approvedIdentity &&
-        approvedAddress &&
-        identityDocumentCountry
-      );
+        const submissions = submissionsResult.data || [];
+        const approvedIdentity = submissions.find(row =>
+          row.verification_type === "identity" && row.status === "approved"
+        );
+        const approvedAddress = submissions.find(row =>
+          row.verification_type === "address" && row.status === "approved"
+        );
 
-      // Once verified, keep the saved document country unchanged on every future login,
-      // even if the user changes device, network, IP address, or uses a VPN.
-      const wasAlreadyVerified = existingResult.data?.verified === true;
-      const isVerified = wasAlreadyVerified || newlyVerified;
-      const lockedCountry = wasAlreadyVerified
-        ? (existingResult.data?.profile_country || null)
-        : (newlyVerified ? identityDocumentCountry : null);
+        const identityDocumentCountry =
+          typeof approvedIdentity?.country === "string"
+            ? approvedIdentity.country.trim()
+            : null;
 
-      const now = new Date().toISOString();
-      const { error: countryUpsertError } = await supabaseAdmin
-        .from("user_country_verifications")
-        .upsert({
-          user_id: authData.user.id,
-          profile_country: lockedCountry,
-          ip_country: ipCountryResult.country,
-          ip_country_code: ipCountryResult.countryCode,
-          ip_address: clientIp,
-          verified: isVerified,
-          checked_at: now,
-          updated_at: now,
-        }, { onConflict: "user_id" });
+        const wasAlreadyVerified = existingResult.data?.verified === true;
+        const newlyVerified = Boolean(
+          !wasAlreadyVerified &&
+          approvedIdentity &&
+          approvedAddress &&
+          identityDocumentCountry
+        );
 
-      if (countryUpsertError) throw countryUpsertError;
-    } catch (countryError) {
-      // Country lookup/storage must not block a valid login.
-      console.error("Country targeting context could not be refreshed:", countryError);
+        if (newlyVerified) {
+          const { error: lockError } = await supabaseAdmin
+            .from("user_country_verifications")
+            .update({
+              profile_country: identityDocumentCountry,
+              verified: true,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("user_id", authData.user.id)
+            .eq("verified", false);
+
+          if (lockError) throw lockError;
+        }
+      } catch (kycError) {
+        // IP country has already been saved; KYC locking can safely retry next login.
+        console.error("KYC country lock could not be refreshed:", kycError);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
