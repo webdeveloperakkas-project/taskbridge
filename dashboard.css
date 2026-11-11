@@ -4828,3 +4828,48 @@ button.header-balance {
         transition: none;
     }
 }
+
+
+/* Desktop country picker: visible flag labels and a menu that opens below the field. */
+.job-country-custom-picker { display: none; position: relative; width: 100%; z-index: 30; }
+.job-country-picker-trigger {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; min-height: 48px; padding: 10px 14px; border: 1px solid #cbd5e1;
+    border-radius: 10px; background: #fff; color: #183b2c; font: inherit;
+    font-weight: 600; text-align: left; cursor: pointer;
+}
+.job-country-picker-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.job-country-picker-chevron { flex: 0 0 auto; color: #475569; font-size: 18px; }
+.job-country-picker-trigger:focus-visible { outline: 3px solid rgba(37,99,235,.22); border-color: #2563eb; }
+.job-country-picker-menu {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 9999;
+    max-height: 340px; overflow-y: auto; overscroll-behavior: contain;
+    padding: 6px; border: 1px solid #dbe3ed; border-radius: 12px;
+    background: #fff; box-shadow: 0 14px 34px rgba(15,23,42,.18);
+}
+.job-country-picker-menu[hidden] { display: none; }
+.job-country-picker-option {
+    display: block; width: 100%; padding: 9px 11px; border: 0; border-radius: 7px;
+    background: transparent; color: #1e293b; font: inherit; font-size: 13px;
+    text-align: left; cursor: pointer;
+}
+.job-country-picker-option:hover, .job-country-picker-option:focus-visible { background: #eff6ff; outline: none; }
+.job-country-picker-option[aria-selected="true"] { background: #e0f2fe; color: #075985; font-weight: 700; }
+.job-country-picker-group { padding: 10px 11px 5px; color: #64748b; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+@media (min-width: 701px) {
+    .job-country-select-group select.job-country-native-select {
+        position: absolute !important; width: 1px !important; height: 1px !important;
+        padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+        clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important;
+    }
+    .job-country-custom-picker { display: block; }
+}
+@media (max-width: 700px) {
+    .job-country-select-group { width: 80% !important; min-width: 0 !important; max-width: none !important; }
+    .job-country-custom-picker { display: none !important; }
+    .job-country-select-group select.job-country-native-select {
+        position: static !important; width: 100% !important; height: auto !important;
+        padding: 11px 13px !important; margin: 0 !important; clip: auto !important;
+        overflow: visible !important; white-space: normal !important;
+    }
+}
