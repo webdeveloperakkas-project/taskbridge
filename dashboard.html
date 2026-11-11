@@ -8,7 +8,7 @@
     <title>TaskBridge - User Dashboard</title>
 
     <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./dashboard.css?v=20261111-job-filter-fix">
+    <link rel="stylesheet" href="./dashboard.css?v=20261111-dashboard-recent-posted">
 
 </head>
 
@@ -674,78 +674,18 @@
                         </div>
 
 
-                        <div class="table-responsive">
-
-                            <table class="dashboard-table">
-
-                                <thead>
-                                    <tr>
-                                        <th>Job Title</th>
-                                        <th>Workers Needed</th>
-                                        <th>Completed</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    <tr>
-                                        <td>
-                                            <div class="job-title-cell">
-                                                <strong>Product Review Task</strong>
-                                                <small>Example Listing</small>
-                                            </div>
-                                        </td>
-
-                                        <td>20</td>
-                                        <td>12</td>
-
-                                        <td>
-                                            <span class="status-badge active-status">
-                                                Active
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <a href="#myPostedJobsSection"
-                                                class="table-action-link"
-                                                data-open-section="myPostedJobsSection">
-                                                Manage
-                                            </a>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>
-                                            <div class="job-title-cell">
-                                                <strong>Website Feedback</strong>
-                                                <small>Example Listing</small>
-                                            </div>
-                                        </td>
-
-                                        <td>15</td>
-                                        <td>8</td>
-
-                                        <td>
-                                            <span class="status-badge pending-status">
-                                                Pending
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <a href="#myPostedJobsSection"
-                                                class="table-action-link"
-                                                data-open-section="myPostedJobsSection">
-                                                Manage
-                                            </a>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
+                        <div class="job-table-scroll posted-job-table-scroll dashboard-my-posted-jobs-scroll">
+                            <div class="job-table-header dashboard-my-posted-jobs-header" aria-hidden="true">
+                                <span>Job Name</span><span>Workers</span><span>Completed</span><span>Status</span><span>Action</span>
+                            </div>
+                            <div id="dashboardMyRecentPostedJobsList" class="job-list" aria-live="polite"></div>
+                        </div>
+                        <div class="empty-state" id="dashboardMyRecentPostedJobsEmpty" hidden>
+                            <div class="empty-state-icon">
+                                <svg class="icon"><use href="#icon-briefcase"></use></svg>
+                            </div>
+                            <h3>No Recent Jobs Yet</h3>
+                            <p>Your latest posted jobs will appear here.</p>
                         </div>
 
                     </section>
@@ -1965,7 +1905,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Dashboard JavaScript -->
-    <script src="./dashboard.js?v=20261111-job-filter-fix"></script>
+    <script src="./dashboard.js?v=20261111-dashboard-recent-posted"></script>
 
 </body>
 
