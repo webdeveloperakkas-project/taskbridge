@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let supabaseClient = null;
     let currentUser = null;
     let categoryRows = [];
+    let postedJobsCache = [];
     let postedJobsChannel = null;
     let submissionsChannel = null;
     let publicJobsChannel = null;
@@ -1786,13 +1787,224 @@ document.addEventListener("DOMContentLoaded", function () {
                     " · Contact taskbridgesupport@gmail.com for assistance.";
             }
             row.appendChild(status);
+
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.className = "job-view-button posted-job-edit-button";
+            edit.textContent = "Edit";
+            edit.setAttribute("aria-label", "Edit " + (job.title || "job"));
+            edit.addEventListener("click", () => openPostedJobEditor(job.id));
+            row.appendChild(edit);
+
             list.appendChild(row);
         });
+        applyPostedJobStatusFilter();
+    }
+
+    function applyPostedJobStatusFilter() {
+        const list = document.getElementById("postedJobsList");
         const activeTab = document.querySelector("#myPostedJobsSection .job-tab.active");
         const selected = activeTab?.dataset.status || "all";
+        if (!list) return;
         list.querySelectorAll(".job-list-item").forEach(card => {
             card.hidden = selected !== "all" && card.dataset.status !== selected;
         });
+    }
+
+    function openPostedJobEditor(jobId) {
+        const job = postedJobsCache.find(item => item.id === jobId);
+        if (!job) return;
+        let dialog = document.getElementById("postedJobEditDialog");
+        if (!dialog) {
+            dialog = document.createElement("dialog");
+            dialog.id = "postedJobEditDialog";
+            dialog.className = "posted-job-edit-dialog";
+            document.body.appendChild(dialog);
+        }
+        dialog.replaceChildren();
+
+        const form = document.createElement("form");
+        form.className = "posted-job-edit-form";
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
+            await savePostedJobChanges(job, form, dialog);
+        });
+
+        const heading = document.createElement("div");
+        heading.className = "posted-job-edit-heading";
+        const title = document.createElement("h2");
+        title.textContent = "Edit Posted Job";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "posted-job-edit-close";
+        close.textContent = "×";
+        close.setAttribute("aria-label", "Close editor");
+        close.addEventListener("click", () => dialog.close());
+        heading.append(title, close);
+        form.appendChild(heading);
+
+        const info = document.createElement("p");
+        info.className = "posted-job-edit-note";
+        info.textContent = "Job details are shown below. Reward per worker cannot be reduced or changed. You can only increase the worker count.";
+        form.appendChild(info);
+
+        const grid = document.createElement("div");
+        grid.className = "posted-job-edit-grid";
+        const addReadOnly = (labelText, value, multiline = false) => {
+            const wrap = document.createElement("label");
+            wrap.className = "posted-job-edit-field" + (multiline ? " full" : "");
+            const label = document.createElement("span");
+            label.textContent = labelText;
+            const control = multiline ? document.createElement("textarea") : document.createElement("input");
+            if (multiline) control.rows = 3;
+            else control.type = "text";
+            control.value = value == null || value === "" ? "—" : String(value);
+            control.readOnly = true;
+            wrap.append(label, control);
+            grid.appendChild(wrap);
+        };
+        const category = getJobCategory(job);
+        addReadOnly("Category", category?.name || "Uncategorized");
+        addReadOnly("Job title", job.title);
+        addReadOnly("Reward per worker", formatWalletMoney(job.reward_per_worker, job.currency || "USD"));
+        addReadOnly("Job duration", formatJobDuration(job.duration_minutes));
+        addReadOnly("Target URL", job.target_url);
+        addReadOnly("Description", job.description, true);
+        addReadOnly("Instructions", job.instructions, true);
+        addReadOnly("Proof requirements", job.proof_requirements, true);
+        addReadOnly("Extra instructions", job.extra_instructions, true);
+        form.appendChild(grid);
+
+        const currentSlots = Math.max(0, Number(job.total_slots) || 0);
+        const canIncrease = ["active", "paused"].includes(String(job.status || "").toLowerCase());
+        const slotsLabel = document.createElement("label");
+        slotsLabel.className = "posted-job-edit-field";
+        const slotsCaption = document.createElement("span");
+        slotsCaption.textContent = "Total workers (can only increase)";
+        const slotsInput = document.createElement("input");
+        slotsInput.type = "number";
+        slotsInput.min = String(currentSlots);
+        slotsInput.step = "1";
+        slotsInput.required = true;
+        slotsInput.value = String(currentSlots);
+        slotsInput.disabled = !canIncrease;
+        slotsLabel.append(slotsCaption, slotsInput);
+        form.appendChild(slotsLabel);
+
+        const statusLabel = document.createElement("label");
+        statusLabel.className = "posted-job-edit-field";
+        const statusCaption = document.createElement("span");
+        statusCaption.textContent = "Job status";
+        const statusSelect = document.createElement("select");
+        const normalizedStatus = String(job.status || "").toLowerCase();
+        const statusOptions = canIncrease
+            ? ["active", "paused", "completed", "rejected"]
+            : [normalizedStatus];
+        statusOptions.forEach(value => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = value.replaceAll("_", " ").replace(/^./, c => c.toUpperCase());
+            statusSelect.appendChild(option);
+        });
+        statusSelect.value = normalizedStatus;
+        statusSelect.disabled = !canIncrease;
+        statusLabel.append(statusCaption, statusSelect);
+        form.appendChild(statusLabel);
+
+        if (!canIncrease) {
+            const lockNote = document.createElement("p");
+            lockNote.className = "posted-job-edit-note";
+            lockNote.textContent = normalizedStatus === "pending_review" || normalizedStatus === "pending"
+                ? "This job must be approved by an administrator before it can be activated or expanded."
+                : "This job is not editable because it is not active or paused.";
+            form.appendChild(lockNote);
+        }
+
+        const cost = document.createElement("div");
+        cost.className = "posted-job-edit-cost";
+        const rewardLine = document.createElement("p");
+        const feeLine = document.createElement("p");
+        const totalLine = document.createElement("strong");
+        cost.append(rewardLine, feeLine, totalLine);
+        form.appendChild(cost);
+
+        const message = document.createElement("p");
+        message.className = "posted-job-edit-message";
+        message.setAttribute("role", "status");
+        form.appendChild(message);
+
+        const actions = document.createElement("div");
+        actions.className = "posted-job-edit-actions";
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.className = "secondary-button";
+        cancel.textContent = "Cancel";
+        cancel.addEventListener("click", () => dialog.close());
+        const save = document.createElement("button");
+        save.type = "submit";
+        save.className = "primary-button";
+        save.textContent = "Save Changes";
+        save.disabled = !canIncrease;
+        actions.append(cancel, save);
+        form.appendChild(actions);
+        dialog.appendChild(form);
+
+        const updateEstimate = () => {
+            const newSlots = Number.parseInt(slotsInput.value, 10);
+            const extraSlots = Number.isInteger(newSlots) && newSlots > currentSlots ? newSlots - currentSlots : 0;
+            const extraReward = extraSlots * (Number(job.reward_per_worker) || 0);
+            const extraFee = Math.round(extraReward * 15) / 100;
+            rewardLine.textContent = "Additional worker rewards: " + formatWalletMoney(extraReward, job.currency || "USD");
+            feeLine.textContent = "Additional 15% platform fee: " + formatWalletMoney(extraFee, job.currency || "USD");
+            totalLine.textContent = "Additional payment (no color fee): " + formatWalletMoney(extraReward + extraFee, job.currency || "USD");
+        };
+        slotsInput.addEventListener("input", updateEstimate);
+        updateEstimate();
+        if (!dialog.open) dialog.showModal();
+    }
+
+    async function savePostedJobChanges(job, form, dialog) {
+        const slotsInput = form.querySelector('input[type="number"]');
+        const statusSelect = form.querySelector("select");
+        const save = form.querySelector('button[type="submit"]');
+        const message = form.querySelector(".posted-job-edit-message");
+        const oldSlots = Number(job.total_slots) || 0;
+        const newSlots = Number.parseInt(slotsInput?.value, 10);
+        const newStatus = statusSelect?.value || job.status;
+        if (!Number.isInteger(newSlots) || newSlots < oldSlots) {
+            message.textContent = "Worker count cannot be reduced.";
+            message.dataset.type = "error";
+            return;
+        }
+        if (newSlots === oldSlots && newStatus === job.status) {
+            dialog.close();
+            return;
+        }
+        if (!["active", "paused"].includes(String(job.status || "").toLowerCase())) {
+            message.textContent = "Only administrator-approved active or paused jobs can be edited.";
+            message.dataset.type = "error";
+            return;
+        }
+        save.disabled = true;
+        save.textContent = "Saving...";
+        message.textContent = "";
+        try {
+            const { error } = await supabaseClient.rpc("update_advertiser_job_with_funding", {
+                p_job_id: job.id,
+                p_new_total_slots: newSlots,
+                p_new_status: newStatus
+            });
+            if (error) throw error;
+            await Promise.all([loadMyPostedJobs(), loadMyWallet(), loadFindJobs()]);
+            dialog.close();
+        } catch (error) {
+            console.error("Posted job update failed:", error);
+            message.textContent = error.message || "Could not update this job.";
+            message.dataset.type = "error";
+        } finally {
+            save.disabled = false;
+            save.textContent = "Save Changes";
+        }
     }
 
     function renderDashboardMyRecentPostedJobs(jobs) {
@@ -1840,11 +2052,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadMyPostedJobs() {
         const { data, error } = await supabaseClient.from("jobs")
-            .select("id,advertiser_id,category_id,title,reward_per_worker,total_slots,reserved_budget,remaining_budget,status,admin_review_note,created_at,currency,duration_minutes")
+            .select("*")
             .eq("advertiser_id", currentUser.id)
             .order("created_at", { ascending: false });
         if (error) throw error;
         const jobs = data || [];
+        postedJobsCache = jobs;
         updatePostedJobStats(jobs);
         const postedCount = document.getElementById("dashboardJobsPosted");
         if (postedCount) postedCount.textContent = String(jobs.length);
