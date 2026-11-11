@@ -1087,20 +1087,24 @@ document.addEventListener("DOMContentLoaded", function () {
         updateWithdrawMethodCards();
     }
 
+    let hasApprovedWebMoneyDeposit = false;
+
     function currencyForWithdrawMethod(method) {
         return ({
             "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
-            "Bank Transfer": "BDT", "Wise": "USD",
+            "Bank Transfer": "BDT", "Wise": "USD", "WebMoney": "USD",
             "USDT - BEP20": "USDT", "USDT - TRC20": "USDT"
         })[method] || "";
     }
 
     function updateWithdrawMethodCards() {
         document.querySelectorAll(".withdraw-method-card").forEach(card => {
-            const currency = currencyForWithdrawMethod(card.dataset.withdrawMethod || "");
+            const method = card.dataset.withdrawMethod || "";
+            const currency = currencyForWithdrawMethod(method);
             const wallet = walletsByCurrency.get(currency);
             const balance = Math.max(0, Number(wallet?.available_balance || 0));
-            card.hidden = !wallet || balance <= 0;
+            const methodEligible = method !== "WebMoney" || hasApprovedWebMoneyDeposit;
+            card.hidden = !methodEligible || !wallet || balance <= 0;
             let topline = card.querySelector(".withdraw-card-topline");
             if (!topline) {
                 topline = document.createElement("span");
@@ -1314,6 +1318,20 @@ document.addEventListener("DOMContentLoaded", function () {
             .eq("user_id", currentUser.id)
             .order("currency", { ascending: true });
         if (error) throw error;
+
+        // WebMoney withdrawals are unlocked only after an admin-approved WebMoney deposit.
+        const webMoneyDeposit = await supabaseClient.from("deposits")
+            .select("id")
+            .eq("user_id", currentUser.id)
+            .eq("payment_method", "WebMoney")
+            .in("status", ["approved", "completed"])
+            .limit(1);
+        hasApprovedWebMoneyDeposit = !webMoneyDeposit.error &&
+            Array.isArray(webMoneyDeposit.data) && webMoneyDeposit.data.length > 0;
+        if (webMoneyDeposit.error) {
+            console.warn("Could not verify WebMoney deposit eligibility:", webMoneyDeposit.error);
+        }
+
         walletRows = data || [];
         walletsByCurrency = new Map(walletRows.map(wallet => [wallet.currency, wallet]));
         const fundedWallets = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
@@ -1351,8 +1369,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const depositCurrencyByMethod = {
         "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
         "Bank Transfer": "BDT", "Wise (manual transfer)": "USD",
-        "Visa": "USD", "Mastercard": "USD"
+        "WebMoney": "USD", "Visa": "USD", "Mastercard": "USD"
     };
+
+    // Public WMZ purse ID only; configure this after verifying the official TaskBridge account.
+    // Keep blank until a real receiving purse has been confirmed.
+    const WEBMONEY_WMZ_PURSE = "";
 
     const depositMethodDetails = {
         "bKash": { title: "bKash payment details (demo)", lines: ["Account type: Agent / Merchant (replace with your verified account)", "Account number: 01XXXXXXXXX", "Reference: TaskBridge Deposit"] },
@@ -1444,13 +1466,21 @@ document.addEventListener("DOMContentLoaded", function () {
             depositInstructions.innerHTML = '<strong>Card checkout is not connected yet.</strong><p>Visa/Mastercard payments will be enabled after a supported payment gateway merchant account and hosted checkout are configured. Do not enter card number, expiry date or CVV on this page.</p>';
             depositInstructions.hidden = false;
             if (depositSubmitButton) depositSubmitButton.disabled = true;
+        } else if (selectedDepositMethod === "WebMoney" && !WEBMONEY_WMZ_PURSE.trim()) {
+            depositInstructions.innerHTML = '<strong>WebMoney setup required.</strong><p>WebMoney WMZ has been added as a deposit method, but deposits are not open yet. The verified TaskBridge WMZ receiving purse must be configured before anyone sends money. Do not transfer funds to an unverified account.</p>';
+            depositInstructions.hidden = false;
+            if (depositSubmitButton) depositSubmitButton.disabled = true;
         } else {
             if (depositSubmitButton) depositSubmitButton.disabled = false;
             const details = depositMethodDetails[selectedDepositMethod];
-            if (!details) { depositInstructions.hidden = true; return; }
+            if (!details && selectedDepositMethod !== "WebMoney") { depositInstructions.hidden = true; return; }
             const escapeHtml = value => String(value).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-            depositInstructions.innerHTML = "<strong>" + escapeHtml(details.title) + "</strong><ul>" +
-                details.lines.map(line => "<li>" + escapeHtml(line) + "</li>").join("") + "</ul>";
+            const lines = selectedDepositMethod === "WebMoney"
+                ? ["Currency: USD (WMZ)", "TaskBridge WMZ receiving purse: " + WEBMONEY_WMZ_PURSE, "Reference: TaskBridge deposit + your account ID"]
+                : details.lines;
+            const title = selectedDepositMethod === "WebMoney" ? "WebMoney WMZ transfer instructions" : details.title;
+            depositInstructions.innerHTML = "<strong>" + escapeHtml(title) + "</strong><ul>" +
+                lines.map(line => "<li>" + escapeHtml(line) + "</li>").join("") + "</ul>";
             depositInstructions.hidden = false;
         }
         if (depositMessage) depositMessage.textContent = "";
@@ -1472,6 +1502,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!method) { if (depositMessage) depositMessage.textContent = "Please select a payment method first."; return; }
             if (["Visa", "Mastercard"].includes(method)) {
                 if (depositMessage) depositMessage.textContent = "Card gateway is not connected yet.";
+                return;
+            }
+            if (method === "WebMoney" && !WEBMONEY_WMZ_PURSE.trim()) {
+                if (depositMessage) depositMessage.textContent = "WebMoney deposits are not open yet. The verified TaskBridge WMZ receiving purse has not been configured.";
                 return;
             }
             if (!Number.isFinite(amount) || amount < 1 || !reference) return;
@@ -1498,7 +1532,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Deposit request failed:", error);
                 if (depositMessage) depositMessage.textContent = error.message || "Could not submit deposit request. Please try again.";
             } finally {
-                if (depositSubmitButton) { depositSubmitButton.disabled = ["Visa", "Mastercard"].includes(selectedDepositMethod); depositSubmitButton.textContent = "Submit Deposit Request"; }
+                if (depositSubmitButton) {
+                    depositSubmitButton.disabled = ["Visa", "Mastercard"].includes(selectedDepositMethod) ||
+                        (selectedDepositMethod === "WebMoney" && !WEBMONEY_WMZ_PURSE.trim());
+                    depositSubmitButton.textContent = "Submit Deposit Request";
+                }
             }
         });
     }
@@ -1509,6 +1547,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "Rocket": { label: "Rocket Account Number", placeholder: "01XXXXXXXXXX", hint: "Enter the Rocket number registered to receive your payout." },
         "Bank Transfer": { label: "Bank Account Details", placeholder: "Bank name, account name, account number, branch and routing number", hint: "Provide the bank details needed to identify your receiving account." },
         "Wise": { label: "Wise Account Details", placeholder: "Wise email or recipient account details", hint: "Enter the recipient details for your Wise account." },
+        "WebMoney": { label: "WebMoney WMZ Purse", placeholder: "Enter your WMZ purse (for example: Z...)", hint: "Enter the WebMoney WMZ purse where you want to receive your USD payout. Withdrawals are available only after an approved WebMoney deposit." },
         "USDT - BEP20": { label: "USDT BEP20 Wallet Address", placeholder: "Enter your BNB Smart Chain (BEP20) wallet address", hint: "Only provide a wallet address that supports USDT on BEP20." },
         "USDT - TRC20": { label: "USDT TRC20 Wallet Address", placeholder: "Enter your TRON (TRC20) wallet address", hint: "Only provide a wallet address that supports USDT on TRC20." }
     };
