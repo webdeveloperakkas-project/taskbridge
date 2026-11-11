@@ -927,8 +927,6 @@ document.addEventListener("DOMContentLoaded", function () {
         walletCurrency = wallet?.currency || "USD";
         walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
         const formatted = formatWalletMoney(walletAvailableBalance, walletCurrency);
-        const dashboardWalletCard = document.getElementById("dashboardWalletBalance");
-        if (dashboardWalletCard) dashboardWalletCard.textContent = formatted;
         ["availableBalanceHeader", "availableBalanceOverview",
             "availableBalanceWallet", "availableBalanceWithdraw"].forEach(id => {
             const node = document.getElementById(id);
@@ -1134,6 +1132,36 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         });
     });
+
+    async function loadMyTotalEarnings() {
+        const node = document.getElementById("dashboardTotalEarnings");
+        if (!node || !supabaseClient || !currentUser) return;
+
+        const { data, error } = await supabaseClient.from("wallet_transactions")
+            .select("amount,currency")
+            .eq("user_id", currentUser.id)
+            .eq("transaction_type", "worker_reward")
+            .eq("direction", "credit")
+            .eq("balance_type", "available");
+        if (error) throw error;
+
+        const totals = new Map([["USD", 0], ["BDT", 0]]);
+        (data || []).forEach(row => {
+            const currency = String(row.currency || "").toUpperCase();
+            if (!totals.has(currency)) totals.set(currency, 0);
+            totals.set(currency, totals.get(currency) + (Number(row.amount) || 0));
+        });
+
+        node.replaceChildren();
+        totals.forEach((amount, currency) => {
+            const line = document.createElement("span");
+            line.textContent = currency + " " + amount.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            node.appendChild(line);
+        });
+    }
 
     async function loadMyWallet() {
         const { data, error } = await supabaseClient.from("wallets")
@@ -1861,7 +1889,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (avatar) avatar.textContent = displayName.trim().charAt(0).toUpperCase() || "U";
 
         await loadJobCategories();
-        await Promise.all([loadMyPostedJobs(), loadFindJobs(), loadMySubmissions()]);
+        await Promise.all([loadMyPostedJobs(), loadFindJobs(), loadMySubmissions(), loadMyTotalEarnings()]);
         await loadMyWallet();
         await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
 
@@ -1892,6 +1920,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .on("postgres_changes", { event: "*", schema: "public", table: "wallet_transactions", filter: "user_id=eq." + currentUser.id }, () => {
                 loadTransactionHistory().catch(err => console.error("Wallet transaction refresh failed:", err));
                 loadMyWallet().catch(err => console.error("Wallet refresh failed:", err));
+                loadMyTotalEarnings().catch(err => console.error("Total earnings refresh failed:", err));
             })
             .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: "user_id=eq." + currentUser.id }, () => {
                 loadHeaderNotifications().catch(err => console.error("Notification refresh failed:", err));
