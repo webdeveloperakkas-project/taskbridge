@@ -2455,6 +2455,129 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initializeDesktopCountryPicker();
 
+    /* =====================================
+       DASHBOARD FOOTER INFORMATION PAGES
+    ====================================== */
+    function initializeFooterInfoPages() {
+        const footerLinks = document.querySelectorAll(".dashboard-footer-links [data-footer-page]");
+        if (!footerLinks.length || document.getElementById("footerInfoOverlay")) return;
+
+        const pageContent = {
+            privacy: {
+                title: "Privacy Policy",
+                html: `
+                    <p class="footer-info-eyebrow">TASKBRIDGE · YOUR PRIVACY</p>
+                    <h2>Privacy Policy</h2>
+                    <p>TaskBridge respects your privacy. This page explains, in general terms, how information may be used when you create an account and use the platform.</p>
+                    <h3>Information you provide</h3>
+                    <p>Depending on the features you use, information may include your account and profile details, contact information, country, job posts, task submissions, support messages and wallet or transaction records.</p>
+                    <h3>Information created while using TaskBridge</h3>
+                    <p>The platform may record activity needed to operate and protect accounts, such as sign-in history, security and verification events, job activity, submission status and transaction history.</p>
+                    <h3>How information is used</h3>
+                    <ul><li>To create and manage accounts and profiles.</li><li>To publish jobs, connect advertisers and workers, and process task submissions.</li><li>To maintain wallet records and support payment-related operations.</li><li>To help prevent fraud, investigate security issues and enforce platform rules.</li><li>To respond to support requests and improve platform reliability.</li></ul>
+                    <h3>Sharing and service providers</h3>
+                    <p>Information may be processed by service providers that help operate the platform, such as hosting, database, authentication and payment-related providers. Information may also be disclosed when required by applicable law or to protect users and the platform.</p>
+                    <h3>Security and retention</h3>
+                    <p>TaskBridge uses technical and organizational measures intended to protect account and platform information. Information may be retained for as long as needed to provide the service, maintain financial and operational records, resolve disputes, and meet legal or security requirements.</p>
+                    <h3>Your choices</h3>
+                    <p>Keep your profile information accurate and protect your password and verification codes. For a privacy-related question or request, contact the TaskBridge support team through Help Center.</p>
+                    <p class="footer-info-note">This in-app policy summary should be reviewed and completed with the operator's legal identity, contact details, applicable jurisdiction and final data-retention practices before being treated as a formal legal policy.</p>
+                `
+            },
+            terms: {
+                title: "Terms & Conditions",
+                html: `
+                    <p class="footer-info-eyebrow">TASKBRIDGE · PLATFORM RULES</p>
+                    <h2>Terms &amp; Conditions</h2>
+                    <p>By accessing or using TaskBridge, you agree to follow these platform rules. If you do not agree, do not use the service.</p>
+                    <h3>Accounts and eligibility</h3>
+                    <p>You are responsible for the accuracy of the information in your account and for keeping your login credentials secure. Do not impersonate another person, create misleading accounts or allow unauthorized use of your account.</p>
+                    <h3>Jobs and task submissions</h3>
+                    <p>Advertisers must provide clear, lawful job descriptions, requirements and rewards. Workers must complete tasks honestly and submit genuine proof of their work. Do not post or perform tasks that are illegal, deceptive, abusive or infringe another person's rights.</p>
+                    <h3>Wallets, fees and payments</h3>
+                    <p>Wallet balances, deposits, withdrawals, rewards and applicable platform fees are displayed or recorded through the platform's payment and transaction features. Review the amount and applicable charges before confirming a transaction. Do not attempt to manipulate balances or payment records.</p>
+                    <h3>Reviews and account restrictions</h3>
+                    <p>TaskBridge may review jobs, submissions, transactions or account activity for safety, compliance and dispute handling. Accounts or content may be restricted where there is suspected fraud, abuse, policy violations or a legal requirement.</p>
+                    <h3>Prohibited conduct</h3>
+                    <ul><li>Fraudulent activity, false proof or payment manipulation.</li><li>Harassment, threats, discrimination or misuse of another user's information.</li><li>Spam, malware, unauthorized access or attempts to disrupt the platform.</li><li>Content or tasks that violate applicable laws or third-party rights.</li></ul>
+                    <h3>Changes and support</h3>
+                    <p>Platform features and these terms may be updated as TaskBridge evolves. Continued use after an updated version is published means you accept the revised terms, to the extent permitted by applicable law. Contact Help Center if you need assistance.</p>
+                    <p class="footer-info-note">The operator should confirm the legal business identity, governing law, dispute process, refund rules and final payment terms before publishing this as a binding legal agreement.</p>
+                `
+            },
+            help: {
+                title: "Help Center",
+                html: `
+                    <p class="footer-info-eyebrow">TASKBRIDGE · SUPPORT</p>
+                    <h2>Help Center</h2>
+                    <p>Find quick answers about using TaskBridge. For an issue with a specific job or transaction, include its reference or Job ID when contacting support.</p>
+                    <h3>How do I update my email or password?</h3><p>Open Settings from your profile menu. Use Account Settings to change your email and Security &amp; Privacy to update your password. Complete any verification steps shown.</p>
+                    <h3>Why is my deposit or withdrawal taking time?</h3><p>Processing times can vary by payment method and review requirements. Check your wallet transaction history for the latest status. If it remains pending, contact support with the transaction reference. Never share your password or verification codes.</p>
+                    <h3>Why is my job waiting for approval?</h3><p>New jobs may require an administrator review before they become available to workers. Check the job status in your dashboard. If it has been pending unusually long, include its Job ID in your support message.</p>
+                    <h3>When will I receive payment for a completed task?</h3><p>Task rewards are credited after the submission is reviewed and approved. Check the submission status and available wallet balance in your dashboard. If an approved reward is missing, contact support with the Job ID and submission details.</p>
+                    <h3>How can I protect my account?</h3><p>Use a strong, unique password and keep your email account secure. Never share your password, OTP or recovery codes. Contact support if you notice unfamiliar account activity.</p>
+                    <h3>Need more help?</h3><p>Open the Help &amp; Support page from the support section of TaskBridge to send a message to the support team.</p>
+                `
+            }
+        };
+
+        const overlay = document.createElement("section");
+        overlay.id = "footerInfoOverlay";
+        overlay.className = "footer-info-overlay";
+        overlay.hidden = true;
+        overlay.setAttribute("role", "dialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-labelledby", "footerInfoTitle");
+        overlay.innerHTML = `
+            <div class="footer-info-panel" role="document">
+                <div class="footer-info-topbar">
+                    <button type="button" class="footer-info-close" id="footerInfoClose"><span aria-hidden="true">←</span> Close</button>
+                    <h2 class="footer-info-page-title" id="footerInfoTitle">Information</h2>
+                </div>
+                <div class="footer-info-content" id="footerInfoContent"></div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        const closeButton = overlay.querySelector("#footerInfoClose");
+        const title = overlay.querySelector("#footerInfoTitle");
+        const content = overlay.querySelector("#footerInfoContent");
+        let previousFocus = null;
+
+        function closePage() {
+            overlay.hidden = true;
+            document.body.classList.remove("footer-info-open");
+            if (previousFocus && typeof previousFocus.focus === "function") previousFocus.focus();
+        }
+        function openPage(key, source) {
+            const page = pageContent[key];
+            if (!page) return;
+            previousFocus = source;
+            title.textContent = page.title;
+            content.innerHTML = page.html;
+            overlay.hidden = false;
+            document.body.classList.add("footer-info-open");
+            closeButton.focus();
+            content.scrollTop = 0;
+        }
+
+        footerLinks.forEach(link => {
+            link.addEventListener("click", event => {
+                event.preventDefault();
+                openPage(link.dataset.footerPage, link);
+            });
+        });
+        closeButton.addEventListener("click", closePage);
+        overlay.addEventListener("click", event => {
+            if (event.target === overlay) closePage();
+        });
+        document.addEventListener("keydown", event => {
+            if (event.key === "Escape" && !overlay.hidden) closePage();
+        });
+    }
+
+    initializeFooterInfoPages();
+
+
     initializeSupabaseDashboard().catch(error => {
         console.error("Supabase dashboard setup failed:", error);
         showJobFormMessage(error.message || "Dashboard data could not be loaded.", "error");
