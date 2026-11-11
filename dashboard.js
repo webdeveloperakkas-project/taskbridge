@@ -1824,6 +1824,8 @@ document.addEventListener("DOMContentLoaded", function () {
         setText("detailJobExtraInstructions", job.extra_instructions);
         const form = document.getElementById("workerSubmissionForm");
         const submitButton = document.getElementById("submitWorkerJobButton");
+        const messageNode = document.getElementById("workerSubmissionMessage");
+        if (messageNode) messageNode.hidden = true;
         const proofText = document.getElementById("workerProofText");
         const proofUrl = document.getElementById("workerProofFileUrl");
         if (proofText) proofText.value = activeWorkerSubmission?.proof_text || "";
