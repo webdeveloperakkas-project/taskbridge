@@ -173,12 +173,12 @@ Deno.serve(async (request: Request) => {
       const sameCountry = (a: string | null, b: string | null) =>
         Boolean(a && b && a.toLowerCase() === b.toLowerCase());
 
-      // Both identity and address documents must be approved, and their countries
-      // must match the saved profile country before document country takes priority.
+      // Both identity and address documents must be approved. The issuing country
+      // on the approved identity document must match the saved profile country.
+      // Address country may legitimately differ for people living abroad.
       const documentVerified = Boolean(
         identity && address &&
-        sameCountry(profileCountry, identityCountry) &&
-        sameCountry(profileCountry, addressCountry)
+        sameCountry(profileCountry, identityCountry)
       );
 
       const { error: countryUpsertError } = await supabaseAdmin
