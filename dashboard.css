@@ -5485,15 +5485,65 @@ body.footer-info-open { overflow: hidden; }
 
 
 /* Worker submission history */
-#mySubmittedJobsSection .worker-submissions-list { display:grid; gap:14px; margin-top:18px; }
-#mySubmittedJobsSection .worker-submission-history-card { padding:17px; border:1px solid var(--border-color,#e5e7eb); border-radius:12px; background:var(--surface-color,#fff); }
-#mySubmittedJobsSection .worker-submission-history-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-#mySubmittedJobsSection .worker-submission-history-heading h3 { margin:0; font-size:16px; }
-#mySubmittedJobsSection .worker-submission-history-status { display:inline-flex; padding:5px 10px; border-radius:999px; font-size:12px; font-weight:700; background:#f2f4f7; color:#475467; }
+/* Worker submission history table */
+#mySubmittedJobsSection .worker-submissions-table-wrap { width:100%; overflow-x:auto; margin-top:18px; }
+#mySubmittedJobsSection .worker-submissions-table-header,
+#mySubmittedJobsSection .worker-submission-history-card {
+    display:grid;
+    grid-template-columns:minmax(190px,2fr) minmax(105px,.85fr) minmax(125px,1fr) minmax(125px,1fr) minmax(76px,.55fr);
+    align-items:center;
+    column-gap:14px;
+    min-width:760px;
+}
+#mySubmittedJobsSection .worker-submissions-table-header {
+    min-height:48px;
+    padding:0 16px;
+    border:1px solid var(--border-color,#e5e7eb);
+    border-radius:10px;
+    background:var(--surface-muted,#f4f6f8);
+    color:var(--text-secondary,#475467);
+    font-size:11px;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:.045em;
+}
+#mySubmittedJobsSection .worker-submissions-list { display:grid; gap:10px; margin-top:10px; }
+#mySubmittedJobsSection .worker-submission-history-card {
+    padding:13px 16px;
+    border:1px solid var(--border-color,#e5e7eb);
+    border-radius:11px;
+    background:var(--surface-color,#fff);
+    box-shadow:0 2px 8px rgba(16,24,40,.035);
+}
+#mySubmittedJobsSection .worker-history-cell { min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:5px; overflow-wrap:anywhere; }
+#mySubmittedJobsSection .worker-history-cell > strong { color:var(--text-primary,#172033); font-size:13px; font-weight:800; }
+#mySubmittedJobsSection .worker-history-job small { color:var(--text-muted,#667085); font-size:10px; overflow-wrap:anywhere; }
+#mySubmittedJobsSection .worker-history-payment > strong { color:#16704a; font-size:14px; font-variant-numeric:tabular-nums; }
+#mySubmittedJobsSection .worker-history-timing > strong { color:var(--text-secondary,#475467); font-size:12px; }
+#mySubmittedJobsSection .worker-submission-history-status { display:inline-flex; padding:6px 9px; border-radius:999px; font-size:11px; font-weight:800; white-space:nowrap; background:#f2f4f7; color:#475467; }
 #mySubmittedJobsSection .worker-submission-history-status.pending { background:#fff4d6; color:#946200; }
 #mySubmittedJobsSection .worker-submission-history-status.approved { background:#dcfae6; color:#067647; }
 #mySubmittedJobsSection .worker-submission-history-status.rejected { background:#fee4e2; color:#b42318; }
 #mySubmittedJobsSection .worker-submission-history-status.revision { background:#f4ebff; color:#6941c6; }
-#mySubmittedJobsSection .worker-submission-history-meta { margin:9px 0; color:var(--text-muted,#667085); font-size:12px; overflow-wrap:anywhere; }
-#mySubmittedJobsSection .worker-submission-history-proof { white-space:pre-wrap; overflow-wrap:anywhere; }
-#mySubmittedJobsSection .worker-submission-history-note { padding:10px 12px; border-left:3px solid #d92d20; background:#fff5f4; color:#912018; font-size:13px; }
+#mySubmittedJobsSection .worker-submission-view-button { min-height:34px; padding:0 13px; border:1px solid var(--border-color,#d0d5dd); border-radius:8px; background:var(--surface-muted,#f8fafc); color:var(--text-primary,#344054); font-size:12px; font-weight:800; cursor:pointer; }
+#mySubmittedJobsSection .worker-submission-view-button:hover { border-color:#98a2b3; background:#eef2f6; }
+#mySubmittedJobsSection .worker-submission-history-details { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:7px; padding:16px; border:1px solid var(--border-color,#e5e7eb); border-radius:10px; background:var(--surface-muted,#f8fafc); }
+#mySubmittedJobsSection .worker-submission-history-details[hidden] { display:none !important; }
+#mySubmittedJobsSection .worker-submission-history-details h3 { grid-column:1/-1; margin:0; color:var(--text-primary,#172033); font-size:15px; }
+#mySubmittedJobsSection .worker-history-detail-block { min-width:0; }
+#mySubmittedJobsSection .worker-history-detail-block > strong { display:block; margin-bottom:4px; color:var(--text-secondary,#475467); font-size:11px; }
+#mySubmittedJobsSection .worker-history-detail-block p { margin:0; color:var(--text-primary,#344054); font-size:13px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+#mySubmittedJobsSection .worker-history-detail-block.rejected-note { grid-column:1/-1; padding:10px; border-left:3px solid #d92d20; background:#fff5f4; }
+#mySubmittedJobsSection .worker-submission-history-proof-link { grid-column:1/-1; width:max-content; color:#175cd3; font-size:13px; font-weight:800; text-decoration:underline; }
+@media(max-width:700px) {
+    #mySubmittedJobsSection .worker-submissions-table-header { display:none; }
+    #mySubmittedJobsSection .worker-submissions-table-wrap { overflow:visible; }
+    #mySubmittedJobsSection .worker-submissions-list { gap:12px; }
+    #mySubmittedJobsSection .worker-submission-history-card { min-width:0; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 10px; padding:14px; }
+    #mySubmittedJobsSection .worker-history-job { grid-column:1/-1; }
+    #mySubmittedJobsSection .worker-history-cell::before { content:attr(data-label); color:var(--text-muted,#667085); font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+    #mySubmittedJobsSection .worker-history-view { justify-content:flex-end; }
+    #mySubmittedJobsSection .worker-submission-history-details { grid-column:1/-1; grid-template-columns:1fr; padding:13px; }
+    #mySubmittedJobsSection .worker-submission-history-details h3,
+    #mySubmittedJobsSection .worker-history-detail-block.rejected-note { grid-column:1; }
+}
