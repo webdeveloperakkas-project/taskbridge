@@ -15,17 +15,41 @@ function isValidIp(value: string): boolean {
 }
 
 function getClientIp(request: Request): string | null {
-  // These headers are supplied by the edge/proxy layer, never by the JSON body.
+  // Prefer the IP set by the Cloudflare edge. Never accept an IP from the JSON body
+  // or trust the first X-Forwarded-For value supplied by a client.
   const candidates = [
     request.headers.get("cf-connecting-ip"),
     request.headers.get("x-real-ip"),
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim(),
   ];
 
   for (const candidate of candidates) {
     if (candidate && isValidIp(candidate)) return candidate.trim();
   }
   return null;
+}
+
+async function getIpCountry(ip: string | null): Promise<string | null> {
+  const token = Deno.env.get("IPINFO_TOKEN");
+  if (!ip || !token) return null;
+
+  try {
+    const response = await fetch(
+      `https://api.ipinfo.io/lite/${encodeURIComponent(ip)}?token=${encodeURIComponent(token)}`,
+      { headers: { Accept: "application/json" } },
+    );
+    if (!response.ok) {
+      console.warn("IP country lookup returned HTTP", response.status);
+      return null;
+    }
+
+    const result = await response.json();
+    return typeof result.country === "string" && result.country.trim()
+      ? result.country.trim()
+      : null;
+  } catch (error) {
+    console.warn("IP country lookup failed:", error);
+    return null;
+  }
 }
 
 function getDeviceType(userAgent: string): string {
@@ -105,11 +129,12 @@ Deno.serve(async (request: Request) => {
       ? body.device_timezone.trim().slice(0, 100)
       : null;
 
+    const clientIp = getClientIp(request);
     const { error: insertError } = await supabaseAdmin
       .from("user_login_history")
       .insert({
         user_id: authData.user.id,
-        ip_address: getClientIp(request),
+        ip_address: clientIp,
         device_type: getDeviceType(userAgent),
         browser: getBrowser(userAgent),
         operating_system: getOperatingSystem(userAgent),
@@ -118,6 +143,69 @@ Deno.serve(async (request: Request) => {
       });
 
     if (insertError) throw insertError;
+
+    // Country targeting uses IP country only while the user is not fully KYC verified.
+    // The API token stays in Supabase Secrets; no IP or country is accepted from the browser body.
+    try {
+      const [ipCountry, profileResult, detailsResult, submissionsResult] = await Promise.all([
+        getIpCountry(clientIp),
+        supabaseAdmin.from("profiles")
+          .select("verification_status")
+          .eq("id", authData.user.id)
+          .maybeSingle(),
+        supabaseAdmin.from("user_profile_details")
+          .select("country")
+          .eq("user_id", authData.user.id)
+          .maybeSingle(),
+        supabaseAdmin.from("user_verification_submissions")
+          .select("verification_type,status,country,address_country")
+          .eq("user_id", authData.user.id),
+      ]);
+
+      if (profileResult.error) throw profileResult.error;
+      if (detailsResult.error) throw detailsResult.error;
+      if (submissionsResult.error) throw submissionsResult.error;
+
+      const submissions = submissionsResult.data || [];
+      const identity = submissions.find(row =>
+        row.verification_type === "identity" && row.status === "approved"
+      );
+      const address = submissions.find(row =>
+        row.verification_type === "address" && row.status === "approved"
+      );
+      const profileCountry = detailsResult.data?.country?.trim() || null;
+      const identityCountry = identity?.country?.trim() || null;
+      const addressCountry = address?.address_country?.trim() || null;
+      const sameCountry = (a: string | null, b: string | null) =>
+        Boolean(a && b && a.toLowerCase() === b.toLowerCase());
+
+      // Both identity and address documents must be approved, and their countries
+      // must match the saved profile country before document country takes priority.
+      const documentVerified = Boolean(
+        profileResult.data?.verification_status === "verified" &&
+        identity && address &&
+        sameCountry(profileCountry, identityCountry) &&
+        sameCountry(profileCountry, addressCountry)
+      );
+
+      const { error: countryUpsertError } = await supabaseAdmin
+        .from("user_country_verifications")
+        .upsert({
+          user_id: authData.user.id,
+          profile_country: profileCountry,
+          ip_country: ipCountry,
+          ip_address: clientIp,
+          verified: documentVerified,
+          checked_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "user_id" });
+
+      if (countryUpsertError) throw countryUpsertError;
+    } catch (countryError) {
+      // Country lookup/storage must not block a valid login. Missing lookup data
+      // leaves the worker without a trusted country until the next successful check.
+      console.error("Country targeting context could not be refreshed:", countryError);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
