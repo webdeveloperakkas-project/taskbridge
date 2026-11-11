@@ -5262,3 +5262,77 @@ body.footer-info-open { overflow: hidden; }
         color: #355642 !important;
     }
 }
+
+
+/* Worker timed job and proof submission */
+#jobDetailsSection .worker-job-timer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    margin: 22px 0;
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--surface-soft, #f8fafc);
+    text-align: center;
+}
+#jobDetailsSection .worker-job-timer-label {
+    color: var(--text-muted, #64748b);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+#jobDetailsSection #workerJobCountdown {
+    color: var(--text-primary, #172033);
+    font-size: clamp(28px, 5vw, 42px);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    line-height: 1.15;
+}
+#jobDetailsSection .worker-job-timer-card > span:last-child {
+    color: var(--text-muted, #64748b);
+    font-size: 13px;
+}
+#jobDetailsSection .worker-submission-form {
+    display: grid;
+    gap: 11px;
+    margin: 22px 0;
+    padding: 20px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 14px;
+    background: var(--surface-color, #fff);
+}
+#jobDetailsSection .worker-submission-form h3 { margin: 0 0 4px; }
+#jobDetailsSection .worker-submission-form label {
+    color: var(--text-primary, #172033);
+    font-size: 13px;
+    font-weight: 650;
+}
+#jobDetailsSection .worker-submission-form textarea,
+#jobDetailsSection .worker-submission-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color, #d7dce4);
+    border-radius: 9px;
+    background: var(--input-background, #fff);
+    color: var(--text-primary, #172033);
+    font: inherit;
+}
+#jobDetailsSection .worker-submission-form textarea { min-height: 110px; resize: vertical; }
+#jobDetailsSection #submitWorkerJobButton { justify-self: start; min-width: 150px; }
+#jobDetailsSection .worker-submission-message {
+    margin: 2px 0 0;
+    padding: 11px 13px;
+    border-radius: 9px;
+    font-size: 13px;
+}
+#jobDetailsSection .worker-submission-message.success { background: #ecfdf3; color: #067647; }
+#jobDetailsSection .worker-submission-message.error { background: #fef3f2; color: #b42318; }
+#jobDetailsSection .worker-submission-message.info { background: #eff6ff; color: #1d4ed8; }
+#jobDetailsSection .job-status.expired { background: #fef3f2; color: #b42318; }
+@media (max-width: 640px) {
+    #jobDetailsSection .worker-submission-form { padding: 15px; }
+    #jobDetailsSection #submitWorkerJobButton { width: 100%; }
+}
