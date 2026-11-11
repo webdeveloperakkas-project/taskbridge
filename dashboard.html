@@ -594,11 +594,14 @@
 
                     <!-- DASHBOARD OVERVIEW CARDS -->
                     <section class="stats-grid dashboard-stats-grid" aria-label="Account overview">
-                        <article class="stat-card dashboard-stat-card dashboard-stat-wallet">
+                        <article class="stat-card dashboard-stat-card dashboard-stat-earnings">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-wallet"></use></svg></div>
-                            <p>Wallet Balance</p>
-                            <h3 id="dashboardWalletBalance">Loading...</h3>
-                            <span class="dashboard-stat-caption">Available balance</span>
+                            <p>Total Earnings</p>
+                            <div id="dashboardTotalEarnings" class="dashboard-total-earnings" aria-live="polite">
+                                <span>USD 0.00</span>
+                                <span>BDT 0.00</span>
+                            </div>
+                            <span class="dashboard-stat-caption">Approved worker rewards</span>
                         </article>
                         <article class="stat-card dashboard-stat-card dashboard-stat-completed">
                             <div class="stat-card-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
