@@ -180,6 +180,39 @@ Deno.serve(async (request: Request) => {
       // Do not block a valid login, but keep a clear server-side diagnostic.
       console.error("Could not save IP country verification context:", countryUpsertError);
     } else {
+      // Populate the ordinary profile country from the user's profile details.
+      // Only update rows that are not KYC-verified, so a locked identity-document
+      // country can never be replaced by an editable profile value.
+      try {
+        const { data: profileDetails, error: profileDetailsError } = await supabaseAdmin
+          .from("user_profile_details")
+          .select("country")
+          .eq("user_id", authData.user.id)
+          .maybeSingle();
+
+        if (profileDetailsError) throw profileDetailsError;
+
+        const profileCountry = typeof profileDetails?.country === "string"
+          ? profileDetails.country.trim()
+          : "";
+
+        if (profileCountry) {
+          const { error: profileCountryUpdateError } = await supabaseAdmin
+            .from("user_country_verifications")
+            .update({
+              profile_country: profileCountry,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("user_id", authData.user.id)
+            .eq("verified", false);
+
+          if (profileCountryUpdateError) throw profileCountryUpdateError;
+        }
+      } catch (profileCountryError) {
+        // Profile country is supplementary; do not block login or IP-country storage.
+        console.error("Could not sync profile country from user_profile_details:", profileCountryError);
+      }
+
       // KYC country locking is a separate operation. It must never overwrite a
       // country that has already been verified and locked.
       try {
