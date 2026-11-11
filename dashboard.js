@@ -557,7 +557,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (window.location.hash !== newHash) {
 
-                history.pushState({ taskBridgeSection: sectionId }, "", newHash);\n                if (sectionNavigationStack[sectionNavigationStack.length - 1] !== sectionId) {\n                    sectionNavigationStack.push(sectionId);\n                }
+                history.pushState({ taskBridgeSection: sectionId }, "", newHash);
+                if (sectionNavigationStack[sectionNavigationStack.length - 1] !== sectionId) {
+                    sectionNavigationStack.push(sectionId);
+                }
 
             }
 
