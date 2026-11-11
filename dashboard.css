@@ -2289,6 +2289,7 @@ button {
 .brand-nagad{width:32px;min-width:32px;height:32px;border-radius:10px;background:#f97316;color:white;font-size:20px}
 .brand-rocket{width:32px;min-width:32px;height:32px;border-radius:50%;background:#7c3aed;color:white;font-size:20px}
 .brand-bank{width:34px;min-width:34px;height:34px;border-radius:9px;background:#e0f2fe;color:#0369a1;font-size:21px}
+.brand-bank svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block}
 .brand-usdt{width:34px;min-width:34px;height:34px;border-radius:50%;background:#e6f7ef;color:#15966b;font-size:22px}
 .deposit-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:22px;align-items:start}
 .deposit-form-panel form,.deposit-entry-fields{display:grid;gap:11px}
