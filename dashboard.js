@@ -441,6 +441,35 @@ document.addEventListener("DOMContentLoaded", function () {
         ".sidebar-navigation .nav-link[data-section]"
     );
 
+    // Keep an in-dashboard navigation trail for the section Back buttons.
+    let sectionNavigationStack = [];
+
+    function addSectionBackButtons() {
+        pageSections.forEach(function (sectionId) {
+            if (sectionId === "dashboardSection") return;
+
+            const section = document.getElementById(sectionId);
+            const heading = section?.querySelector(".section-heading");
+            if (!heading || heading.querySelector(".section-back-button")) return;
+
+            const backButton = document.createElement("button");
+            backButton.type = "button";
+            backButton.className = "section-back-button";
+            backButton.setAttribute("aria-label", "Go back to the previous page");
+            backButton.innerHTML = '<span aria-hidden="true">←</span><span>Back</span>';
+            backButton.addEventListener("click", function () {
+                if (sectionNavigationStack.length > 1) {
+                    window.history.back();
+                } else {
+                    showPageSection("dashboardSection");
+                }
+            });
+            heading.insertBefore(backButton, heading.firstChild);
+        });
+    }
+
+    addSectionBackButtons();
+
 
     /* =====================================
        SHOW SELECTED SECTION
@@ -528,7 +557,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (window.location.hash !== newHash) {
 
-                history.pushState(null, "", newHash);
+                history.pushState({ taskBridgeSection: sectionId }, "", newHash);\n                if (sectionNavigationStack[sectionNavigationStack.length - 1] !== sectionId) {\n                    sectionNavigationStack.push(sectionId);\n                }
 
             }
 
@@ -621,6 +650,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+        const initialSection = pageSections.includes(window.location.hash.replace("#", ""))
+            ? window.location.hash.replace("#", "")
+            : "dashboardSection";
+        sectionNavigationStack = [initialSection];
+        history.replaceState({ taskBridgeSection: initialSection }, "", window.location.href);
+
     }
 
 
@@ -639,13 +674,16 @@ document.addEventListener("DOMContentLoaded", function () {
             pageSections.includes(hashSection) &&
             document.getElementById(hashSection)
         ) {
-
+            const previousIndex = sectionNavigationStack.lastIndexOf(hashSection);
+            if (previousIndex >= 0) {
+                sectionNavigationStack = sectionNavigationStack.slice(0, previousIndex + 1);
+            } else {
+                sectionNavigationStack.push(hashSection);
+            }
             showPageSection(hashSection, false);
-
         } else {
-
+            sectionNavigationStack = ["dashboardSection"];
             showPageSection("dashboardSection", false);
-
         }
 
     });
