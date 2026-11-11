@@ -1928,6 +1928,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Submitting..."; }
         if (message) message.hidden = true;
         try {
+            // Let the database expire overdue attempts before accepting a submission.
+            const { error: expiryError } = await supabaseClient.rpc("expire_submissions");
+            if (expiryError) console.warn("Could not run expiry sweep before submit:", expiryError);
             const submittedAt = new Date().toISOString();
             const { data, error } = await supabaseClient.from("job_submissions")
                 .update({
