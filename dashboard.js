@@ -2646,25 +2646,127 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadMySubmissions() {
         const { data, error } = await supabaseClient.from("job_submissions")
-            .select("id,status")
-            .eq("worker_id", currentUser.id);
+            .select("id,job_id,worker_id,status,proof_text,proof_file_url,started_at,submitted_at,review_note,created_at")
+            .eq("worker_id", currentUser.id)
+            .order("submitted_at", { ascending: false, nullsFirst: false });
         if (error) {
-            console.error("Could not load dashboard submission statistics:", error);
-            const submittedNode = document.getElementById("dashboardJobsSubmitted");
-            const completedNode = document.getElementById("dashboardJobsCompleted");
-            if (submittedNode) submittedNode.textContent = "—";
-            if (completedNode) completedNode.textContent = "—";
+            console.error("Could not load worker submission history:", error);
+            ["workerTotalSubmitted","workerPendingReview","workerApproved","workerRejected","workerRevisionRequired"].forEach(id => {
+                const node = document.getElementById(id);
+                if (node) node.textContent = "—";
+            });
             return;
         }
+
         const submissions = data || [];
+        const statuses = submissions.map(item => String(item.status || "").toLowerCase());
+        const pending = statuses.filter(status => status === "submitted").length;
+        const approved = statuses.filter(status => ["approved","completed"].includes(status)).length;
+        const rejected = statuses.filter(status => status === "rejected").length;
+        const revision = statuses.filter(status => ["revision","revision_required","needs_revision"].includes(status)).length;
+
+        const counts = {
+            workerTotalSubmitted: submissions.filter(item => ["submitted","approved","completed","rejected","revision","revision_required","needs_revision"].includes(String(item.status || "").toLowerCase())).length,
+            workerPendingReview: pending,
+            workerApproved: approved,
+            workerRejected: rejected,
+            workerRevisionRequired: revision
+        };
+        Object.entries(counts).forEach(([id, value]) => {
+            const node = document.getElementById(id);
+            if (node) node.textContent = String(value);
+        });
+
+        const jobIds = [...new Set(submissions.map(item => item.job_id).filter(Boolean))];
+        let jobsById = {};
+        if (jobIds.length) {
+            const { data: jobs, error: jobsError } = await supabaseClient.from("jobs")
+                .select("id,title,reward_per_worker,currency")
+                .in("id", jobIds);
+            if (jobsError) console.error("Could not load submission job details:", jobsError);
+            else jobsById = Object.fromEntries((jobs || []).map(job => [job.id, job]));
+        }
+        renderWorkerSubmissionHistory(submissions, jobsById);
         const submittedNode = document.getElementById("dashboardJobsSubmitted");
         const completedNode = document.getElementById("dashboardJobsCompleted");
-        if (submittedNode) submittedNode.textContent = String(submissions.length);
-        if (completedNode) {
-            completedNode.textContent = String(submissions.filter(item =>
-                ["approved", "completed"].includes(String(item.status || "").toLowerCase())
-            ).length);
-        }
+        if (submittedNode) submittedNode.textContent = String(counts.workerTotalSubmitted);
+        if (completedNode) completedNode.textContent = String(approved);
+    }
+
+    function renderWorkerSubmissionHistory(submissions, jobsById) {
+        const container = document.getElementById("workerSubmissionsList");
+        const empty = document.getElementById("workerSubmissionsEmpty");
+        if (!container || !empty) return;
+        container.replaceChildren();
+        empty.hidden = submissions.length > 0;
+
+        submissions.forEach(submission => {
+            const status = String(submission.status || "unknown").toLowerCase();
+            const job = jobsById[submission.job_id] || {};
+            const card = document.createElement("article");
+            card.className = "worker-submission-history-card job-list-item";
+            card.dataset.status = status === "submitted" ? "pending" :
+                ["approved","completed"].includes(status) ? "approved" :
+                ["revision","revision_required","needs_revision"].includes(status) ? "revision" : status;
+
+            const heading = document.createElement("div");
+            heading.className = "worker-submission-history-heading";
+            const title = document.createElement("h3");
+            title.textContent = job.title || "Task submission";
+            const badge = document.createElement("span");
+            badge.className = "worker-submission-history-status " +
+                (status === "submitted" ? "pending" :
+                 ["approved","completed"].includes(status) ? "approved" :
+                 status === "rejected" ? "rejected" :
+                 ["revision","revision_required","needs_revision"].includes(status) ? "revision" : "other");
+            badge.textContent = status === "submitted" ? "Pending Review" :
+                ["approved","completed"].includes(status) ? "Approved · Paid" :
+                status === "rejected" ? "Rejected" :
+                ["revision","revision_required","needs_revision"].includes(status) ? "Revision Required" :
+                status.replaceAll("_"," ");
+            heading.append(title,badge);
+            card.appendChild(heading);
+
+            const meta = document.createElement("p");
+            meta.className = "worker-submission-history-meta";
+            meta.textContent = "Job ID: " + submission.job_id +
+                " · Reward: " + formatWalletMoney(job.reward_per_worker || 0, job.currency || "USD") +
+                " · " + (submission.submitted_at ? "Submitted " + new Date(submission.submitted_at).toLocaleString() :
+                    "Started " + (submission.started_at ? new Date(submission.started_at).toLocaleString() : "—"));
+            card.appendChild(meta);
+
+            if (submission.proof_text) {
+                const proof = document.createElement("p");
+                proof.className = "worker-submission-history-proof";
+                proof.textContent = submission.proof_text;
+                card.appendChild(proof);
+            }
+            if (submission.proof_file_url) {
+                const link = document.createElement("a");
+                link.href = submission.proof_file_url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "View submitted proof";
+                card.appendChild(link);
+            }
+            if (submission.review_note) {
+                const note = document.createElement("p");
+                note.className = "worker-submission-history-note";
+                note.textContent = (status === "rejected" ? "Rejection reason: " : "Review note: ") + submission.review_note;
+                card.appendChild(note);
+            }
+            container.appendChild(card);
+        });
+        applyWorkerSubmissionFilter();
+    }
+
+    function applyWorkerSubmissionFilter() {
+        const panel = document.querySelector("#mySubmittedJobsSection .content-panel");
+        const activeTab = panel?.querySelector(".job-tab.active");
+        const selected = activeTab?.dataset.status || "all";
+        panel?.querySelectorAll(".worker-submission-history-card").forEach(card => {
+            card.hidden = selected !== "all" && card.dataset.status !== selected;
+        });
     }
 
     async function submitNewJob() {
