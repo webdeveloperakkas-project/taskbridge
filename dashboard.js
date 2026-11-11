@@ -1793,7 +1793,7 @@ document.addEventListener("DOMContentLoaded", function () {
             edit.className = "job-view-button posted-job-edit-button";
             edit.textContent = "Edit";
             edit.setAttribute("aria-label", "Edit " + (job.title || "job"));
-            edit.addEventListener("click", () => openPostedJobEditor(job.id));
+            edit.addEventListener("click", () => openPostedJobEditor(job.id, row));
             row.appendChild(edit);
 
             list.appendChild(row);
@@ -1811,23 +1811,24 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function openPostedJobEditor(jobId) {
+    function openPostedJobEditor(jobId, row) {
         const job = postedJobsCache.find(item => item.id === jobId);
         if (!job) return;
-        let dialog = document.getElementById("postedJobEditDialog");
-        if (!dialog) {
-            dialog = document.createElement("dialog");
-            dialog.id = "postedJobEditDialog";
-            dialog.className = "posted-job-edit-dialog";
-            document.body.appendChild(dialog);
+        const existing = row.nextElementSibling;
+        if (existing?.classList.contains("posted-job-edit-panel")) {
+            existing.remove();
+            return;
         }
-        dialog.replaceChildren();
+        document.querySelectorAll("#postedJobsList .posted-job-edit-panel").forEach(panel => panel.remove());
+        const panel = document.createElement("section");
+        panel.className = "posted-job-edit-panel";
+        panel.setAttribute("aria-label", "Edit posted job details");
 
         const form = document.createElement("form");
         form.className = "posted-job-edit-form";
         form.addEventListener("submit", async event => {
             event.preventDefault();
-            await savePostedJobChanges(job, form, dialog);
+            await savePostedJobChanges(job, form, panel);
         });
 
         const heading = document.createElement("div");
@@ -1839,7 +1840,7 @@ document.addEventListener("DOMContentLoaded", function () {
         close.className = "posted-job-edit-close";
         close.textContent = "×";
         close.setAttribute("aria-label", "Close editor");
-        close.addEventListener("click", () => dialog.close());
+        close.addEventListener("click", () => panel.remove());
         heading.append(title, close);
         form.appendChild(heading);
 
@@ -1939,7 +1940,7 @@ document.addEventListener("DOMContentLoaded", function () {
         cancel.type = "button";
         cancel.className = "secondary-button";
         cancel.textContent = "Cancel";
-        cancel.addEventListener("click", () => dialog.close());
+        cancel.addEventListener("click", () => panel.remove());
         const save = document.createElement("button");
         save.type = "submit";
         save.className = "primary-button";
@@ -1947,7 +1948,8 @@ document.addEventListener("DOMContentLoaded", function () {
         save.disabled = !canIncrease;
         actions.append(cancel, save);
         form.appendChild(actions);
-        dialog.appendChild(form);
+        panel.appendChild(form);
+        row.insertAdjacentElement("afterend", panel);
 
         const updateEstimate = () => {
             const newSlots = Number.parseInt(slotsInput.value, 10);
@@ -1960,10 +1962,10 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         slotsInput.addEventListener("input", updateEstimate);
         updateEstimate();
-        if (!dialog.open) dialog.showModal();
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    async function savePostedJobChanges(job, form, dialog) {
+    async function savePostedJobChanges(job, form, panel) {
         const slotsInput = form.querySelector('input[type="number"]');
         const statusSelect = form.querySelector("select");
         const save = form.querySelector('button[type="submit"]');
@@ -1977,7 +1979,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         if (newSlots === oldSlots && newStatus === job.status) {
-            dialog.close();
+            panel.remove();
             return;
         }
         if (!["active", "paused"].includes(String(job.status || "").toLowerCase())) {
@@ -1996,7 +1998,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             if (error) throw error;
             await Promise.all([loadMyPostedJobs(), loadMyWallet(), loadFindJobs()]);
-            dialog.close();
+            panel.remove();
         } catch (error) {
             console.error("Posted job update failed:", error);
             message.textContent = error.message || "Could not update this job.";
