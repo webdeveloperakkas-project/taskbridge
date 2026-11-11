@@ -5137,3 +5137,128 @@ body.footer-info-open { overflow: hidden; }
         padding: 18px 15px 26px;
     }
 }
+
+
+/* FINAL MOBILE OVERRIDES — mirror the desktop footer and info-page palette. */
+@media screen and (max-width: 700px) {
+    .dashboard-footer {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 23px 17px 15px !important;
+        border: 0 !important;
+        border-top: 1px solid #cfe4d3 !important;
+        border-radius: 0 !important;
+        background: #edf6ee !important;
+        box-shadow: none !important;
+    }
+    .dashboard-footer::before { display: none !important; content: none !important; }
+    .dashboard-footer-main {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 20px 14px !important;
+    }
+    .dashboard-footer-about { grid-column: 1 / -1 !important; max-width: 100% !important; }
+    .dashboard-footer-group-links {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px 10px !important;
+    }
+    .dashboard-footer-group-links a {
+        display: inline-flex !important;
+        min-height: 32px !important;
+        padding: 5px 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #245b3a !important;
+        font-size: 11px !important;
+        text-align: left !important;
+    }
+    .dashboard-footer-copyright {
+        margin-top: 14px !important;
+        padding-top: 14px !important;
+        border-top: 1px solid #d7e8da !important;
+        color: #64786a !important;
+        text-align: center !important;
+    }
+    .footer-info-overlay {
+        position: fixed !important;
+        inset: 68px 0 0 !important;
+        z-index: 10050 !important;
+        display: flex !important;
+        align-items: stretch !important;
+        justify-content: stretch !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        background: rgba(8, 15, 20, .58) !important;
+        backdrop-filter: blur(3px) !important;
+    }
+    .footer-info-overlay[hidden] { display: none !important; }
+    .footer-info-panel {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: 100% !important;
+        max-height: none !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+    .footer-info-topbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        min-height: 56px !important;
+        padding: 9px 12px !important;
+        gap: 9px !important;
+        border: 0 !important;
+        border-bottom: 1px solid #d5e5d7 !important;
+        border-radius: 0 !important;
+        background: #eaf4eb !important;
+    }
+    .footer-info-close {
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        min-height: 35px !important;
+        padding: 6px 10px !important;
+        border: 1px solid #b9d5bf !important;
+        border-radius: 0 !important;
+        background: #dcefe0 !important;
+        color: #245b3a !important;
+        font-size: 11px !important;
+    }
+    .footer-info-page-title {
+        min-width: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        color: #245b3a !important;
+        font-size: 14px !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    .footer-info-content {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        padding: 18px 15px 26px !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain !important;
+        background: #fff !important;
+        color: #263449 !important;
+    }
+    .footer-info-content h3 { color: #245b3a !important; }
+    .footer-info-content .footer-info-note {
+        border-left-color: #86b995 !important;
+        border-radius: 0 !important;
+        background: #edf6ee !important;
+        color: #355642 !important;
+    }
+}
