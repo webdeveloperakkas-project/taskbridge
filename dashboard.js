@@ -1746,19 +1746,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         showWorkerSubmissionMessage("Time is over. This job has expired and can no longer be submitted.", "error");
         try {
+            // Expiry is performed by the server-side function so workers do not
+            // need direct permission to change job_submissions into "expired".
             const { error } = await supabaseClient.rpc("expire_submissions");
             if (error) throw error;
         } catch (error) {
-            console.error("Could not run expire_submissions:", error);
-            if (activeWorkerSubmission?.id) {
-                const { error: updateError } = await supabaseClient.from("job_submissions")
-                    .update({ status: "expired", updated_at: new Date().toISOString() })
-                    .eq("id", activeWorkerSubmission.id)
-                    .eq("worker_id", currentUser.id)
-                    .eq("status", "in_progress")
-                    .lte("expires_at", new Date().toISOString());
-                if (updateError) console.error("Could not mark worker submission expired:", updateError);
-            }
+            // Do not fall back to a client-side UPDATE: the worker RLS policy
+            // intentionally allows only in_progress -> submitted.
+            console.error("Could not expire worker submission through the server function:", error);
         }
         window.setTimeout(() => showPageSection("dashboardSection"), 1400);
     }
@@ -1872,8 +1867,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 openJobDetails(jobId, existing);
                 return;
             }
-            if (existing && ["submitted", "approved", "rejected"].includes(String(existing.status).toLowerCase())) {
-                window.alert("You have already submitted this job. Please check your submissions.");
+            if (existing && ["submitted", "approved", "completed", "rejected", "revision", "revision_required", "needs_revision"].includes(String(existing.status).toLowerCase())) {
+                window.alert("You already submitted this task. Please check My Submitted Jobs for its status.");
                 return;
             }
             if (existing?.status === "expired") {
@@ -2662,7 +2657,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const submissions = data || [];
+        // My Submitted Jobs is a history of work actually submitted.
+        // Active attempts and expired, unsubmitted attempts stay out of this list.
+        const finalSubmissionStatuses = ["submitted","approved","completed","rejected","revision","revision_required","needs_revision"];
+        const submissions = (data || []).filter(item =>
+            finalSubmissionStatuses.includes(String(item.status || "").toLowerCase())
+        );
         const statuses = submissions.map(item => String(item.status || "").toLowerCase());
         const pending = statuses.filter(status => status === "submitted").length;
         const approved = statuses.filter(status => ["approved","completed"].includes(status)).length;
