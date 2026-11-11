@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let walletRows = [];
     let walletsByCurrency = new Map();
     let selectedWithdrawCurrency = "";
+    let activeWorkerJob = null;
+    let activeWorkerSubmission = null;
+    let workerJobTimerInterval = null;
 
     const JOB_COUNTRY_GROUPS = {"Asia":"Afghanistan|Armenia|Azerbaijan|Bahrain|Bangladesh|Bhutan|Brunei|Cambodia|China|Cyprus|Georgia|India|Indonesia|Iran|Iraq|Israel|Japan|Jordan|Kazakhstan|Kuwait|Kyrgyzstan|Laos|Lebanon|Malaysia|Maldives|Mongolia|Myanmar|Nepal|North Korea|Oman|Pakistan|Palestine|Philippines|Qatar|Saudi Arabia|Singapore|South Korea|Sri Lanka|Syria|Taiwan|Tajikistan|Thailand|Timor-Leste|Turkey|Turkmenistan|United Arab Emirates|Uzbekistan|Vietnam|Yemen","Europe":"Albania|Andorra|Austria|Belarus|Belgium|Bosnia and Herzegovina|Bulgaria|Croatia|Czechia|Denmark|Estonia|Finland|France|Germany|Greece|Hungary|Iceland|Ireland|Italy|Kosovo|Latvia|Liechtenstein|Lithuania|Luxembourg|Malta|Moldova|Monaco|Montenegro|Netherlands|North Macedonia|Norway|Poland|Portugal|Romania|Russia|San Marino|Serbia|Slovakia|Slovenia|Spain|Sweden|Switzerland|Ukraine|United Kingdom|Vatican City","Africa":"Algeria|Angola|Benin|Botswana|Burkina Faso|Burundi|Cabo Verde|Cameroon|Central African Republic|Chad|Comoros|Democratic Republic of the Congo|Republic of the Congo|Côte d’Ivoire|Djibouti|Egypt|Equatorial Guinea|Eritrea|Eswatini|Ethiopia|Gabon|Gambia|Ghana|Guinea|Guinea-Bissau|Kenya|Lesotho|Liberia|Libya|Madagascar|Malawi|Mali|Mauritania|Mauritius|Morocco|Mozambique|Namibia|Niger|Nigeria|Rwanda|São Tomé and Príncipe|Senegal|Seychelles|Sierra Leone|Somalia|South Africa|South Sudan|Sudan|Tanzania|Togo|Tunisia|Uganda|Zambia|Zimbabwe","North America":"Antigua and Barbuda|Bahamas|Barbados|Belize|Canada|Costa Rica|Cuba|Dominica|Dominican Republic|El Salvador|Grenada|Guatemala|Haiti|Honduras|Jamaica|Mexico|Nicaragua|Panama|Saint Kitts and Nevis|Saint Lucia|Saint Vincent and the Grenadines|Trinidad and Tobago|United States","South America":"Argentina|Bolivia|Brazil|Chile|Colombia|Ecuador|Guyana|Paraguay|Peru|Suriname|Uruguay|Venezuela","Oceania":"Australia|Fiji|Kiribati|Marshall Islands|Micronesia|Nauru|New Zealand|Palau|Papua New Guinea|Samoa|Solomon Islands|Tonga|Tuvalu|Vanuatu"};
     let currentUserCountry = "";
@@ -1704,9 +1707,87 @@ document.addEventListener("DOMContentLoaded", function () {
         return cell;
     }
 
-    function openJobDetails(jobId) {
-        const job = publicJobs.find(item => item.id === jobId);
+    function stopWorkerJobTimer() {
+        if (workerJobTimerInterval) {
+            window.clearInterval(workerJobTimerInterval);
+            workerJobTimerInterval = null;
+        }
+    }
+
+    function formatWorkerCountdown(milliseconds) {
+        const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return [hours, minutes, seconds].map(value => String(value).padStart(2, "0")).join(":");
+    }
+
+    function showWorkerSubmissionMessage(message, type) {
+        const node = document.getElementById("workerSubmissionMessage");
+        if (!node) return;
+        node.textContent = message;
+        node.className = "worker-submission-message " + (type || "info");
+        node.hidden = false;
+    }
+
+    async function expireCurrentWorkerSubmission() {
+        stopWorkerJobTimer();
+        const form = document.getElementById("workerSubmissionForm");
+        const submitButton = document.getElementById("submitWorkerJobButton");
+        if (form) form.hidden = true;
+        if (submitButton) submitButton.hidden = true;
+        const timer = document.getElementById("workerJobCountdown");
+        if (timer) timer.textContent = "00:00:00";
+        const status = document.getElementById("detailJobStatus");
+        if (status) {
+            status.textContent = "Expired";
+            status.className = "job-status expired";
+        }
+        showWorkerSubmissionMessage("Time is over. This job has expired and can no longer be submitted.", "error");
+        try {
+            const { error } = await supabaseClient.rpc("expire_submissions");
+            if (error) throw error;
+        } catch (error) {
+            console.error("Could not run expire_submissions:", error);
+            if (activeWorkerSubmission?.id) {
+                const { error: updateError } = await supabaseClient.from("job_submissions")
+                    .update({ status: "expired", updated_at: new Date().toISOString() })
+                    .eq("id", activeWorkerSubmission.id)
+                    .eq("worker_id", currentUser.id)
+                    .eq("status", "in_progress")
+                    .lte("expires_at", new Date().toISOString());
+                if (updateError) console.error("Could not mark worker submission expired:", updateError);
+            }
+        }
+        window.setTimeout(() => showPageSection("dashboardSection"), 1400);
+    }
+
+    function startWorkerJobCountdown(submission) {
+        stopWorkerJobTimer();
+        const timer = document.getElementById("workerJobCountdown");
+        const form = document.getElementById("workerSubmissionForm");
+        const submitButton = document.getElementById("submitWorkerJobButton");
+        const deadline = new Date(submission.expires_at).getTime();
+
+        const tick = () => {
+            const remaining = deadline - Date.now();
+            if (timer) timer.textContent = formatWorkerCountdown(remaining);
+            if (remaining <= 0) {
+                expireCurrentWorkerSubmission();
+                return;
+            }
+            if (form) form.hidden = false;
+            if (submitButton) submitButton.hidden = false;
+        };
+        tick();
+        if (deadline > Date.now()) workerJobTimerInterval = window.setInterval(tick, 1000);
+    }
+
+    function openJobDetails(jobId, submission) {
+        const job = publicJobs.find(item => item.id === jobId) || activeWorkerJob;
         if (!job) return;
+        activeWorkerJob = job;
+        activeWorkerSubmission = submission || activeWorkerSubmission;
         const category = getJobCategory(job);
         const categoryNode = document.getElementById("detailJobCategory");
         const titleNode = document.getElementById("detailJobTitle");
@@ -1720,7 +1801,7 @@ document.addEventListener("DOMContentLoaded", function () {
             " per worker · " + Number(job.total_slots || 0) + " total workers · " +
             formatJobDuration(job.duration_minutes);
         if (statusNode) {
-            statusNode.textContent = "Active";
+            statusNode.textContent = activeWorkerSubmission?.status === "submitted" ? "Submitted" : "In Progress";
             statusNode.className = "job-status active";
         }
         if (iconNode) {
@@ -1741,8 +1822,189 @@ document.addEventListener("DOMContentLoaded", function () {
         setText("detailProofTitle", "Proof Requirements");
         setText("detailProofDescription", job.proof_requirements);
         setText("detailJobExtraInstructions", job.extra_instructions);
+        const form = document.getElementById("workerSubmissionForm");
+        const submitButton = document.getElementById("submitWorkerJobButton");
+        const proofText = document.getElementById("workerProofText");
+        const proofUrl = document.getElementById("workerProofFileUrl");
+        if (proofText) proofText.value = activeWorkerSubmission?.proof_text || "";
+        if (proofUrl) proofUrl.value = activeWorkerSubmission?.proof_file_url || "";
+        if (activeWorkerSubmission?.status === "in_progress") {
+            if (form) form.hidden = false;
+            if (submitButton) submitButton.hidden = false;
+            startWorkerJobCountdown(activeWorkerSubmission);
+        } else {
+            stopWorkerJobTimer();
+            if (form) form.hidden = true;
+            if (submitButton) submitButton.hidden = true;
+            const timer = document.getElementById("workerJobCountdown");
+            if (timer) timer.textContent = activeWorkerSubmission?.status === "submitted" ? "Submitted" : "--:--:--";
+            if (activeWorkerSubmission?.status === "submitted") {
+                showWorkerSubmissionMessage("Job Successfully Submitted. Your submission is waiting for advertiser review.", "success");
+            }
+        }
         showPageSection("jobDetailsSection");
     }
+
+    async function startWorkerJob(jobId) {
+        const job = publicJobs.find(item => item.id === jobId);
+        if (!job || !currentUser) return;
+        const button = document.querySelector('[data-start-job="' + jobId + '"]');
+        if (button) { button.disabled = true; button.textContent = "Starting..."; }
+        try {
+            const { data: existingRows, error: existingError } = await supabaseClient.from("job_submissions")
+                .select("id,job_id,worker_id,status,started_at,expires_at,proof_text,proof_file_url,submitted_at")
+                .eq("job_id", jobId)
+                .eq("worker_id", currentUser.id)
+                .order("created_at", { ascending: false })
+                .limit(1);
+            if (existingError) throw existingError;
+            const existing = existingRows?.[0] || null;
+            if (existing?.status === "in_progress") {
+                if (new Date(existing.expires_at).getTime() <= Date.now()) {
+                    activeWorkerSubmission = existing;
+                    activeWorkerJob = job;
+                    await expireCurrentWorkerSubmission();
+                    return;
+                }
+                openJobDetails(jobId, existing);
+                return;
+            }
+            if (existing && ["submitted", "approved", "rejected"].includes(String(existing.status).toLowerCase())) {
+                window.alert("You have already submitted this job. Please check your submissions.");
+                return;
+            }
+            if (existing?.status === "expired") {
+                window.alert("This job attempt has expired and cannot be restarted.");
+                return;
+            }
+
+            const startedAt = new Date();
+            const durationMinutes = Number(job.duration_minutes);
+            if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) {
+                throw new Error("This job has an invalid time limit. Please contact support.");
+            }
+            const expiresAt = new Date(startedAt.getTime() + durationMinutes * 60 * 1000);
+            const { data: submission, error } = await supabaseClient.from("job_submissions")
+                .insert({
+                    job_id: job.id,
+                    worker_id: currentUser.id,
+                    status: "in_progress",
+                    started_at: startedAt.toISOString(),
+                    expires_at: expiresAt.toISOString()
+                })
+                .select("id,job_id,worker_id,status,started_at,expires_at,proof_text,proof_file_url,submitted_at")
+                .single();
+            if (error) throw error;
+            activeWorkerJob = job;
+            activeWorkerSubmission = submission;
+            openJobDetails(jobId, submission);
+        } catch (error) {
+            console.error("Could not start worker job:", error);
+            window.alert(error.message || "Could not start this job. Please try again.");
+        } finally {
+            if (button) { button.disabled = false; button.textContent = "Start Job"; }
+        }
+    }
+
+    async function submitWorkerJob(event) {
+        event.preventDefault();
+        if (!activeWorkerSubmission || !currentUser) return;
+        const submitButton = document.getElementById("submitWorkerJobButton");
+        const proofText = document.getElementById("workerProofText");
+        const proofUrl = document.getElementById("workerProofFileUrl");
+        const message = document.getElementById("workerSubmissionMessage");
+        const proof = proofText?.value.trim() || "";
+        const fileUrl = proofUrl?.value.trim() || "";
+        if (!proof && !fileUrl) {
+            showWorkerSubmissionMessage("Please enter your work proof or a proof file link.", "error");
+            return;
+        }
+        if (new Date(activeWorkerSubmission.expires_at).getTime() <= Date.now()) {
+            await expireCurrentWorkerSubmission();
+            return;
+        }
+        if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Submitting..."; }
+        if (message) message.hidden = true;
+        try {
+            const submittedAt = new Date().toISOString();
+            const { data, error } = await supabaseClient.from("job_submissions")
+                .update({
+                    proof_text: proof || null,
+                    proof_file_url: fileUrl || null,
+                    status: "submitted",
+                    submitted_at: submittedAt,
+                    updated_at: submittedAt
+                })
+                .eq("id", activeWorkerSubmission.id)
+                .eq("worker_id", currentUser.id)
+                .eq("status", "in_progress")
+                .gt("expires_at", submittedAt)
+                .select("id,job_id,worker_id,status,started_at,expires_at,proof_text,proof_file_url,submitted_at")
+                .maybeSingle();
+            if (error) throw error;
+            if (!data) {
+                await expireCurrentWorkerSubmission();
+                return;
+            }
+            activeWorkerSubmission = data;
+            stopWorkerJobTimer();
+            if (submitButton) submitButton.hidden = true;
+            const form = document.getElementById("workerSubmissionForm");
+            if (form) form.hidden = true;
+            const status = document.getElementById("detailJobStatus");
+            if (status) { status.textContent = "Submitted"; status.className = "job-status active"; }
+            const timer = document.getElementById("workerJobCountdown");
+            if (timer) timer.textContent = "Submitted";
+            showWorkerSubmissionMessage("Job Successfully Submitted. Your submission is waiting for advertiser review.", "success");
+            await loadMySubmissions();
+        } catch (error) {
+            console.error("Worker job submission failed:", error);
+            showWorkerSubmissionMessage(error.message || "Could not submit this job. Please try again.", "error");
+        } finally {
+            if (submitButton && !submitButton.hidden) {
+                submitButton.disabled = false;
+                submitButton.textContent = "Submit Job";
+            }
+        }
+    }
+
+    async function restoreActiveWorkerJob() {
+        const { data, error } = await supabaseClient.from("job_submissions")
+            .select("id,job_id,worker_id,status,started_at,expires_at,proof_text,proof_file_url,submitted_at")
+            .eq("worker_id", currentUser.id)
+            .eq("status", "in_progress")
+            .order("started_at", { ascending: false })
+            .limit(1);
+        if (error) {
+            console.error("Could not restore active worker job:", error);
+            return;
+        }
+        const submission = data?.[0];
+        if (!submission) return;
+        if (new Date(submission.expires_at).getTime() <= Date.now()) {
+            activeWorkerSubmission = submission;
+            await expireCurrentWorkerSubmission();
+            return;
+        }
+        let job = publicJobs.find(item => item.id === submission.job_id);
+        if (!job) {
+            const { data: jobData, error: jobError } = await supabaseClient.from("jobs")
+                .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country")
+                .eq("id", submission.job_id)
+                .maybeSingle();
+            if (jobError) {
+                console.error("Could not load active worker job details:", jobError);
+                return;
+            }
+            job = jobData;
+        }
+        if (!job) return;
+        activeWorkerJob = job;
+        openJobDetails(job.id, submission);
+    }
+
+    const workerSubmissionForm = document.getElementById("workerSubmissionForm");
+    if (workerSubmissionForm) workerSubmissionForm.addEventListener("submit", submitWorkerJob);
 
 
     function renderDashboardRecentJobs(jobs) {
@@ -1780,8 +2042,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const viewButton = document.createElement("button");
             viewButton.type = "button";
             viewButton.className = "job-view-button";
-            viewButton.dataset.openJob = job.id;
-            viewButton.textContent = "View Details";
+            viewButton.dataset.startJob = job.id;
+            viewButton.textContent = "Start Job";
             actionCell.appendChild(viewButton);
             row.appendChild(actionCell);
 
@@ -1823,7 +2085,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const nameButton = document.createElement("button");
             nameButton.type = "button";
             nameButton.className = "job-name-link";
-            nameButton.dataset.openJob = job.id;
+            nameButton.dataset.startJob = job.id;
             nameButton.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
             nameButton.title = nameButton.textContent;
             nameCell.appendChild(nameButton);
@@ -1839,8 +2101,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const viewButton = document.createElement("button");
             viewButton.type = "button";
             viewButton.className = "job-view-button";
-            viewButton.dataset.openJob = job.id;
-            viewButton.textContent = "View";
+            viewButton.dataset.startJob = job.id;
+            viewButton.textContent = "Start Job";
             actionCell.appendChild(viewButton);
             row.appendChild(actionCell);
             list.appendChild(row);
@@ -1860,16 +2122,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const dashboardRecentJobsList = document.getElementById("dashboardRecentJobsList");
     if (dashboardRecentJobsList) {
         dashboardRecentJobsList.addEventListener("click", event => {
-            const trigger = event.target.closest("[data-open-job]");
-            if (trigger) openJobDetails(trigger.dataset.openJob);
+            const trigger = event.target.closest("[data-start-job]");
+            if (trigger) startWorkerJob(trigger.dataset.startJob);
         });
     }
 
     const findJobsList = document.getElementById("jobList");
     if (findJobsList) {
         findJobsList.addEventListener("click", event => {
-            const trigger = event.target.closest("[data-open-job]");
-            if (trigger) openJobDetails(trigger.dataset.openJob);
+            const trigger = event.target.closest("[data-start-job]");
+            if (trigger) startWorkerJob(trigger.dataset.startJob);
         });
     }
     ["backToJobsButton", "detailsBackButton"].forEach(id => {
@@ -2311,6 +2573,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         await loadJobCategories();
         await Promise.all([loadMyPostedJobs(), loadFindJobs(), loadMySubmissions(), loadMyTotalEarnings()]);
+        await restoreActiveWorkerJob();
         await loadMyWallet();
         await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
 
