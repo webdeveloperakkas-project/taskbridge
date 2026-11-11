@@ -4721,6 +4721,10 @@ button.header-balance {
     justify-self: end;
 }
 
+.section-heading:has(> a)::after {
+    display: none;
+}
+
 .section-heading::after {
     content: "";
     grid-column: 3;
