@@ -2685,7 +2685,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let jobsById = {};
         if (jobIds.length) {
             const { data: jobs, error: jobsError } = await supabaseClient.from("jobs")
-                .select("id,title,reward_per_worker,currency")
+                .select("id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,currency,duration_minutes")
                 .in("id", jobIds);
             if (jobsError) console.error("Could not load submission job details:", jobsError);
             else jobsById = Object.fromEntries((jobs || []).map(job => [job.id, job]));
@@ -2707,58 +2707,120 @@ document.addEventListener("DOMContentLoaded", function () {
         submissions.forEach(submission => {
             const status = String(submission.status || "unknown").toLowerCase();
             const job = jobsById[submission.job_id] || {};
+            const isPaid = ["approved","completed"].includes(status);
+            const isRejected = status === "rejected";
+            const isPending = status === "submitted";
+            const isRevision = ["revision","revision_required","needs_revision"].includes(status);
+            const filterStatus = isPending ? "pending" : isPaid ? "approved" :
+                isRevision ? "revision" : status;
+
             const card = document.createElement("article");
             card.className = "worker-submission-history-card job-list-item";
-            card.dataset.status = status === "submitted" ? "pending" :
-                ["approved","completed"].includes(status) ? "approved" :
-                ["revision","revision_required","needs_revision"].includes(status) ? "revision" : status;
+            card.dataset.status = filterStatus;
 
-            const heading = document.createElement("div");
-            heading.className = "worker-submission-history-heading";
-            const title = document.createElement("h3");
+            const titleCell = document.createElement("div");
+            titleCell.className = "worker-history-cell worker-history-job";
+            titleCell.dataset.label = "Job Name";
+            const title = document.createElement("strong");
             title.textContent = job.title || "Task submission";
+            const jobId = document.createElement("small");
+            jobId.textContent = "Job ID: " + submission.job_id;
+            titleCell.append(title, jobId);
+
+            const paymentCell = document.createElement("div");
+            paymentCell.className = "worker-history-cell worker-history-payment";
+            paymentCell.dataset.label = "Payment";
+            const payment = document.createElement("strong");
+            payment.textContent = formatWalletMoney(job.reward_per_worker || 0, job.currency || "USD");
+            paymentCell.appendChild(payment);
+
+            const statusCell = document.createElement("div");
+            statusCell.className = "worker-history-cell";
+            statusCell.dataset.label = "Status";
             const badge = document.createElement("span");
             badge.className = "worker-submission-history-status " +
-                (status === "submitted" ? "pending" :
-                 ["approved","completed"].includes(status) ? "approved" :
-                 status === "rejected" ? "rejected" :
-                 ["revision","revision_required","needs_revision"].includes(status) ? "revision" : "other");
-            badge.textContent = status === "submitted" ? "Pending Review" :
-                ["approved","completed"].includes(status) ? "Approved · Paid" :
-                status === "rejected" ? "Rejected" :
-                ["revision","revision_required","needs_revision"].includes(status) ? "Revision Required" :
-                status.replaceAll("_"," ");
-            heading.append(title,badge);
-            card.appendChild(heading);
+                (isPending ? "pending" : isPaid ? "approved" : isRejected ? "rejected" : isRevision ? "revision" : "other");
+            badge.textContent = isPending ? "Pending Review" : isPaid ? "Paid · Completed" :
+                isRejected ? "Rejected" : isRevision ? "Revision Required" : status.replaceAll("_"," ");
+            statusCell.appendChild(badge);
 
-            const meta = document.createElement("p");
-            meta.className = "worker-submission-history-meta";
-            meta.textContent = "Job ID: " + submission.job_id +
-                " · Reward: " + formatWalletMoney(job.reward_per_worker || 0, job.currency || "USD") +
-                " · " + (submission.submitted_at ? "Submitted " + new Date(submission.submitted_at).toLocaleString() :
-                    "Started " + (submission.started_at ? new Date(submission.started_at).toLocaleString() : "—"));
-            card.appendChild(meta);
-
-            if (submission.proof_text) {
-                const proof = document.createElement("p");
-                proof.className = "worker-submission-history-proof";
-                proof.textContent = submission.proof_text;
-                card.appendChild(proof);
+            const timingCell = document.createElement("div");
+            timingCell.className = "worker-history-cell worker-history-timing";
+            timingCell.dataset.label = "Payment Time";
+            const timing = document.createElement("strong");
+            if (isPaid) {
+                timing.textContent = "Paid";
+            } else if (isRejected) {
+                timing.textContent = "Not payable";
+            } else if (isRevision) {
+                timing.textContent = "Review required";
+            } else {
+                const submittedAt = submission.submitted_at ? new Date(submission.submitted_at) : null;
+                if (submittedAt && !Number.isNaN(submittedAt.getTime())) {
+                    const deadline = new Date(submittedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    const remaining = Math.max(0, Math.ceil((deadline.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+                    timing.textContent = remaining > 0 ? "Within " + remaining + " day(s)" : "7-day review due";
+                } else {
+                    timing.textContent = "Within 7 days";
+                }
             }
+            timingCell.appendChild(timing);
+
+            const viewCell = document.createElement("div");
+            viewCell.className = "worker-history-cell worker-history-view";
+            viewCell.dataset.label = "View";
+            const viewButton = document.createElement("button");
+            viewButton.type = "button";
+            viewButton.className = "worker-submission-view-button";
+            viewButton.textContent = "View";
+            viewButton.setAttribute("aria-expanded", "false");
+            viewCell.appendChild(viewButton);
+
+            const details = document.createElement("div");
+            details.className = "worker-submission-history-details";
+            details.hidden = true;
+            const detailsHeading = document.createElement("h3");
+            detailsHeading.textContent = "Task & Submission Details";
+            details.appendChild(detailsHeading);
+
+            const addDetail = (label, value, className) => {
+                if (value == null || String(value).trim() === "") return;
+                const block = document.createElement("div");
+                block.className = "worker-history-detail-block" + (className ? " " + className : "");
+                const caption = document.createElement("strong");
+                caption.textContent = label;
+                const content = document.createElement("p");
+                content.textContent = String(value);
+                block.append(caption, content);
+                details.appendChild(block);
+            };
+            addDetail("Job ID", submission.job_id);
+            addDetail("Submission ID", submission.id);
+            addDetail("Job Description", job.description);
+            addDetail("Instructions", job.instructions);
+            addDetail("Target URL", job.target_url);
+            addDetail("Proof Requirements", job.proof_requirements);
+            addDetail("Additional Instructions", job.extra_instructions);
+            addDetail("Your Submitted Proof", submission.proof_text);
             if (submission.proof_file_url) {
-                const link = document.createElement("a");
-                link.href = submission.proof_file_url;
-                link.target = "_blank";
-                link.rel = "noopener noreferrer";
-                link.textContent = "View submitted proof";
-                card.appendChild(link);
+                const proofLink = document.createElement("a");
+                proofLink.href = submission.proof_file_url;
+                proofLink.target = "_blank";
+                proofLink.rel = "noopener noreferrer";
+                proofLink.className = "worker-submission-history-proof-link";
+                proofLink.textContent = "Open submitted proof file";
+                details.appendChild(proofLink);
             }
-            if (submission.review_note) {
-                const note = document.createElement("p");
-                note.className = "worker-submission-history-note";
-                note.textContent = (status === "rejected" ? "Rejection reason: " : "Review note: ") + submission.review_note;
-                card.appendChild(note);
-            }
+            addDetail("Submitted At", submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : "—");
+            addDetail("Payment / Review Note", submission.review_note, isRejected ? "rejected-note" : "");
+            viewButton.addEventListener("click", () => {
+                const opening = details.hidden;
+                details.hidden = !opening;
+                viewButton.textContent = opening ? "Close" : "View";
+                viewButton.setAttribute("aria-expanded", opening ? "true" : "false");
+            });
+
+            card.append(titleCell, paymentCell, statusCell, timingCell, viewCell, details);
             container.appendChild(card);
         });
         applyWorkerSubmissionFilter();
