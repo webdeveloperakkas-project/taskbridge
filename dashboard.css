@@ -3369,7 +3369,7 @@ button.header-balance {
 .dashboard-recent-list-panel .job-table-header,
 .dashboard-recent-list-panel .dashboard-recent-job-row {
     display: grid;
-    grid-template-columns: minmax(0, 2.1fr) minmax(90px, .85fr) minmax(90px, .85fr) minmax(80px, .7fr) minmax(105px, .8fr);
+    grid-template-columns: minmax(0, 2fr) minmax(82px, .8fr) minmax(70px, .65fr) minmax(82px, .75fr) minmax(75px, .65fr) minmax(105px, .8fr);
     align-items: center;
     column-gap: 14px;
     min-width: 720px;
@@ -4316,4 +4316,22 @@ button.header-balance {
     .top-header .header-right {
         grid-template-columns: minmax(0, 1fr) 36px auto !important;
     }
+}
+
+
+/* Post Job: keep task duration and buyer payment window side by side. */
+.post-job-time-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+.post-job-time-grid .form-group { min-width: 0; }
+.post-job-time-grid input,
+.post-job-time-grid select {
+    width: 100%;
+    min-height: 44px;
+}
+@media (max-width: 480px) {
+    .post-job-time-grid { gap: 9px; }
+    .post-job-time-grid label { font-size: 11px; }
 }
