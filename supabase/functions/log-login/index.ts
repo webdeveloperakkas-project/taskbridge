@@ -159,59 +159,68 @@ Deno.serve(async (request: Request) => {
 
     if (insertError) throw insertError;
 
-    // Country targeting uses IP country only while the user is not fully KYC verified.
-    // The API token stays in Supabase Secrets; no IP or country is accepted from the browser body.
+    // Refresh the current IP country on every login, but never overwrite a locked KYC country.
+    // IP/country values are derived server-side; none are accepted from the browser body.
     try {
-      const [ipCountryResult, detailsResult, submissionsResult] = await Promise.all([
+      const [ipCountryResult, submissionsResult, existingResult] = await Promise.all([
         getIpCountry(clientIp),
-        supabaseAdmin.from("user_profile_details")
-          .select("country")
+        supabaseAdmin.from("user_verification_submissions")
+          .select("verification_type,status,country")
+          .eq("user_id", authData.user.id),
+        supabaseAdmin.from("user_country_verifications")
+          .select("profile_country,verified")
           .eq("user_id", authData.user.id)
           .maybeSingle(),
-        supabaseAdmin.from("user_verification_submissions")
-          .select("verification_type,status,country,address_country")
-          .eq("user_id", authData.user.id),
       ]);
-      if (detailsResult.error) throw detailsResult.error;
+
       if (submissionsResult.error) throw submissionsResult.error;
+      if (existingResult.error) throw existingResult.error;
 
       const submissions = submissionsResult.data || [];
-      const identity = submissions.find(row =>
+      const approvedIdentity = submissions.find(row =>
         row.verification_type === "identity" && row.status === "approved"
       );
-      const address = submissions.find(row =>
+      const approvedAddress = submissions.find(row =>
         row.verification_type === "address" && row.status === "approved"
       );
-      const profileCountry = detailsResult.data?.country?.trim() || null;
-      const identityCountry = identity?.country?.trim() || null;
-      const sameCountry = (a: string | null, b: string | null) =>
-        Boolean(a && b && a.toLowerCase() === b.toLowerCase());
 
-      // Both identity and address documents must be approved. The issuing country
-      // on the approved identity document must match the saved profile country.
-      // Address country may legitimately differ for people living abroad.
-      const documentVerified = Boolean(
-        identity && address &&
-        sameCountry(profileCountry, identityCountry)
+      const identityDocumentCountry =
+        typeof approvedIdentity?.country === "string"
+          ? approvedIdentity.country.trim()
+          : null;
+
+      // Both identity and address documents must be approved before locking a country.
+      const newlyVerified = Boolean(
+        approvedIdentity &&
+        approvedAddress &&
+        identityDocumentCountry
       );
 
+      // Once verified, keep the saved document country unchanged on every future login,
+      // even if the user changes device, network, IP address, or uses a VPN.
+      const wasAlreadyVerified = existingResult.data?.verified === true;
+      const isVerified = wasAlreadyVerified || newlyVerified;
+      const lockedCountry = wasAlreadyVerified
+        ? (existingResult.data?.profile_country || null)
+        : (newlyVerified ? identityDocumentCountry : null);
+
+      const now = new Date().toISOString();
       const { error: countryUpsertError } = await supabaseAdmin
         .from("user_country_verifications")
         .upsert({
           user_id: authData.user.id,
-          profile_country: profileCountry,
+          profile_country: lockedCountry,
           ip_country: ipCountryResult.country,
           ip_country_code: ipCountryResult.countryCode,
           ip_address: clientIp,
-          verified: documentVerified,
-          checked_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          verified: isVerified,
+          checked_at: now,
+          updated_at: now,
         }, { onConflict: "user_id" });
 
       if (countryUpsertError) throw countryUpsertError;
     } catch (countryError) {
-      // Country lookup/storage must not block a valid login. Missing lookup data
-      // leaves the worker without a trusted country until the next successful check.
+      // Country lookup/storage must not block a valid login.
       console.error("Country targeting context could not be refreshed:", countryError);
     }
 
