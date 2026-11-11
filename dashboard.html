@@ -637,7 +637,8 @@
                             <div class="job-table-header" aria-hidden="true">
                                 <span>Job Name</span>
                                 <span>Payment</span>
-                                <span>Task Time</span>
+                                <span>TTF</span>
+                                <span>Pay Time</span>
                                 <span>Workers</span>
                                 <span>Action</span>
                             </div>
@@ -1316,10 +1317,24 @@
                                     required></textarea>
 
                             </div>
-                            <div class="form-group">
-                                <label for="jobDuration">Estimated Completion Time (minutes)</label>
-                                <input type="number" id="jobDuration" name="durationMinutes"
-                                    min="1" step="1" value="5" required>
+                            <div class="post-job-time-grid">
+                                <div class="form-group">
+                                    <label for="jobDuration">Task Time (minutes)</label>
+                                    <input type="number" id="jobDuration" name="durationMinutes"
+                                        min="1" step="1" value="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="buyerPaymentDays">Buyer Pay Time</label>
+                                    <select id="buyerPaymentDays" name="buyerPaymentDays" required>
+                                        <option value="" selected disabled>Select days</option>
+                                        <option value="1">1 day</option>
+                                        <option value="2">2 days</option>
+                                        <option value="3">3 days</option>
+                                        <option value="5">5 days</option>
+                                        <option value="7">7 days</option>
+                                        <option value="14">14 days</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="form-row">
