@@ -4682,3 +4682,145 @@ button.header-balance {
     .find-job-stats-grid .stat-card,
     .my-posted-stats-grid .stat-card { transition: none; }
 }
+
+
+/* =========================================
+   CENTERED SECTION HEADERS & BACK BUTTONS
+========================================= */
+
+.section-heading {
+    display: grid;
+    grid-template-columns: minmax(76px, 1fr) minmax(0, 2fr) minmax(76px, 1fr);
+    align-items: center;
+    gap: 14px;
+    min-height: 112px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.16);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 12% 0%, rgba(255,255,255,.75), transparent 35%),
+        linear-gradient(115deg, #e8f2ff 0%, #f0eaff 48%, #e7fbf5 100%);
+    box-shadow: 0 8px 24px rgba(50, 75, 130, 0.07);
+}
+
+.section-heading > div:first-of-type {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.section-heading > a,
+.section-heading > button {
+    grid-row: 1;
+}
+
+.section-heading > a {
+    grid-column: 3;
+    justify-self: end;
+}
+
+.section-heading::after {
+    content: "";
+    grid-column: 3;
+    grid-row: 1;
+    min-width: 0;
+}
+
+.section-heading h1,
+.section-heading h2 {
+    color: #263b66;
+    font-weight: 800;
+    letter-spacing: -0.35px;
+}
+
+.section-heading > div > span {
+    color: #5269bd;
+}
+
+.section-heading p {
+    color: #53627c;
+}
+
+.section-back-button {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 15px;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed 58%, #0d9488);
+    box-shadow: 0 5px 14px rgba(65, 86, 190, 0.24);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.section-back-button span:first-child {
+    font-size: 19px;
+    line-height: 1;
+}
+
+.section-back-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 8px 18px rgba(65, 86, 190, 0.3);
+}
+
+.section-back-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .3);
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .section-heading {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 10px;
+        min-height: 100px;
+        padding: 14px;
+    }
+
+    .section-heading > div:first-of-type {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .section-heading > a {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .section-heading::after {
+        display: none;
+    }
+
+    .section-back-button {
+        grid-column: 1;
+        grid-row: 1;
+        min-height: 36px;
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .section-heading h1 {
+        font-size: 22px;
+    }
+
+    .section-heading h2 {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-back-button {
+        transition: none;
+    }
+}
