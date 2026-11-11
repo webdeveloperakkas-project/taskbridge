@@ -4562,3 +4562,123 @@ button.header-balance {
     .posted-job-edit-grid { grid-template-columns: 1fr; }
     .posted-job-edit-field.full { grid-column: auto; }
 }
+
+
+/* Country selector: compact width without changing the form's other fields. */
+.job-country-select-group {
+    width: 30%;
+    min-width: 220px;
+    max-width: 360px;
+}
+.job-country-select-group select {
+    width: 100%;
+}
+
+/* Find Jobs: three compact, colorful statistic cards on every screen size. */
+.find-job-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+.find-job-stats-grid .stat-card,
+.my-posted-stats-grid .stat-card {
+    --mini-card-accent: #2563eb;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-width: 0;
+    border: 1px solid color-mix(in srgb, var(--mini-card-accent) 28%, white);
+    border-radius: 16px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--mini-card-accent) 10%, white), color-mix(in srgb, var(--mini-card-accent) 19%, white) 58%, #ffffff);
+    box-shadow: 0 5px 16px rgba(15, 23, 42, .06), inset 0 1px 0 rgba(255,255,255,.9);
+    transition: transform .22s ease, box-shadow .22s ease;
+}
+.find-job-stats-grid .stat-card::before,
+.my-posted-stats-grid .stat-card::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -18%;
+    top: -58%;
+    width: 140%;
+    height: 105%;
+    border-radius: 0 0 50% 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.06));
+    transform: rotate(-7deg);
+    animation: compactCardWaterWave 8s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+.find-job-stats-grid .stat-card::after,
+.my-posted-stats-grid .stat-card::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(112deg, transparent 25%, rgba(255,255,255,.08) 42%, rgba(255,255,255,.58) 50%, rgba(255,255,255,.08) 60%, transparent 76%);
+    background-size: 220% 100%;
+    animation: compactCardWaterShimmer 8s ease-in-out infinite;
+    pointer-events: none;
+}
+.find-job-stats-grid .stat-card:hover,
+.my-posted-stats-grid .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, .11);
+}
+.find-job-stats-grid .stat-card p,
+.my-posted-stats-grid .stat-card p,
+.find-job-stats-grid .stat-card h3,
+.my-posted-stats-grid .stat-card h3 {
+    position: relative;
+}
+.find-job-stats-grid .stat-card:nth-child(1),
+.my-posted-stats-grid .stat-card:nth-child(1) { --mini-card-accent: #0d9488; }
+.find-job-stats-grid .stat-card:nth-child(2),
+.my-posted-stats-grid .stat-card:nth-child(2) { --mini-card-accent: #7c3aed; }
+.find-job-stats-grid .stat-card:nth-child(3),
+.my-posted-stats-grid .stat-card:nth-child(3) { --mini-card-accent: #2563eb; }
+.my-posted-stats-grid .stat-card:nth-child(4) { --mini-card-accent: #d97706; }
+.my-posted-stats-grid .stat-card:nth-child(5) { --mini-card-accent: #e11d48; }
+
+@keyframes compactCardWaterWave {
+    from { transform: translate3d(-2%, 0, 0) rotate(-7deg) scale(1); }
+    to { transform: translate3d(5%, 12%, 0) rotate(2deg) scale(1.06); }
+}
+@keyframes compactCardWaterShimmer {
+    0%, 18% { background-position: 150% 0; }
+    65%, 100% { background-position: -130% 0; }
+}
+
+.my-posted-stats-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+.my-posted-stats-grid .stat-card {
+    padding: 16px;
+}
+@media (max-width: 900px) {
+    .my-posted-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+    .find-job-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .find-job-stats-grid .stat-card { padding: 11px 8px; border-radius: 12px; }
+    .find-job-stats-grid .stat-card p,
+    .my-posted-stats-grid .stat-card p { font-size: 10px; line-height: 1.3; overflow-wrap: anywhere; }
+    .find-job-stats-grid .stat-card h3,
+    .my-posted-stats-grid .stat-card h3 { font-size: 18px; }
+    .my-posted-stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .my-posted-stats-grid .stat-card { padding: 13px 11px; border-radius: 13px; }
+    .job-country-select-group { width: 45%; min-width: 190px; }
+}
+@media (max-width: 360px) {
+    .find-job-stats-grid { gap: 5px; }
+    .find-job-stats-grid .stat-card { padding: 9px 6px; }
+    .find-job-stats-grid .stat-card p { font-size: 9px; }
+    .find-job-stats-grid .stat-card h3 { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .find-job-stats-grid .stat-card::before,
+    .find-job-stats-grid .stat-card::after,
+    .my-posted-stats-grid .stat-card::before,
+    .my-posted-stats-grid .stat-card::after { animation: none; }
+    .find-job-stats-grid .stat-card,
+    .my-posted-stats-grid .stat-card { transition: none; }
+}
