@@ -932,6 +932,19 @@ button {
     font-weight: 700;
 }
 
+.job-country-select-group select {
+    min-height: 48px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.job-country-help {
+    color: var(--muted, #64748b);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: -2px;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea {
