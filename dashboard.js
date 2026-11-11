@@ -2685,7 +2685,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let jobsById = {};
         if (jobIds.length) {
             const { data: jobs, error: jobsError } = await supabaseClient.from("jobs")
-                .select("id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,currency,duration_minutes")
+                .select("id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,currency,duration_minutes,buyer_payment_days")
                 .in("id", jobIds);
             if (jobsError) console.error("Could not load submission job details:", jobsError);
             else jobsById = Object.fromEntries((jobs || []).map(job => [job.id, job]));
@@ -2757,11 +2757,13 @@ document.addEventListener("DOMContentLoaded", function () {
             } else {
                 const submittedAt = submission.submitted_at ? new Date(submission.submitted_at) : null;
                 if (submittedAt && !Number.isNaN(submittedAt.getTime())) {
-                    const deadline = new Date(submittedAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    const paymentDays = Math.min(15, Math.max(1, Number.parseInt(job.buyer_payment_days, 10) || 7));
+                    const deadline = new Date(submittedAt.getTime() + paymentDays * 24 * 60 * 60 * 1000);
                     const remaining = Math.max(0, Math.ceil((deadline.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
-                    timing.textContent = remaining > 0 ? "Within " + remaining + " day(s)" : "7-day review due";
+                    timing.textContent = remaining > 0 ? "Within " + remaining + " day(s)" : "Payment deadline reached";
                 } else {
-                    timing.textContent = "Within 7 days";
+                    const paymentDays = Math.min(15, Math.max(1, Number.parseInt(job.buyer_payment_days, 10) || 7));
+                    timing.textContent = "Within " + paymentDays + " days";
                 }
             }
             timingCell.appendChild(timing);
@@ -2843,12 +2845,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const reward = Number(document.getElementById("workerReward")?.value);
         const slots = Number.parseInt(document.getElementById("workersRequired")?.value, 10);
         const duration = Number.parseInt(document.getElementById("jobDuration")?.value, 10);
+        const buyerPaymentDays = Number.parseInt(document.getElementById("buyerPaymentDays")?.value, 10);
         const proofType = document.getElementById("proofType")?.value;
         const proofDetails = document.getElementById("proofInstructions")?.value.trim();
 
         if (!categoryRows.some(c => c.id === categoryId) || !title || !description ||
             !proofType || !Number.isFinite(reward) || reward <= 0 ||
-            !Number.isInteger(slots) || slots <= 0 || !Number.isInteger(duration) || duration <= 0) {
+            !Number.isInteger(slots) || slots <= 0 || !Number.isInteger(duration) || duration <= 0 ||
+            !Number.isInteger(buyerPaymentDays) || buyerPaymentDays < 1 || buyerPaymentDays > 15) {
             showJobFormMessage("Please complete all required fields with valid values.", "error");
             return;
         }
@@ -2870,7 +2874,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 p_total_slots: slots,
                 p_duration_minutes: duration,
                 p_card_color: getSelectedCardColor(),
-                p_target_country: targetCountry
+                p_target_country: targetCountry,
+                p_buyer_payment_days: buyerPaymentDays
             });
             if (error) throw error;
             showJobFormMessage("Job submitted. It is pending admin review. Reference: " + data, "success");
