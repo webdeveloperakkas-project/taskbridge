@@ -5464,3 +5464,18 @@ body.footer-info-open { overflow: hidden; }
     .posted-job-actions { align-items: flex-start; }
     .posted-job-review-heading { align-items: flex-start; flex-direction: column; }
 }
+
+
+/* Worker submission history */
+#mySubmittedJobsSection .worker-submissions-list { display:grid; gap:14px; margin-top:18px; }
+#mySubmittedJobsSection .worker-submission-history-card { padding:17px; border:1px solid var(--border-color,#e5e7eb); border-radius:12px; background:var(--surface-color,#fff); }
+#mySubmittedJobsSection .worker-submission-history-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+#mySubmittedJobsSection .worker-submission-history-heading h3 { margin:0; font-size:16px; }
+#mySubmittedJobsSection .worker-submission-history-status { display:inline-flex; padding:5px 10px; border-radius:999px; font-size:12px; font-weight:700; background:#f2f4f7; color:#475467; }
+#mySubmittedJobsSection .worker-submission-history-status.pending { background:#fff4d6; color:#946200; }
+#mySubmittedJobsSection .worker-submission-history-status.approved { background:#dcfae6; color:#067647; }
+#mySubmittedJobsSection .worker-submission-history-status.rejected { background:#fee4e2; color:#b42318; }
+#mySubmittedJobsSection .worker-submission-history-status.revision { background:#f4ebff; color:#6941c6; }
+#mySubmittedJobsSection .worker-submission-history-meta { margin:9px 0; color:var(--text-muted,#667085); font-size:12px; overflow-wrap:anywhere; }
+#mySubmittedJobsSection .worker-submission-history-proof { white-space:pre-wrap; overflow-wrap:anywhere; }
+#mySubmittedJobsSection .worker-submission-history-note { padding:10px 12px; border-left:3px solid #d92d20; background:#fff5f4; color:#912018; font-size:13px; }
