@@ -169,7 +169,6 @@ Deno.serve(async (request: Request) => {
       );
       const profileCountry = detailsResult.data?.country?.trim() || null;
       const identityCountry = identity?.country?.trim() || null;
-      const addressCountry = address?.address_country?.trim() || null;
       const sameCountry = (a: string | null, b: string | null) =>
         Boolean(a && b && a.toLowerCase() === b.toLowerCase());
 
