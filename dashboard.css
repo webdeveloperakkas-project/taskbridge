@@ -3377,6 +3377,13 @@ button.header-balance {
 .dashboard-recent-list-panel .job-table-header {
     padding: 0 14px;
     min-height: 46px;
+    color: #172033;
+    background: #f4b400;
+    border-bottom: 1px solid #d99b00;
+    font-weight: 850;
+}
+.dashboard-recent-list-panel .job-table-header > span {
+    color: #172033;
 }
 .dashboard-recent-list-panel .dashboard-recent-job-row {
     min-height: 58px;
