@@ -2334,11 +2334,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const actions = document.createElement("div");
             actions.className = "posted-job-actions";
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.className = "job-view-button posted-job-edit-button";
+            edit.textContent = "Edit";
+            edit.setAttribute("aria-label", "Edit " + (job.title || "job"));
+            edit.addEventListener("click", () => openPostedJobEditor(job.id, row));
+            actions.appendChild(edit);
+            row.appendChild(actions);
+
+            const reviewCell = document.createElement("div");
+            reviewCell.className = "posted-job-review-cell";
             const review = document.createElement("button");
             review.type = "button";
-            review.className = "job-view-button posted-job-review-button";
-            review.textContent = pendingCount ? "Review (" + pendingCount + ")" : "Submissions";
-            review.setAttribute("aria-label", "Review submissions for " + (job.title || "job"));
+            review.className = "posted-job-review-button";
+            review.innerHTML = '<strong>' + pendingCount + '</strong><span>' +
+                (pendingCount === 1 ? 'Submitted' : 'Submitted') + '</span>';
+            review.setAttribute("aria-label", "Review " + pendingCount + " submitted jobs for " + (job.title || "job"));
             review.addEventListener("click", () => {
                 const existingPanel = row.nextElementSibling;
                 if (existingPanel?.classList.contains("posted-job-review-panel")) {
@@ -2348,16 +2360,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const panel = renderPostedJobReviewPanel(job, jobSubmissions);
                 row.insertAdjacentElement("afterend", panel);
             });
-            actions.appendChild(review);
-
-            const edit = document.createElement("button");
-            edit.type = "button";
-            edit.className = "job-view-button posted-job-edit-button";
-            edit.textContent = "Edit";
-            edit.setAttribute("aria-label", "Edit " + (job.title || "job"));
-            edit.addEventListener("click", () => openPostedJobEditor(job.id, row));
-            actions.appendChild(edit);
-            row.appendChild(actions);
+            reviewCell.appendChild(review);
+            row.appendChild(reviewCell);
 
             list.appendChild(row);
         });
