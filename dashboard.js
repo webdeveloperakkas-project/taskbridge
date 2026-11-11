@@ -2371,6 +2371,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
     populateJobCountryOptions();
 
+    // Desktop country picker: render flags in regular HTML and open the menu downward.
+    function initializeDesktopCountryPicker() {
+        const select = document.getElementById("jobTargetCountry");
+        if (!select || select.dataset.customPickerReady === "true") return;
+
+        const picker = document.createElement("div");
+        picker.className = "job-country-custom-picker";
+        picker.innerHTML = `
+            <button type="button" class="job-country-picker-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span class="job-country-picker-value"></span><span class="job-country-picker-chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="job-country-picker-menu" role="listbox" hidden></div>
+        `;
+        select.insertAdjacentElement("afterend", picker);
+        select.classList.add("job-country-native-select");
+        const trigger = picker.querySelector(".job-country-picker-trigger");
+        const valueLabel = picker.querySelector(".job-country-picker-value");
+        const menu = picker.querySelector(".job-country-picker-menu");
+
+        function syncValue() {
+            const selected = select.options[select.selectedIndex];
+            valueLabel.textContent = selected ? selected.textContent : "Choose a country";
+            menu.querySelectorAll("[data-country-value]").forEach(item => {
+                item.setAttribute("aria-selected", item.dataset.countryValue === select.value ? "true" : "false");
+            });
+        }
+
+        function closeMenu() {
+            menu.hidden = true;
+            trigger.setAttribute("aria-expanded", "false");
+            picker.classList.remove("is-open");
+        }
+
+        function addChoice(option, isGroupHeading) {
+            if (isGroupHeading) {
+                const heading = document.createElement("div");
+                heading.className = "job-country-picker-group";
+                heading.textContent = option.label;
+                menu.appendChild(heading);
+                return;
+            }
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "job-country-picker-option";
+            item.setAttribute("role", "option");
+            item.dataset.countryValue = option.value;
+            item.textContent = option.textContent;
+            item.addEventListener("click", () => {
+                select.value = option.value;
+                select.dispatchEvent(new Event("change", { bubbles: true }));
+                syncValue();
+                closeMenu();
+            });
+            menu.appendChild(item);
+        }
+
+        Array.from(select.children).forEach(child => {
+            if (child.tagName === "OPTGROUP") {
+                addChoice(child, true);
+                Array.from(child.children).forEach(option => addChoice(option, false));
+            } else if (child.tagName === "OPTION") {
+                addChoice(child, false);
+            }
+        });
+
+        trigger.addEventListener("click", () => {
+            const opening = menu.hidden;
+            menu.hidden = !opening;
+            trigger.setAttribute("aria-expanded", opening ? "true" : "false");
+            picker.classList.toggle("is-open", opening);
+        });
+        trigger.addEventListener("keydown", event => {
+            if (event.key === "Escape") closeMenu();
+        });
+        document.addEventListener("click", event => {
+            if (!picker.contains(event.target)) closeMenu();
+        });
+        select.addEventListener("change", syncValue);
+        syncValue();
+        select.dataset.customPickerReady = "true";
+    }
+
+    initializeDesktopCountryPicker();
+
     initializeSupabaseDashboard().catch(error => {
         console.error("Supabase dashboard setup failed:", error);
         showJobFormMessage(error.message || "Dashboard data could not be loaded.", "error");
