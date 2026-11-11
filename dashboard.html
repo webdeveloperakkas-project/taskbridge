@@ -1593,30 +1593,11 @@
 
                     <div class="stats-grid">
 
-                        <div class="stat-card">
-                            <p>Total Submitted</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Pending Review</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Approved</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Rejected</p>
-                            <h3>0</h3>
-                        </div>
-
-                        <div class="stat-card">
-                            <p>Revision Required</p>
-                            <h3>0</h3>
-                        </div>
+                        <div class="stat-card"><p>Total Submitted</p><h3 id="workerTotalSubmitted">0</h3></div>
+                        <div class="stat-card"><p>Pending Review</p><h3 id="workerPendingReview">0</h3></div>
+                        <div class="stat-card"><p>Approved</p><h3 id="workerApproved">0</h3></div>
+                        <div class="stat-card"><p>Rejected</p><h3 id="workerRejected">0</h3></div>
+                        <div class="stat-card"><p>Revision Required</p><h3 id="workerRevisionRequired">0</h3></div>
 
                     </div>
 
@@ -1660,28 +1641,13 @@
                         </div>
 
 
-                        <div class="empty-state">
-
-                            <div class="empty-state-icon">
-                                <svg class="icon">
-                                    <use href="#icon-clipboard"></use>
-                                </svg>
-                            </div>
-
+                        <div id="workerSubmissionsEmpty" class="empty-state">
+                            <div class="empty-state-icon"><svg class="icon"><use href="#icon-clipboard"></use></svg></div>
                             <h3>No Submissions Yet</h3>
-
-                            <p>
-                                You haven't submitted any jobs yet.
-                                Find an available task and start working.
-                            </p>
-
-                            <a href="#findJobSection"
-                                class="primary-button"
-                                data-open-section="findJobSection">
-                                Find a Job
-                            </a>
-
+                            <p>You haven't submitted any jobs yet. Find an available task and start working.</p>
+                            <a href="#findJobSection" class="primary-button" data-open-section="findJobSection">Find a Job</a>
                         </div>
+                        <div id="workerSubmissionsList" class="worker-submissions-list"></div>
 
                     </section>
 
