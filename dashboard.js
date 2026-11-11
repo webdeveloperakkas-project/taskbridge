@@ -1616,6 +1616,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 formatWalletMoney(job.reward_per_worker, job.currency || "USD")
             ));
             row.appendChild(createJobCell("", formatJobDuration(job.duration_minutes)));
+            row.appendChild(createJobCell("job-buyer-pay-time-cell", "—"));
             row.appendChild(createJobCell("job-completed-cell", String(Number(job.total_slots || 0))));
 
             const actionCell = document.createElement("div");
