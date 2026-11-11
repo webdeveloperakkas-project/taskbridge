@@ -147,12 +147,8 @@ Deno.serve(async (request: Request) => {
     // Country targeting uses IP country only while the user is not fully KYC verified.
     // The API token stays in Supabase Secrets; no IP or country is accepted from the browser body.
     try {
-      const [ipCountry, profileResult, detailsResult, submissionsResult] = await Promise.all([
+      const [ipCountry, detailsResult, submissionsResult] = await Promise.all([
         getIpCountry(clientIp),
-        supabaseAdmin.from("profiles")
-          .select("verification_status")
-          .eq("id", authData.user.id)
-          .maybeSingle(),
         supabaseAdmin.from("user_profile_details")
           .select("country")
           .eq("user_id", authData.user.id)
@@ -161,8 +157,6 @@ Deno.serve(async (request: Request) => {
           .select("verification_type,status,country,address_country")
           .eq("user_id", authData.user.id),
       ]);
-
-      if (profileResult.error) throw profileResult.error;
       if (detailsResult.error) throw detailsResult.error;
       if (submissionsResult.error) throw submissionsResult.error;
 
@@ -182,7 +176,6 @@ Deno.serve(async (request: Request) => {
       // Both identity and address documents must be approved, and their countries
       // must match the saved profile country before document country takes priority.
       const documentVerified = Boolean(
-        profileResult.data?.verification_status === "verified" &&
         identity && address &&
         sameCountry(profileCountry, identityCountry) &&
         sameCountry(profileCountry, addressCountry)
