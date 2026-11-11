@@ -5561,3 +5561,7 @@ body.footer-info-open { overflow: hidden; }
     #mySubmittedJobsSection .worker-submission-history-details h3,
     #mySubmittedJobsSection .worker-history-detail-block.rejected-note { grid-column:1; }
 }
+
+
+/* WebMoney text mark */
+.brand-webmoney { background:#f0f5ff; color:#2457a6; border:1px solid #d7e3ff; font-weight:900; letter-spacing:-1px; }
