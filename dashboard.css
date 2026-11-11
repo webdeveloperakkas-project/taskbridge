@@ -4335,3 +4335,10 @@ button.header-balance {
     .post-job-time-grid { gap: 9px; }
     .post-job-time-grid label { font-size: 11px; }
 }
+
+/* The author-defined grid display on job rows overrides the browser's
+   default [hidden] styling. Keep filtered rows genuinely hidden. */
+.job-table-row[hidden],
+.job-list-item[hidden] {
+    display: none !important;
+}
