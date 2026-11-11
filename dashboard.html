@@ -1163,23 +1163,26 @@
 
         </div>
 
-        <div class="job-details-actions">
+        <div class="worker-job-timer-card">
+            <span class="worker-job-timer-label">TIME REMAINING</span>
+            <strong id="workerJobCountdown">--:--:--</strong>
+            <span>Your timer started when you clicked Start Job.</span>
+        </div>
 
-            <button type="button"
-                    class="btn-secondary"
-                    id="detailsBackButton">
+        <form id="workerSubmissionForm" class="worker-submission-form" hidden>
+            <h3>Submit Your Work</h3>
+            <label for="workerProofText">Work Proof</label>
+            <textarea id="workerProofText" rows="4" placeholder="Describe the work you completed or paste your proof here"></textarea>
+            <label for="workerProofFileUrl">Proof File Link (Optional)</label>
+            <input id="workerProofFileUrl" type="url" placeholder="https://example.com/your-proof">
+            <button type="submit" class="btn-primary" id="submitWorkerJobButton">Submit Job</button>
+            <p id="workerSubmissionMessage" class="worker-submission-message" hidden></p>
+        </form>
+
+        <div class="job-details-actions">
+            <button type="button" class="btn-secondary" id="detailsBackButton">
                 Back to Jobs
             </button>
-
-            <button type="button"
-                    class="btn-primary"
-                    id="startJobButton">
-                Start Job
-                <svg class="icon">
-                    <use href="#icon-arrow-right"></use>
-                </svg>
-            </button>
-
         </div>
 
     </div>
