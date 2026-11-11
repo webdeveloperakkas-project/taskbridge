@@ -2206,7 +2206,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const { data: profileDetails, error: profileDetailsError } = await supabaseClient
                 .from("user_profile_details").select("full_name,country").eq("user_id", currentUser.id).maybeSingle();
             if (!profileDetailsError && profileDetails?.full_name) displayName = profileDetails.full_name;
-            if (!profileDetailsError && profileDetails?.country) currentUserCountry = profileDetails.country;
+            if (!profileDetailsError && profileDetails?.country) {
+                currentUserCountry = profileDetails.country;
+            } else {
+                currentUserCountry = currentUser.user_metadata?.country || "";
+            }
         } catch (profileDetailsError) {
             console.warn("Could not load profile display name:", profileDetailsError);
         }
