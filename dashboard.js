@@ -1869,11 +1869,8 @@ document.addEventListener("DOMContentLoaded", function () {
         addReadOnly("Job title", job.title);
         addReadOnly("Reward per worker", formatWalletMoney(job.reward_per_worker, job.currency || "USD"));
         addReadOnly("Job duration", formatJobDuration(job.duration_minutes));
-        addReadOnly("Target URL", job.target_url);
         addReadOnly("Description", job.description, true);
-        addReadOnly("Instructions", job.instructions, true);
         addReadOnly("Proof requirements", job.proof_requirements, true);
-        addReadOnly("Extra instructions", job.extra_instructions, true);
         form.appendChild(grid);
 
         const currentSlots = Math.max(0, Number(job.total_slots) || 0);
