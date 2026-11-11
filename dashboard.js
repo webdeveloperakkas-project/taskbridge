@@ -705,7 +705,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll("#findJobSection .job-category-item").forEach(button => {
         button.addEventListener("click", () => {
-            selectedFindCategory = String(button.dataset.category || "all").toLowerCase();
+            selectedFindCategory = button.dataset.category === "all"
+                ? "all"
+                : normalizeJobCategory(button.dataset.category);
             document.querySelectorAll("#findJobSection .job-category-item").forEach(item => {
                 item.classList.toggle("active", item === button);
             });
@@ -1541,6 +1543,21 @@ document.addEventListener("DOMContentLoaded", function () {
         return categoryRows.find(category => category.id === job.category_id) || null;
     }
 
+    // Normalize database category slugs/names to the fixed Browse by Category keys.
+    // This handles common variants such as "websites", "website_tasks", and "Twitter / X".
+    function normalizeJobCategory(value) {
+        const key = String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (!key) return "other";
+        if (key === "fb" || key.includes("facebook")) return "facebook";
+        if (key === "yt" || key.includes("youtube")) return "youtube";
+        if (key === "ig" || key.includes("instagram")) return "instagram";
+        if (key.includes("tiktok")) return "tiktok";
+        if (key === "x" || key.includes("twitter")) return "twitter";
+        if (key.includes("website") || key === "web" || key === "site") return "website";
+        if (key === "other" || key.includes("other")) return "other";
+        return key;
+    }
+
     function createJobCell(className, value) {
         const cell = document.createElement("span");
         cell.className = "job-table-cell " + (className || "");
@@ -1655,7 +1672,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.className = "job-table-row job-list-item";
             row.dataset.jobId = job.id;
             row.dataset.title = (category?.name || "") + " " + (job.title || "");
-            row.dataset.category = String(category?.slug || category?.name || "other").toLowerCase();
+            row.dataset.category = normalizeJobCategory(category?.slug || category?.name);
             row.dataset.reward = String(Number(job.reward_per_worker) || 0);
             row.dataset.date = job.created_at || "";
             row.style.setProperty("--job-card-background", "#ffffff");
