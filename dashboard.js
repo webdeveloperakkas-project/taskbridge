@@ -20,6 +20,54 @@ document.addEventListener("DOMContentLoaded", function () {
     let walletsByCurrency = new Map();
     let selectedWithdrawCurrency = "";
 
+    const JOB_COUNTRY_GROUPS = {"Asia":"Afghanistan|Armenia|Azerbaijan|Bahrain|Bangladesh|Bhutan|Brunei|Cambodia|China|Cyprus|Georgia|India|Indonesia|Iran|Iraq|Israel|Japan|Jordan|Kazakhstan|Kuwait|Kyrgyzstan|Laos|Lebanon|Malaysia|Maldives|Mongolia|Myanmar|Nepal|North Korea|Oman|Pakistan|Palestine|Philippines|Qatar|Saudi Arabia|Singapore|South Korea|Sri Lanka|Syria|Taiwan|Tajikistan|Thailand|Timor-Leste|Turkey|Turkmenistan|United Arab Emirates|Uzbekistan|Vietnam|Yemen","Europe":"Albania|Andorra|Austria|Belarus|Belgium|Bosnia and Herzegovina|Bulgaria|Croatia|Czechia|Denmark|Estonia|Finland|France|Germany|Greece|Hungary|Iceland|Ireland|Italy|Kosovo|Latvia|Liechtenstein|Lithuania|Luxembourg|Malta|Moldova|Monaco|Montenegro|Netherlands|North Macedonia|Norway|Poland|Portugal|Romania|Russia|San Marino|Serbia|Slovakia|Slovenia|Spain|Sweden|Switzerland|Ukraine|United Kingdom|Vatican City","Africa":"Algeria|Angola|Benin|Botswana|Burkina Faso|Burundi|Cabo Verde|Cameroon|Central African Republic|Chad|Comoros|Democratic Republic of the Congo|Republic of the Congo|Côte d’Ivoire|Djibouti|Egypt|Equatorial Guinea|Eritrea|Eswatini|Ethiopia|Gabon|Gambia|Ghana|Guinea|Guinea-Bissau|Kenya|Lesotho|Liberia|Libya|Madagascar|Malawi|Mali|Mauritania|Mauritius|Morocco|Mozambique|Namibia|Niger|Nigeria|Rwanda|São Tomé and Príncipe|Senegal|Seychelles|Sierra Leone|Somalia|South Africa|South Sudan|Sudan|Tanzania|Togo|Tunisia|Uganda|Zambia|Zimbabwe","North America":"Antigua and Barbuda|Bahamas|Barbados|Belize|Canada|Costa Rica|Cuba|Dominica|Dominican Republic|El Salvador|Grenada|Guatemala|Haiti|Honduras|Jamaica|Mexico|Nicaragua|Panama|Saint Kitts and Nevis|Saint Lucia|Saint Vincent and the Grenadines|Trinidad and Tobago|United States","South America":"Argentina|Bolivia|Brazil|Chile|Colombia|Ecuador|Guyana|Paraguay|Peru|Suriname|Uruguay|Venezuela","Oceania":"Australia|Fiji|Kiribati|Marshall Islands|Micronesia|Nauru|New Zealand|Palau|Papua New Guinea|Samoa|Solomon Islands|Tonga|Tuvalu|Vanuatu"};
+    let currentUserCountry = "";
+
+    function populateJobCountryOptions() {
+        const select = document.getElementById("jobTargetCountry");
+        if (!select || select.dataset.populated === "true") return;
+        Object.entries(JOB_COUNTRY_GROUPS).forEach(([region, countries]) => {
+            const regionOption = document.createElement("option");
+            regionOption.value = "region:" + region;
+            regionOption.textContent = region + " Zone — All Countries";
+            select.appendChild(regionOption);
+
+            const group = document.createElement("optgroup");
+            group.label = region + " Countries";
+            countries.split("|").forEach(country => {
+                const option = document.createElement("option");
+                option.value = country;
+                option.textContent = country;
+                group.appendChild(option);
+            });
+            select.appendChild(group);
+        });
+        select.dataset.populated = "true";
+    }
+
+    function getCountryRegion(country) {
+        const normalized = String(country || "").trim().toLocaleLowerCase();
+        if (!normalized) return "";
+        for (const [region, countries] of Object.entries(JOB_COUNTRY_GROUPS)) {
+            if (countries.split("|").some(name => name.toLocaleLowerCase() === normalized)) {
+                return region;
+            }
+        }
+        return "";
+    }
+
+    function isJobAvailableInCountry(targetCountry, workerCountry) {
+        const target = String(targetCountry || "Worldwide").trim();
+        if (!target || ["worldwide", "all countries", "all"].includes(target.toLocaleLowerCase())) {
+            return true;
+        }
+        if (target.startsWith("region:")) {
+            const targetRegion = target.slice("region:".length).trim().toLocaleLowerCase();
+            return getCountryRegion(workerCountry).toLocaleLowerCase() === targetRegion;
+        }
+        return String(workerCountry || "").trim().toLocaleLowerCase() === target.toLocaleLowerCase();
+    }
+
     /* =====================================
        CURRENT YEAR
     ====================================== */
@@ -1655,12 +1703,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadFindJobs() {
         const { data, error } = await supabaseClient.from("jobs")
-            .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget")
+            .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country")
             .eq("status", "active")
             .gt("remaining_budget", 0)
             .order("created_at", { ascending: false });
         if (error) throw error;
-        publicJobs = data || [];
+        publicJobs = (data || []).filter(job =>
+            isJobAvailableInCountry(job.target_country, currentUserCountry)
+        );
 
         renderDashboardRecentJobs(publicJobs.slice(0, 20));
         const list = document.getElementById("jobList");
@@ -2088,6 +2138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function submitNewJob() {
+        const targetCountry = document.getElementById("jobTargetCountry")?.value || "Worldwide";
         const categoryId = document.getElementById("postJobCategory")?.value;
         const title = document.getElementById("jobTitle")?.value.trim();
         const description = document.getElementById("jobDescription")?.value.trim();
@@ -2120,7 +2171,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 p_reward_per_worker: reward,
                 p_total_slots: slots,
                 p_duration_minutes: duration,
-                p_card_color: getSelectedCardColor()
+                p_card_color: getSelectedCardColor(),
+                p_target_country: targetCountry
             });
             if (error) throw error;
             showJobFormMessage("Job submitted. It is pending admin review. Reference: " + data, "success");
@@ -2152,8 +2204,9 @@ document.addEventListener("DOMContentLoaded", function () {
         let displayName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || "My Account";
         try {
             const { data: profileDetails, error: profileDetailsError } = await supabaseClient
-                .from("user_profile_details").select("full_name").eq("user_id", currentUser.id).maybeSingle();
+                .from("user_profile_details").select("full_name,country").eq("user_id", currentUser.id).maybeSingle();
             if (!profileDetailsError && profileDetails?.full_name) displayName = profileDetails.full_name;
+            if (!profileDetailsError && profileDetails?.country) currentUserCountry = profileDetails.country;
         } catch (profileDetailsError) {
             console.warn("Could not load profile display name:", profileDetailsError);
         }
@@ -2221,6 +2274,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }, () => loadFindJobs().catch(err => console.error("Find Jobs realtime refresh failed:", err)))
             .subscribe();
     }
+
+    populateJobCountryOptions();
 
     initializeSupabaseDashboard().catch(error => {
         console.error("Supabase dashboard setup failed:", error);
