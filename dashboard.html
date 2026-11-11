@@ -1646,7 +1646,16 @@
                             <p>You haven't submitted any jobs yet. Find an available task and start working.</p>
                             <a href="#findJobSection" class="primary-button" data-open-section="findJobSection">Find a Job</a>
                         </div>
-                        <div id="workerSubmissionsList" class="worker-submissions-list"></div>
+                        <div class="worker-submissions-table-wrap">
+                            <div class="worker-submissions-table-header" aria-hidden="true">
+                                <span>Job Name</span>
+                                <span>Payment</span>
+                                <span>Status</span>
+                                <span>Payment Time</span>
+                                <span>View</span>
+                            </div>
+                            <div id="workerSubmissionsList" class="worker-submissions-list" aria-live="polite"></div>
+                        </div>
 
                     </section>
 
