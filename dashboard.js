@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentUser = null;
     let categoryRows = [];
     let postedJobsCache = [];
+    let postedSubmissionsCache = [];
     let postedJobsChannel = null;
     let submissionsChannel = null;
     let publicJobsChannel = null;
@@ -2159,6 +2160,131 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function renderPostedJobReviewPanel(job, submissions) {
+        const panel = document.createElement("section");
+        panel.className = "posted-job-review-panel";
+        panel.dataset.jobId = job.id;
+
+        const heading = document.createElement("div");
+        heading.className = "posted-job-review-heading";
+        const title = document.createElement("h3");
+        title.textContent = "Worker Submissions";
+        const summary = document.createElement("span");
+        const pendingCount = submissions.filter(item => item.status === "submitted").length;
+        const approvedCount = submissions.filter(item => item.status === "approved").length;
+        summary.textContent = pendingCount + " pending review · " + approvedCount + " approved";
+        heading.append(title, summary);
+        panel.appendChild(heading);
+
+        if (!submissions.length) {
+            const empty = document.createElement("p");
+            empty.className = "posted-job-review-empty";
+            empty.textContent = "No workers have started or submitted this job yet.";
+            panel.appendChild(empty);
+            return panel;
+        }
+
+        submissions.forEach(submission => {
+            const card = document.createElement("article");
+            card.className = "posted-submission-card";
+            const top = document.createElement("div");
+            top.className = "posted-submission-top";
+            const worker = document.createElement("strong");
+            worker.textContent = "Worker " + String(submission.worker_id || "").slice(0, 8);
+            const status = document.createElement("span");
+            status.className = "posted-submission-status " +
+                (submission.status === "submitted" ? "pending" :
+                 submission.status === "approved" ? "approved" :
+                 submission.status === "rejected" ? "rejected" : "other");
+            status.textContent = String(submission.status || "unknown").replaceAll("_", " ");
+            top.append(worker, status);
+            card.appendChild(top);
+
+            const submittedAt = document.createElement("p");
+            submittedAt.className = "posted-submission-date";
+            submittedAt.textContent = submission.submitted_at
+                ? "Submitted " + new Date(submission.submitted_at).toLocaleString()
+                : "Started " + (submission.started_at ? new Date(submission.started_at).toLocaleString() : "—");
+            card.appendChild(submittedAt);
+
+            if (submission.proof_text) {
+                const proof = document.createElement("p");
+                proof.className = "posted-submission-proof";
+                proof.textContent = submission.proof_text;
+                card.appendChild(proof);
+            }
+            if (submission.proof_file_url) {
+                const link = document.createElement("a");
+                link.className = "posted-submission-proof-link";
+                link.href = submission.proof_file_url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "Open submitted proof";
+                card.appendChild(link);
+            }
+            if (submission.review_note) {
+                const note = document.createElement("p");
+                note.className = "posted-submission-review-note";
+                note.textContent = "Review note: " + submission.review_note;
+                card.appendChild(note);
+            }
+
+            if (submission.status === "submitted") {
+                const actions = document.createElement("div");
+                actions.className = "posted-submission-actions";
+                const approve = document.createElement("button");
+                approve.type = "button";
+                approve.className = "posted-submission-approve";
+                approve.textContent = "Approve & Pay";
+                approve.addEventListener("click", () => reviewPostedSubmission(submission.id, "approve"));
+                const reject = document.createElement("button");
+                reject.type = "button";
+                reject.className = "posted-submission-reject";
+                reject.textContent = "Reject";
+                reject.addEventListener("click", () => reviewPostedSubmission(submission.id, "reject"));
+                actions.append(approve, reject);
+                card.appendChild(actions);
+            }
+            panel.appendChild(card);
+        });
+        return panel;
+    }
+
+    async function reviewPostedSubmission(submissionId, decision) {
+        const isApprove = decision === "approve";
+        const confirmation = isApprove
+            ? "Approve this worker's submission and release the full reward from the job's held balance?"
+            : "Reject this worker's submission?";
+        if (!window.confirm(confirmation)) return;
+
+        let reviewNote = null;
+        if (!isApprove) {
+            reviewNote = window.prompt("Optional rejection reason for the worker:", "The submitted proof does not meet the job requirements.");
+            if (reviewNote === null) return;
+            reviewNote = reviewNote.trim() || "The submitted proof does not meet the job requirements.";
+        }
+
+        const rpcName = isApprove ? "approve_submission" : "reject_submission";
+        const { error } = await supabaseClient.rpc(rpcName, {
+            p_submission_id: submissionId,
+            p_review_note: reviewNote
+        });
+        if (error) {
+            console.error("Submission review failed:", error);
+            window.alert(error.message || "Could not review this submission. Please try again.");
+            return;
+        }
+
+        await Promise.all([
+            loadMyPostedJobs(),
+            loadMyWallet(),
+            loadMyTotalEarnings()
+        ]);
+        window.alert(isApprove
+            ? "Submission approved. The worker's full reward has been credited."
+            : "Submission rejected. The worker has been notified through the submission status.");
+    }
+
     function renderPostedJobs(jobs) {
         const list = document.getElementById("postedJobsList");
         const empty = document.getElementById("postedJobsMessage");
@@ -2172,6 +2298,10 @@ document.addEventListener("DOMContentLoaded", function () {
             row.dataset.status = uiStatus(job.status);
             row.style.setProperty("--job-card-background", "#ffffff");
 
+            const jobSubmissions = postedSubmissionsCache.filter(item => item.job_id === job.id);
+            const approvedCount = jobSubmissions.filter(item => item.status === "approved").length;
+            const pendingCount = jobSubmissions.filter(item => item.status === "submitted").length;
+
             const name = document.createElement("span");
             name.className = "job-table-cell job-name-cell";
             name.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
@@ -2179,7 +2309,12 @@ document.addEventListener("DOMContentLoaded", function () {
             row.appendChild(name);
 
             row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
-            row.appendChild(createJobCell("job-completed-cell", "— / " + Number(job.total_slots || 0)));
+
+            const completed = document.createElement("span");
+            completed.className = "job-table-cell job-completed-cell " + (approvedCount > 0 ? "has-approved" : pendingCount > 0 ? "has-pending" : "");
+            completed.textContent = approvedCount + " / " + Number(job.total_slots || 0);
+            completed.title = approvedCount + " approved and paid · " + pendingCount + " awaiting review";
+            row.appendChild(completed);
 
             const status = document.createElement("span");
             const normalized = uiStatus(job.status);
@@ -2195,13 +2330,32 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             row.appendChild(status);
 
+            const actions = document.createElement("div");
+            actions.className = "posted-job-actions";
+            const review = document.createElement("button");
+            review.type = "button";
+            review.className = "job-view-button posted-job-review-button";
+            review.textContent = pendingCount ? "Review (" + pendingCount + ")" : "Submissions";
+            review.setAttribute("aria-label", "Review submissions for " + (job.title || "job"));
+            review.addEventListener("click", () => {
+                const existingPanel = row.nextElementSibling;
+                if (existingPanel?.classList.contains("posted-job-review-panel")) {
+                    existingPanel.hidden = !existingPanel.hidden;
+                    return;
+                }
+                const panel = renderPostedJobReviewPanel(job, jobSubmissions);
+                row.insertAdjacentElement("afterend", panel);
+            });
+            actions.appendChild(review);
+
             const edit = document.createElement("button");
             edit.type = "button";
             edit.className = "job-view-button posted-job-edit-button";
             edit.textContent = "Edit";
             edit.setAttribute("aria-label", "Edit " + (job.title || "job"));
             edit.addEventListener("click", () => openPostedJobEditor(job.id, row));
-            row.appendChild(edit);
+            actions.appendChild(edit);
+            row.appendChild(actions);
 
             list.appendChild(row);
         });
@@ -2464,6 +2618,23 @@ document.addEventListener("DOMContentLoaded", function () {
         if (error) throw error;
         const jobs = data || [];
         postedJobsCache = jobs;
+
+        const jobIds = jobs.map(job => job.id);
+        if (jobIds.length) {
+            const { data: submissions, error: submissionsError } = await supabaseClient.from("job_submissions")
+                .select("id,job_id,worker_id,status,proof_text,proof_file_url,started_at,submitted_at,review_note,created_at")
+                .in("job_id", jobIds)
+                .order("submitted_at", { ascending: false, nullsFirst: false });
+            if (submissionsError) {
+                console.error("Could not load advertiser job submissions:", submissionsError);
+                postedSubmissionsCache = [];
+            } else {
+                postedSubmissionsCache = submissions || [];
+            }
+        } else {
+            postedSubmissionsCache = [];
+        }
+
         updatePostedJobStats(jobs);
         const postedCount = document.getElementById("dashboardJobsPosted");
         if (postedCount) postedCount.textContent = String(jobs.length);
@@ -2628,6 +2799,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 event: "*", schema: "public", table: "job_submissions",
                 filter: "worker_id=eq." + currentUser.id
             }, () => loadMySubmissions().catch(err => console.error("Submission stats refresh failed:", err)))
+            .subscribe();
+
+        supabaseClient.channel("advertiser-submissions-" + currentUser.id)
+            .on("postgres_changes", {
+                event: "*", schema: "public", table: "job_submissions"
+            }, () => loadMyPostedJobs().catch(err => console.error("Advertiser submissions refresh failed:", err)))
             .subscribe();
 
         publicJobsChannel = supabaseClient.channel("public-active-jobs")
