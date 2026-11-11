@@ -28,27 +28,42 @@ function getClientIp(request: Request): string | null {
   return null;
 }
 
-async function getIpCountry(ip: string | null): Promise<string | null> {
+type IpCountryResult = {
+  country: string | null;
+  countryCode: string | null;
+};
+
+async function getIpCountry(ip: string | null): Promise<IpCountryResult> {
   const token = Deno.env.get("IPINFO_TOKEN");
-  if (!ip || !token) return null;
+  if (!ip || !token) return { country: null, countryCode: null };
 
   try {
     const response = await fetch(
-      `https://api.ipinfo.io/lite/${encodeURIComponent(ip)}?token=${encodeURIComponent(token)}`,
-      { headers: { Accept: "application/json" } },
+      `https://api.ipinfo.io/lite/${encodeURIComponent(ip)}`,
+      {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     if (!response.ok) {
       console.warn("IP country lookup returned HTTP", response.status);
-      return null;
+      return { country: null, countryCode: null };
     }
 
     const result = await response.json();
-    return typeof result.country === "string" && result.country.trim()
-      ? result.country.trim()
-      : null;
+    return {
+      country: typeof result.country === "string" && result.country.trim()
+        ? result.country.trim()
+        : null,
+      countryCode: typeof result.country_code === "string" && result.country_code.trim()
+        ? result.country_code.trim().toUpperCase()
+        : null,
+    };
   } catch (error) {
     console.warn("IP country lookup failed:", error);
-    return null;
+    return { country: null, countryCode: null };
   }
 }
 
@@ -147,7 +162,7 @@ Deno.serve(async (request: Request) => {
     // Country targeting uses IP country only while the user is not fully KYC verified.
     // The API token stays in Supabase Secrets; no IP or country is accepted from the browser body.
     try {
-      const [ipCountry, detailsResult, submissionsResult] = await Promise.all([
+      const [ipCountryResult, detailsResult, submissionsResult] = await Promise.all([
         getIpCountry(clientIp),
         supabaseAdmin.from("user_profile_details")
           .select("country")
@@ -185,7 +200,8 @@ Deno.serve(async (request: Request) => {
         .upsert({
           user_id: authData.user.id,
           profile_country: profileCountry,
-          ip_country: ipCountry,
+          ip_country: ipCountryResult.country,
+          ip_country_code: ipCountryResult.countryCode,
           ip_address: clientIp,
           verified: documentVerified,
           checked_at: new Date().toISOString(),
