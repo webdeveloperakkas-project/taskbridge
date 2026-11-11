@@ -2311,10 +2311,11 @@ document.addEventListener("DOMContentLoaded", function () {
             row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
 
             const completed = document.createElement("span");
-            const completedCount = approvedCount + pendingCount;
-            completed.className = "job-table-cell job-completed-cell " + (pendingCount > 0 ? "has-pending" : approvedCount > 0 ? "has-approved" : "");
-            completed.textContent = completedCount + " / " + Number(job.total_slots || 0);
-            completed.title = pendingCount + " awaiting advertiser review · " + approvedCount + " approved and paid";
+            // Completed counts only submissions that the advertiser has approved and paid.
+            // Pending submissions are counted separately in the Review action.
+            completed.className = "job-table-cell job-completed-cell " + (approvedCount > 0 ? "has-approved" : "");
+            completed.textContent = approvedCount + " / " + Number(job.total_slots || 0);
+            completed.title = approvedCount + " approved and paid · " + pendingCount + " awaiting review";
             row.appendChild(completed);
 
             const status = document.createElement("span");
