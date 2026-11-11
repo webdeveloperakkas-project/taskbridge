@@ -4441,3 +4441,112 @@ button.header-balance {
     .posted-job-edit-actions { flex-direction: column-reverse; }
     .posted-job-edit-actions button { width: 100%; }
 }
+
+
+/* Inline expandable editor for My Posted Jobs */
+#myPostedJobsSection .panel-heading h2 {
+    color: #d6a514;
+}
+.posted-job-edit-button {
+    border: 1px solid #d6a514;
+    background: #fff8df;
+    color: #765900;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.posted-job-edit-button:hover {
+    background: #f6e7b2;
+}
+.posted-job-edit-panel {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin: 10px 0 18px;
+    padding: 20px;
+    border: 1px solid #ead48a;
+    border-radius: 14px;
+    background: #fffdf5;
+    box-sizing: border-box;
+}
+.posted-job-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.posted-job-edit-heading,
+.posted-job-edit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.posted-job-edit-heading h2 {
+    margin: 0;
+    color: #765900;
+}
+.posted-job-edit-close {
+    border: 0;
+    background: transparent;
+    font-size: 26px;
+    cursor: pointer;
+}
+.posted-job-edit-note {
+    margin: 0;
+    color: #665b3b;
+    font-size: 13px;
+}
+.posted-job-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+.posted-job-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    color: #51472e;
+    font-size: 13px;
+    font-weight: 600;
+}
+.posted-job-edit-field.full {
+    grid-column: 1 / -1;
+}
+.posted-job-edit-field input,
+.posted-job-edit-field textarea,
+.posted-job-edit-field select {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid #ddd3b5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+    color: #29251b;
+    font: inherit;
+}
+.posted-job-edit-field input[readonly],
+.posted-job-edit-field textarea[readonly] {
+    background: #f7f5ee;
+}
+.posted-job-edit-cost {
+    padding: 13px 15px;
+    border-radius: 10px;
+    background: #fff4cc;
+    color: #574514;
+}
+.posted-job-edit-cost p {
+    margin: 4px 0;
+}
+.posted-job-edit-message[data-type="error"] {
+    color: #b42318;
+}
+.posted-job-edit-message[data-type="success"] {
+    color: #167647;
+}
+@media (max-width: 640px) {
+    .posted-job-edit-panel { padding: 14px; }
+    .posted-job-edit-grid { grid-template-columns: 1fr; }
+    .posted-job-edit-field.full { grid-column: auto; }
+}
