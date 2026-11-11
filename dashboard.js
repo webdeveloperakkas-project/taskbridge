@@ -1795,6 +1795,49 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function renderDashboardMyRecentPostedJobs(jobs) {
+        const list = document.getElementById("dashboardMyRecentPostedJobsList");
+        const empty = document.getElementById("dashboardMyRecentPostedJobsEmpty");
+        if (!list || !empty) return;
+
+        list.replaceChildren();
+        const rows = Array.isArray(jobs) ? jobs.slice(0, 5) : [];
+        rows.forEach(job => {
+            const category = getJobCategory(job);
+            const row = document.createElement("article");
+            row.className = "job-table-row dashboard-my-posted-job-row";
+            row.style.setProperty("--job-card-background", "#ffffff");
+
+            const title = document.createElement("span");
+            title.className = "job-table-cell job-name-cell";
+            title.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
+            row.appendChild(title);
+            row.appendChild(createJobCell("job-completed-cell", String(Number(job.total_slots || 0))));
+            row.appendChild(createJobCell("job-completed-cell", "—"));
+
+            const status = document.createElement("span");
+            const normalized = uiStatus(job.status);
+            status.className = "posted-job-status " +
+                (normalized === "pending_review" || normalized === "pending" ? "pending" :
+                 normalized === "active" ? "active" :
+                 normalized === "rejected" ? "rejected" : "other");
+            status.textContent = normalized === "pending_review" ? "Pending" :
+                String(normalized || "Unknown").replaceAll("_", " ");
+            row.appendChild(status);
+
+            const action = document.createElement("button");
+            action.type = "button";
+            action.className = "job-view-button";
+            action.textContent = "Manage";
+            action.addEventListener("click", () => {
+                document.querySelector('[data-section="myPostedJobsSection"]')?.click();
+            });
+            row.appendChild(action);
+            list.appendChild(row);
+        });
+        empty.hidden = rows.length > 0;
+    }
+
     async function loadMyPostedJobs() {
         const { data, error } = await supabaseClient.from("jobs")
             .select("id,advertiser_id,category_id,title,reward_per_worker,total_slots,reserved_budget,remaining_budget,status,admin_review_note,created_at,currency,duration_minutes")
@@ -1806,6 +1849,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const postedCount = document.getElementById("dashboardJobsPosted");
         if (postedCount) postedCount.textContent = String(jobs.length);
         renderPostedJobs(jobs);
+        renderDashboardMyRecentPostedJobs(jobs);
     }
 
     async function loadMySubmissions() {
