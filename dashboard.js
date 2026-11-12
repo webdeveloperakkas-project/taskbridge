@@ -2419,8 +2419,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const name = document.createElement("span");
             name.className = "job-table-cell job-name-cell";
-            name.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
-            name.title = [name.textContent, job.admin_review_note || ""].filter(Boolean).join(" — ");
+            const nameText = document.createElement("span");
+            nameText.textContent = (category?.name || "Uncategorized") + " · " + (job.title || "Untitled Job");
+            nameText.title = [nameText.textContent, job.admin_review_note || ""].filter(Boolean).join(" — ");
+            const jobId = document.createElement("small");
+            jobId.className = "posted-job-id";
+            jobId.textContent = "Job ID: " + job.id;
+            name.append(nameText, jobId);
             row.appendChild(name);
 
             row.appendChild(createJobCell("job-payment-cell", formatWalletMoney(job.reward_per_worker, job.currency || "USD")));
