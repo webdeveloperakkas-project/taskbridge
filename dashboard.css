@@ -6050,3 +6050,88 @@ body.footer-info-open { overflow: hidden; }
 .wallet-balance-menu .wallet-currency-option.active .wallet-currency-option-amount {
     color: var(--primary-dark);
 }
+
+
+/* Finance method cards: compact balance badge + centered brand mark */
+.header-balance { gap: 5px; }
+
+.deposit-method-card,
+.withdraw-method-card {
+    position: relative;
+    min-height: 132px;
+    padding: 64px 10px 13px;
+    gap: 5px;
+}
+
+.deposit-card-topline,
+.withdraw-card-topline {
+    position: static;
+    display: contents;
+    min-height: 0;
+}
+
+.deposit-card-balance,
+.withdraw-card-balance {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: calc(100% - 16px);
+    padding: 4px 7px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 7px;
+    background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(109,40,217,.16);
+}
+
+.deposit-card-balance::before,
+.withdraw-card-balance::before {
+    content: "◉";
+    font-size: 8px;
+    line-height: 1;
+    opacity: .95;
+}
+
+.deposit-method-card .deposit-brand-mark,
+.withdraw-method-card .deposit-brand-mark {
+    position: absolute;
+    top: 29px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+}
+
+.deposit-method-card strong,
+.withdraw-method-card strong {
+    margin-top: 0;
+    line-height: 1.25;
+}
+
+@media(max-width:600px) {
+    .deposit-method-card,
+    .withdraw-method-card {
+        min-height: 124px;
+        padding: 61px 5px 10px;
+    }
+    .deposit-card-balance,
+    .withdraw-card-balance {
+        top: 7px;
+        left: 6px;
+        padding: 4px 5px;
+        font-size: 8px;
+    }
+    .deposit-method-card .deposit-brand-mark,
+    .withdraw-method-card .deposit-brand-mark {
+        top: 28px;
+    }
+}
