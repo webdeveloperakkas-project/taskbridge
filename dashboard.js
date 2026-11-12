@@ -1096,8 +1096,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (withdrawAmount) withdrawAmount.max = String(walletAvailableBalance);
         const withdrawLabel = document.querySelector('label[for="withdrawAmount"]');
         if (withdrawLabel) withdrawLabel.textContent = "Withdrawal Amount (" + walletCurrency + ")";
+        if (walletBalanceToggle) {
+            walletBalanceToggle.title = walletPaymentMethod
+                ? walletPaymentMethod + " · " + walletCurrency
+                : "Select active wallet";
+        }
         renderHeaderWalletOptions();
         updateWithdrawMethodCards();
+        calculateJobBudget();
     }
 
     let hasApprovedWebMoneyDeposit = false;
