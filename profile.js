@@ -9,25 +9,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   const $ = id => document.getElementById(id);
   function initializeAccountMenu() {
-    const profileToggle = document.getElementById("profileToggle");
-    const profileMenu = document.getElementById("profileMenu");
     const notificationToggle = document.getElementById("notificationToggle");
     const notificationMenu = document.getElementById("notificationMenu");
     const closeMenus = () => {
-      profileMenu?.classList.remove("show");
       notificationMenu?.classList.remove("show");
-      profileToggle?.setAttribute("aria-expanded", "false");
       notificationToggle?.setAttribute("aria-expanded", "false");
     };
-    profileToggle?.addEventListener("click", event => {
-      event.stopPropagation();
-      const opening = !profileMenu.classList.contains("show");
-      closeMenus();
-      if (opening) {
-        profileMenu.classList.add("show");
-        profileToggle.setAttribute("aria-expanded", "true");
-      }
-    });
     notificationToggle?.addEventListener("click", event => {
       event.stopPropagation();
       const opening = !notificationMenu.classList.contains("show");
@@ -38,13 +25,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
     document.addEventListener("click", event => {
-      if (!event.target.closest(".profile-dropdown") && !event.target.closest(".notification-dropdown")) closeMenus();
+      if (!event.target.closest(".notification-dropdown")) closeMenus();
     });
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
-    const currentPage = window.location.pathname.split("/").pop();
-    profileMenu?.querySelectorAll("a").forEach(link => {
-      if (new URL(link.href, window.location.href).pathname.split("/").pop() === currentPage) link.setAttribute("aria-current", "page");
-    });
   }
 
   initializeAccountMenu();
@@ -221,27 +204,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     const initialName=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
     
     try {
-      const {data:wallets,error:walletError}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
-      if(walletError)throw walletError;
-      const walletRows=wallets||[];
-      const funded=walletRows.filter(row=>Number(row.available_balance)>0);
-      const walletToggle=$("profileWalletToggle"),walletMenu=$("profileWalletMenu"),balanceNode=$("profileAvailableBalance");
-      let selectedWallet=funded.find(row=>row.currency==="USD")||funded[0]||walletRows.find(row=>row.currency==="USD")||walletRows[0]||{currency:"USD",available_balance:0};
+      const walletToggle=$("walletBalanceToggle"),walletMenu=$("headerWalletMenu"),balanceNode=$("availableBalanceHeader");
+      let walletRows=[],selectedCurrency="USD";
       const formatMoney=(amount,currency)=>{try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency||"USD"}).format(Number(amount)||0);}catch{return (currency||"USD")+" "+(Number(amount)||0).toFixed(2);}};
-      const currencyIcon=(currency)=>({BDT:"৳",USD:"$",USDT:"₮"})[currency]||currency;
-      const renderBalance=()=>{balanceNode.textContent=formatMoney(selectedWallet.available_balance,selectedWallet.currency);};
-      const renderWalletOptions=()=>{
+      const currencyIcon=currency=>({BDT:"৳",USD:"$",USDT:"₮"})[currency]||currency;
+      const renderWallet=()=>{
+        const funded=walletRows.filter(row=>Number(row.available_balance)>0);
+        const selected=walletRows.find(row=>row.currency===selectedCurrency)||funded[0]||walletRows.find(row=>row.currency==="USD")||{currency:"USD",available_balance:0};
+        selectedCurrency=selected.currency||"USD";
+        if(balanceNode)balanceNode.textContent=formatMoney(selected.available_balance,selectedCurrency);
         if(!walletMenu)return;
-        walletMenu.innerHTML=funded.length?funded.map(row=>'<button type="button" class="wallet-currency-option'+(row.currency===selectedWallet.currency?' active':'')+'" data-profile-wallet="'+String(row.currency).replace(/[^A-Z0-9]/gi,'')+'"><span class="wallet-currency-option-icon">'+currencyIcon(row.currency)+'</span><span class="wallet-currency-option-name">'+row.currency+'</span><strong>'+formatMoney(row.available_balance,row.currency)+'</strong></button>').join(""):'<p class="profile-wallet-empty">No funded wallets available</p>';
-        walletMenu.querySelectorAll("[data-profile-wallet]").forEach(option=>option.addEventListener("click",()=>{
-          const wallet=funded.find(row=>String(row.currency).replace(/[^A-Z0-9]/gi,'')===option.dataset.profileWallet);
-          if(!wallet)return;selectedWallet=wallet;renderBalance();renderWalletOptions();walletMenu.classList.remove("show");walletToggle.setAttribute("aria-expanded","false");
-        }));
+        walletMenu.innerHTML=funded.length?funded.map(row=>'<button type="button" class="wallet-currency-option'+(row.currency===selectedCurrency?' active':'')+'" data-profile-wallet="'+String(row.currency).replace(/[^A-Z0-9]/gi,'')+'"><span class="wallet-currency-option-icon">'+currencyIcon(row.currency)+'</span><span class="wallet-currency-option-name">'+row.currency+'</span><strong>'+formatMoney(row.available_balance,row.currency)+'</strong></button>').join(""):'<p class="profile-wallet-empty">No funded wallets available</p>';
+        walletMenu.querySelectorAll("[data-profile-wallet]").forEach(option=>option.addEventListener("click",()=>{const row=funded.find(item=>String(item.currency).replace(/[^A-Z0-9]/gi,'')===option.dataset.profileWallet);if(row){selectedCurrency=row.currency;renderWallet()}walletMenu.classList.remove("show");walletToggle?.setAttribute("aria-expanded","false")}));
       };
-      walletToggle?.addEventListener("click",event=>{event.stopPropagation();const open=walletMenu.classList.contains("show");walletMenu.classList.toggle("show",!open);walletToggle.setAttribute("aria-expanded",String(!open));});
-      document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){walletMenu?.classList.remove("show");walletToggle?.setAttribute("aria-expanded","false");}});
-      renderBalance();renderWalletOptions();
-    } catch(walletError) { console.warn("Could not load profile header wallet:",walletError);$("profileAvailableBalance").textContent="—"; }
+      const refreshWallet=async()=>{const {data,error}=await client.from("wallets").select("id,user_id,currency,available_balance,held_balance,updated_at").eq("user_id",user.id).order("currency",{ascending:true});if(error)throw error;walletRows=data||[];if(!walletRows.some(row=>row.currency===selectedCurrency))selectedCurrency=walletRows.find(row=>Number(row.available_balance)>0)?.currency||"USD";renderWallet()};
+      await refreshWallet();
+      walletToggle?.addEventListener("click",event=>{event.stopPropagation();const open=walletMenu.classList.contains("show");walletMenu.classList.toggle("show",!open);walletToggle.setAttribute("aria-expanded",String(!open))});
+      document.addEventListener("click",event=>{if(!event.target.closest(".wallet-balance-dropdown")){walletMenu?.classList.remove("show");walletToggle?.setAttribute("aria-expanded","false")}});
+      client.channel("profile-header-wallet-"+user.id).on("postgres_changes",{event:"*",schema:"public",table:"wallets",filter:"user_id=eq."+user.id},()=>refreshWallet().catch(error=>console.error("Wallet refresh failed:",error))).subscribe();
+    } catch(walletError) { console.warn("Could not load profile header wallet:",walletError); const balanceNode=$("availableBalanceHeader");if(balanceNode)balanceNode.textContent="—"; }
+
     const [{data:profile,error:profileError},{data:rows,error:rowsError}]=await Promise.all([
       client.from("user_profile_details").select("*").eq("user_id",user.id).maybeSingle(),
       client.from("user_verification_submissions").select("*").eq("user_id",user.id)
