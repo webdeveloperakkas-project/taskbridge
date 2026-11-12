@@ -6004,3 +6004,49 @@ body.footer-info-open { overflow: hidden; }
         height: 23px !important;
     }
 }
+
+
+/* Compact payment-method logos in the header wallet dropdown */
+.wallet-balance-menu .wallet-currency-option {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    min-height: 54px;
+    padding: 10px 14px;
+    text-align: left;
+}
+.wallet-balance-menu .wallet-payment-logo {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+.wallet-balance-menu .wallet-payment-logo-bkash { background: #e2136e; }
+.wallet-balance-menu .wallet-payment-logo-nagad { background: #f47920; }
+.wallet-balance-menu .wallet-payment-logo-rocket { background: #8b2bbd; }
+.wallet-balance-menu .wallet-payment-logo-bank { background: #3974a8; }
+.wallet-balance-menu .wallet-payment-logo-wise { background: #9fe870; color: #163b2b; }
+.wallet-balance-menu .wallet-payment-logo-webmoney { background: #1769aa; font-size: 10px; }
+.wallet-balance-menu .wallet-payment-logo-visa { background: #1a1f71; }
+.wallet-balance-menu .wallet-payment-logo-mastercard { background: #252525; }
+.wallet-balance-menu .wallet-payment-logo-default { background: #64748b; }
+.wallet-balance-menu .wallet-currency-option-amount {
+    justify-self: end;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--dark);
+}
+.wallet-balance-menu .wallet-currency-option.active .wallet-currency-option-amount {
+    color: var(--primary-dark);
+}
