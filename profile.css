@@ -438,3 +438,7 @@ button.topbar-avatar:focus-visible{outline:3px solid #93b4f5;outline-offset:3px}
   .account-shared-header .header-balance .wallet-header-icon,
   .account-shared-header .header-balance .balance-icon{width:18px;height:18px;flex-basis:18px}
 }
+
+/* Profile identity is display-only; page navigation stays in the dashboard sidebar. */
+.account-shared-header .profile-toggle{cursor:default;pointer-events:none}
+.account-shared-header .profile-toggle>.icon{display:none}
