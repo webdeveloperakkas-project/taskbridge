@@ -8,6 +8,9 @@
     <title>TaskBridge - User Dashboard</title>
 
     <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./profile.css?v=20261112-account-sections">
+    <link rel="stylesheet" href="./settings.css?v=20261112-account-sections">
+    <link rel="stylesheet" href="./support.css?v=20261112-account-sections">
     <link rel="stylesheet" href="./dashboard.css?v=20261111-footer-mobile-v2">
 
 </head>
@@ -329,41 +332,13 @@
 </div>
 
 
-                <!-- ACCOUNT & SUPPORT -->
-
+                <!-- SUPPORT -->
                 <div class="nav-section">
-
-                    <p class="nav-section-title">ACCOUNT & SUPPORT</p>
-
-                    <a href="#notifications" class="nav-link">
-                        <svg class="icon">
-                            <use href="#icon-bell"></use>
-                        </svg>
-                        <span>Notifications</span>
-                        <span class="nav-badge">3</span>
-                    </a>
-
-                    <a href="./profile.html" class="nav-link">
-                        <svg class="icon">
-                            <use href="#icon-user"></use>
-                        </svg>
-                        <span>My Profile</span>
-                    </a>
-
-                    <a href="./settings.html" class="nav-link">
-                        <svg class="icon">
-                            <use href="#icon-settings"></use>
-                        </svg>
-                        <span>Settings</span>
-                    </a>
-
-                    <a href="./support.html" class="nav-link">
-                        <svg class="icon">
-                            <use href="#icon-help"></use>
-                        </svg>
+                    <p class="nav-section-title">SUPPORT</p>
+                    <a href="#supportSection" class="nav-link" data-section="supportSection">
+                        <svg class="icon"><use href="#icon-help"></use></svg>
                         <span>Help &amp; Support</span>
                     </a>
-
                 </div>
 
             </nav>
@@ -385,20 +360,12 @@
 
                     <p>Our support team is here to help you.</p>
 
-                    <a href="./support.html">Get Support</a>
+                    <a href="#supportSection" data-open-section="supportSection">Get Support</a>
 
                 </div>
 
 
-                <a href="./login.html" class="nav-link logout-link">
 
-                    <svg class="icon">
-                        <use href="#icon-logout"></use>
-                    </svg>
-
-                    <span>Log Out</span>
-
-                </a>
 
             </div>
 
@@ -499,11 +466,18 @@
                     </div>
 
 
-                    <!-- Account identity; navigation remains in the dashboard sidebar. -->
+                    <!-- Account menu: account destinations open inside this dashboard shell. -->
                     <div class="header-dropdown profile-dropdown">
-                        <div class="profile-toggle" aria-label="Account">
+                        <button type="button" class="profile-toggle" id="profileMenuToggle"
+                            aria-label="Open account menu" aria-expanded="false" aria-controls="headerProfileMenu">
                             <span class="profile-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M4 20.2a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
                             <span class="profile-info"><strong>My Account</strong><small>Member</small></span>
+                        </button>
+                        <div class="dropdown-menu profile-menu" id="headerProfileMenu" aria-label="Account navigation">
+                            <a href="#profileSection" class="profile-menu-link" data-open-section="profileSection"><svg class="icon"><use href="#icon-user"></use></svg><span>Profile</span></a>
+                            <a href="#myStatisticsSection" class="profile-menu-link" data-open-section="myStatisticsSection"><svg class="icon"><use href="#icon-grid"></use></svg><span>My Statistics</span></a>
+                            <a href="#settingsSection" class="profile-menu-link" data-open-section="settingsSection"><svg class="icon"><use href="#icon-settings"></use></svg><span>Settings</span></a>
+                            <a href="./login.html" class="profile-menu-link logout-link"><svg class="icon"><use href="#icon-logout"></use></svg><span>Log Out</span></a>
                         </div>
                     </div>
 
@@ -1816,7 +1790,248 @@
 
 
 
-            </main>
+            
+                <!-- ACCOUNT SECTIONS: the dashboard header and sidebar remain mounted. -->
+                <section id="profileSection" class="page-section account-page-section" hidden>
+                    <div class="profile-shell">
+<section class="profile-intro">
+      <div class="profile-intro-copy">
+        <span class="eyebrow">ACCOUNT CENTER</span>
+        <h1>Profile & Verification</h1>
+        <p>Keep your personal information up to date and verify your identity securely.</p>
+      </div>
+      <div class="overall-status" id="overallStatus"><span class="status-dot"></span><span>Loading status</span></div>
+    </section>
+
+    <nav class="verification-tabs" role="tablist" aria-label="Profile sections">
+      <button class="verification-tab active" type="button" role="tab" aria-selected="true" data-tab="personal">
+        <span class="tab-icon">01</span><span><strong>Personal Details</strong><small>Account information</small></span>
+      </button>
+      <button class="verification-tab" type="button" role="tab" aria-selected="false" data-tab="identity">
+        <span class="tab-icon">02</span><span><strong>ID Verification</strong><small>Identity documents</small></span>
+        <span class="tab-status" id="identityTabStatus">Not submitted</span>
+      </button>
+      <button class="verification-tab" type="button" role="tab" aria-selected="false" data-tab="address">
+        <span class="tab-icon">03</span><span><strong>Address Verification</strong><small>Proof of residence</small></span>
+        <span class="tab-status" id="addressTabStatus">Not submitted</span>
+      </button>
+    </nav>
+
+    <section class="profile-panel active" id="personalPanel" role="tabpanel">
+      <div class="panel-heading"><div><span class="eyebrow">YOUR INFORMATION</span><h2>Personal Details</h2><p>These details are private and visible only to you and authorized administrators.</p></div><span class="panel-icon">♙</span></div>
+      <form id="personalForm" class="form-card">
+        <div class="form-grid">
+          <label class="field wide"><span>Full Name</span><input id="fullName" name="full_name" type="text" maxlength="120" autocomplete="name" placeholder="Enter your full legal name" required></label>
+          <label class="field wide"><span>Email Address</span><input id="emailAddress" type="email" readonly><small>Your sign-in email is managed securely by your account.</small></label>
+          <label class="field"><span>Date of Birth</span><input id="dateOfBirth" name="date_of_birth" type="date"></label>
+          <label class="field"><span>Phone Number</span><input id="phoneNumber" name="phone_number" type="tel" maxlength="30" autocomplete="tel" placeholder="+880 1XXXXXXXXX"></label>
+          <label class="field"><span>Gender <em>Optional</em></span><select id="gender" name="gender"><option value="">Prefer not to say</option><option value="female">Female</option><option value="male">Male</option><option value="non_binary">Non-binary</option><option value="other">Other</option></select></label>
+          <label class="field"><span>Country</span><select id="personalCountry" name="country"><option value="">Select country</option></select></label>
+        </div>
+        <div class="form-actions"><p class="form-feedback" id="personalFeedback" aria-live="polite"></p><button class="primary-button" id="savePersonalButton" type="submit">Save Changes</button></div>
+      </form>
+    </section>
+
+    <section class="profile-panel" id="identityPanel" role="tabpanel" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">KNOW YOUR CUSTOMER</span><h2>Identity Verification</h2><p>Submit a valid government-issued ID and a live selfie for review.</p></div><span class="panel-icon">◇</span></div>
+      <div class="notice-card"><span>🔒</span><p>Your documents are stored in private encrypted-access storage. Only you and authorized administrators can access them.</p></div>
+      <form id="identityForm" class="form-card verification-form">
+        <div class="form-grid">
+          <label class="field"><span>ID Document Type</span><select id="idDocumentType" required><option value="">Select ID type</option><option value="national_id">National ID Card</option><option value="passport">Passport</option><option value="driving_license">Driving License</option></select></label>
+          <label class="field"><span>Issuing Country</span><select id="idCountry" required><option value="">Select country</option></select></label>
+        </div>
+        <div class="upload-grid">
+          <div class="upload-card">
+            <div class="upload-card-heading"><span class="upload-step">01</span><div><h3>Front Side</h3><p>Upload a clear image of the front.</p></div></div>
+            <div class="upload-preview" id="frontPreview"><span class="upload-placeholder">▧</span><strong>Front side preview</strong><small>JPG, PNG or WEBP · Max 2 MB</small></div>
+            <input class="file-input" id="frontFile" type="file" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-actions"><label class="secondary-button" for="frontFile">Upload File</label><button type="button" class="secondary-button camera-button" data-camera="front">Take Photo</button></div>
+            <span class="upload-feedback" id="frontFeedback">Not uploaded</span>
+          </div>
+          <div class="upload-card">
+            <div class="upload-card-heading"><span class="upload-step">02</span><div><h3>Back Side</h3><p>Upload the reverse side of your ID.</p></div></div>
+            <div class="upload-preview" id="backPreview"><span class="upload-placeholder">▧</span><strong>Back side preview</strong><small>JPG, PNG or WEBP · Max 2 MB</small></div>
+            <input class="file-input" id="backFile" type="file" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-actions"><label class="secondary-button" for="backFile">Upload File</label><button type="button" class="secondary-button camera-button" data-camera="back">Take Photo</button></div>
+            <span class="upload-feedback" id="backFeedback">Not uploaded</span>
+          </div>
+        </div>
+        <div class="selfie-card">
+          <div class="selfie-copy"><span class="eyebrow">LIVE SELFIE</span><h3>Verify that it is really you</h3><p>Use your device camera. Keep your face inside the guide and capture a clear, well-lit photo.</p><span class="selfie-tip">A live camera capture is required; selecting an existing selfie file is not available.</span></div>
+          <div class="selfie-preview" id="selfiePreview"><div class="selfie-ring"><span>☺</span></div><small>Selfie not captured</small></div>
+          <button type="button" class="primary-button" id="openSelfieCamera">Open Live Camera</button>
+          <span class="upload-feedback" id="selfieFeedback">Not submitted</span>
+        </div>
+        <div class="submission-status" id="identitySubmissionStatus"></div>
+        <div class="form-actions"><p class="form-feedback" id="identityFeedback" aria-live="polite"></p><button class="primary-button" id="submitIdentityButton" type="submit">Submit Identity Verification</button></div>
+      </form>
+    </section>
+
+    <section class="profile-panel" id="addressPanel" role="tabpanel" hidden>
+      <div class="panel-heading"><div><span class="eyebrow">PROOF OF RESIDENCE</span><h2>Address Verification</h2><p>Provide your current residential address and one supporting document.</p></div><span class="panel-icon">⌖</span></div>
+      <div class="notice-card"><span>📄</span><p>Accepted documents: Utility Bill, Bank Statement, Government Address Certificate, Rental Agreement, or National/Voter ID showing your current address. Prefer a document issued within the last 3 months.</p></div>
+      <form id="addressForm" class="form-card verification-form">
+        <div class="form-grid">
+          <label class="field wide"><span>Street Address / House & Building</span><input id="addressLine" type="text" maxlength="240" autocomplete="street-address" required placeholder="House, road, street and area"></label>
+          <label class="field"><span>City</span><input id="addressCity" type="text" maxlength="100" required autocomplete="address-level2"></label>
+          <label class="field"><span>State / Division / Region</span><input id="addressRegion" type="text" maxlength="100" autocomplete="address-level1"></label>
+          <label class="field"><span>Postal Code</span><input id="postalCode" type="text" maxlength="20" autocomplete="postal-code"></label>
+          <label class="field"><span>Country</span><select id="addressCountry" required><option value="">Select country</option></select></label>
+          <label class="field wide"><span>Proof of Address Document</span><select id="addressDocumentType" required><option value="">Choose document type</option><option value="utility_bill">Utility Bill (Electricity / Water / Gas)</option><option value="bank_statement">Bank Statement</option><option value="government_certificate">Government Address Certificate</option><option value="rental_agreement">Rental Agreement</option><option value="national_voter_id">National ID / Voter ID with current address</option></select></label>
+        </div>
+        <div class="upload-card address-upload-card">
+          <div class="upload-card-heading"><span class="upload-step">04</span><div><h3>Address Document</h3><p>Upload a clear scan or photo of your proof of address.</p></div></div>
+          <div class="upload-preview document-preview" id="addressPreview"><span class="upload-placeholder">▤</span><strong>Address document preview</strong><small>JPG, PNG, WEBP or PDF · Max 2 MB</small></div>
+          <input class="file-input" id="addressFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf">
+          <div class="upload-actions"><label class="secondary-button" for="addressFile">Upload Document</label><button type="button" class="secondary-button camera-button" data-camera="address">Take Photo</button></div>
+          <span class="upload-feedback" id="addressUploadFeedback">Not uploaded</span>
+        </div>
+        <div class="submission-status" id="addressSubmissionStatus"></div>
+        <div class="form-actions"><p class="form-feedback" id="addressFeedback" aria-live="polite"></p><button class="primary-button" id="submitAddressButton" type="submit">Submit Address Verification</button></div>
+      </form>
+    </section>
+    <p class="page-footnote">TaskBridge will only use your verification information to protect the marketplace and comply with applicable requirements.</p>
+  </div>
+                    <div class="camera-modal" id="cameraModal" aria-hidden="true">
+    <div class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="cameraTitle">
+      <div class="camera-header"><div><span class="eyebrow">SECURE CAMERA</span><h2 id="cameraTitle">Camera Capture</h2></div><button type="button" class="camera-close" id="closeCamera" aria-label="Close camera">×</button></div>
+      <div class="camera-stage" id="cameraStage"><video id="cameraVideo" autoplay playsinline muted></video><div class="camera-guide" id="cameraGuide"><span></span></div><div class="camera-glow"></div></div>
+      <p class="camera-instruction" id="cameraInstruction">Position the document clearly inside the frame.</p>
+      <div class="camera-controls"><button type="button" class="secondary-button" id="cancelCamera">Cancel</button><button type="button" class="primary-button" id="capturePhoto">Capture Photo</button></div>
+      <canvas id="cameraCanvas" hidden></canvas>
+    </div>
+  </div>
+                </section>
+
+                <section id="myStatisticsSection" class="page-section account-page-section" hidden>
+                    <div class="statistics-shell">
+                        <div class="statistics-heading">
+                            <span class="statistics-eyebrow">ACCOUNT OVERVIEW</span>
+                            <h1>My Statistics</h1>
+                            <p>Your real TaskBridge work and job-posting history.</p>
+                        </div>
+                        <p id="statisticsStatus" class="statistics-status" role="status" aria-live="polite">Loading your statistics...</p>
+                        <div class="account-statistics-grid">
+                            <article class="account-stat-card"><span class="statistics-card-icon">▦</span><strong id="statJobsPosted">—</strong><small>Jobs Posted</small></article>
+                            <article class="account-stat-card"><span class="statistics-card-icon">✓</span><strong id="statTasksCompleted">—</strong><small>Tasks Completed</small></article>
+                            <article class="account-stat-card"><span class="statistics-card-icon">↗</span><strong id="statSubmissions">—</strong><small>Work Submissions</small></article>
+                            <article class="account-stat-card"><span class="statistics-card-icon">◷</span><strong id="statPending">—</strong><small>Pending Review</small></article>
+                            <article class="account-stat-card"><span class="statistics-card-icon">▶</span><strong id="statInProgress">—</strong><small>Active Tasks</small></article>
+                            <article class="account-stat-card"><span class="statistics-card-icon">!</span><strong id="statRejected">—</strong><small>Rejected Tasks</small></article>
+                        </div>
+                        <div class="statistics-history-grid">
+                            <section class="statistics-history-card">
+                                <div class="statistics-history-heading"><h2>Jobs You Posted</h2><span>Recent history</span></div>
+                                <div id="statisticsPostedJobs" class="statistics-history-list"><p>Loading job history...</p></div>
+                            </section>
+                            <section class="statistics-history-card">
+                                <div class="statistics-history-heading"><h2>Your Work History</h2><span>Recent activity</span></div>
+                                <div id="statisticsWorkerHistory" class="statistics-history-list"><p>Loading work history...</p></div>
+                            </section>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="settingsSection" class="page-section account-page-section settings-page" hidden>
+                    <div class="settings-shell">
+<div class="settings-heading shared-page-intro"><div><p class="settings-eyebrow">ACCOUNT PREFERENCES</p><h1>Settings</h1><p>Manage your account, security and notification preferences.</p></div></div>
+  <div class="settings-layout">
+    <nav class="settings-nav" aria-label="Settings sections">
+      <button class="settings-nav-item active" type="button" data-settings-tab="account"><span>♙</span> Account Settings</button>
+      <button class="settings-nav-item" type="button" data-settings-tab="security"><span>♧</span> Security &amp; Privacy</button>
+      <button class="settings-nav-item" type="button" data-settings-tab="notifications"><span>♧</span> Notifications</button>
+    </nav>
+    <section class="settings-content">
+      <section class="settings-panel active" data-settings-panel="account">
+        <div class="settings-panel-heading"><div><h2>Account Settings</h2><p>Update the email address connected to your account.</p></div></div>
+        <div class="settings-email-row">
+          <div class="settings-email-current"><label for="accountEmail">Email Address</label><input id="accountEmail" type="email" autocomplete="email" readonly></div>
+          <button class="settings-change-button" id="showEmailChange" type="button">Change</button>
+        </div>
+        <form id="emailForm" class="settings-form settings-email-change" hidden>
+          <label for="newEmailAddress">Enter Your New Email Address</label>
+          <div class="settings-inline-field"><input id="newEmailAddress" type="email" autocomplete="email" placeholder="Enter your new email address" required><button class="settings-secondary" id="sendEmailCode" type="button">Send Code</button></div>
+          <div id="emailOtpArea" class="settings-otp-area" hidden>
+            <label for="emailOtp">Verification Code</label>
+            <input id="emailOtp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Enter the code sent to your current email">
+            <button class="settings-primary" type="submit" id="saveEmailChange">Save</button>
+          </div>
+          <button class="settings-cancel-button" id="cancelEmailChange" type="button">Cancel</button>
+          <p class="settings-hint">A verification code will be sent to your current email address to verify your identity. After verification, a confirmation message will be sent to your new email address.</p>
+        </form>
+        <div id="accountMessage" class="settings-message" role="status"></div>
+      </section>
+      <section class="settings-panel" data-settings-panel="security">
+        <div class="settings-panel-heading"><div><h2>Security &amp; Privacy</h2><p>Keep your account secure by changing your password.</p></div></div>
+        <form id="passwordForm" class="settings-form">
+          <label for="currentPassword">Current Password</label>
+          <input id="currentPassword" type="password" autocomplete="current-password" placeholder="Enter your current password" required>
+          <label for="newPassword">New Password</label>
+          <input id="newPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters" required>
+          <label for="confirmPassword">Confirm New Password</label>
+          <input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" placeholder="Enter the new password again" required>
+          <a class="settings-forgot-link" href="./forgot-password.html">Forgot Password?</a>
+          <button class="settings-primary" type="submit">Update Password</button>
+        </form>
+        <div class="settings-privacy-note"><strong>Privacy</strong><p>Your account information and activity are used to provide TaskBridge services. Never share your password or verification codes.</p></div>
+        <div id="securityMessage" class="settings-message" role="status"></div>
+      </section>
+      <section class="settings-panel" data-settings-panel="notifications">
+        <div class="settings-panel-heading"><div><h2>Notification Preferences</h2><p>Choose which updates you want to receive. Turn any notification on or off.</p></div></div>
+        <div class="notification-preference-list">
+          <div class="notification-group-title">GENERAL UPDATES</div>
+          <label class="notification-preference"><span><strong>News &amp; Updates</strong><small>Product news, announcements and important updates.</small></span><input type="checkbox" data-notification-pref="news_updates"><i></i></label>
+          <div class="notification-group-title">PAYMENTS &amp; WALLET</div>
+          <label class="notification-preference"><span><strong>Payment Received</strong><small>When a buyer pays you or money is credited to your wallet.</small></span><input type="checkbox" data-notification-pref="payment_received"><i></i></label>
+          <label class="notification-preference"><span><strong>Payment Receipts</strong><small>Receipts and confirmations for deposits and payments.</small></span><input type="checkbox" data-notification-pref="payment_receipts"><i></i></label>
+          <label class="notification-preference"><span><strong>Deposit Updates</strong><small>When a deposit is submitted, approved or rejected.</small></span><input type="checkbox" data-notification-pref="deposit_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Withdrawal Updates</strong><small>When a withdrawal is processed, approved or rejected.</small></span><input type="checkbox" data-notification-pref="withdrawal_updates"><i></i></label>
+          <div class="notification-group-title">JOB ACTIVITY</div>
+          <label class="notification-preference"><span><strong>Job Updates</strong><small>Changes to jobs you posted or are working on.</small></span><input type="checkbox" data-notification-pref="job_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Submission &amp; Review Updates</strong><small>When a submission is received, reviewed or needs attention.</small></span><input type="checkbox" data-notification-pref="submission_updates"><i></i></label>
+          <label class="notification-preference"><span><strong>Job Approval &amp; Rejection</strong><small>When your posted job is approved or rejected.</small></span><input type="checkbox" data-notification-pref="job_status_updates"><i></i></label>
+          <div class="notification-group-title">ACCOUNT SECURITY</div>
+          <label class="notification-preference"><span><strong>Security Alerts</strong><small>Important account and security-related notifications.</small></span><input type="checkbox" data-notification-pref="security_alerts"><i></i></label>
+        </div>
+        <div id="notificationMessage" class="settings-message" role="status"></div>
+      </section>
+    </section>
+  </div>
+</div>
+                </section>
+
+                <section id="supportSection" class="page-section account-page-section support-page" hidden>
+                    <div class="shared-page-shell">
+<section class="shared-page-intro"><div><span class="eyebrow">TASKBRIDGE ASSISTANCE</span><h1>Help &amp; Support</h1><p>Find answers to common questions or send a message to our support team.</p></div></section>
+
+    <section class="support-section">
+      <div class="support-section-heading"><div><span class="support-kicker">HELP CENTER</span><h2>Frequently Asked Questions</h2><p>Choose a question to read helpful information.</p></div></div>
+      <div class="support-faq-list">
+        <details class="support-faq"><summary>How do I update my account email or password?<span class="faq-chevron" aria-hidden="true"></span></summary><p>Open Settings from your profile menu. In Account Settings, use Change Email and complete the verification steps. To update your password, open Security &amp; Privacy, enter your current password, then choose and confirm your new password.</p></details>
+        <details class="support-faq"><summary>Why is my deposit or withdrawal taking time?<span class="faq-chevron" aria-hidden="true"></span></summary><p>Payment processing times can vary by payment method and review requirements. Check your wallet transaction history for the latest status. If a transaction remains pending longer than expected, send us its reference and details using the form below. Never share your password or verification codes.</p></details>
+        <details class="support-faq"><summary>Why is my job waiting for approval?<span class="faq-chevron" aria-hidden="true"></span></summary><p>New jobs may require an administrator review before they become available to workers. Check your job status in the dashboard. If the job has been pending unusually long, include its Job ID in your support message.</p></details>
+        <details class="support-faq"><summary>When will I receive payment for a completed task?<span class="faq-chevron" aria-hidden="true"></span></summary><p>Task rewards are credited after the submission is reviewed and approved. You can check the submission status and your available wallet balance from the dashboard. If an approved reward is missing, include the Job ID and submission details.</p></details>
+        <details class="support-faq"><summary>How can I protect my account and personal information?<span class="faq-chevron" aria-hidden="true"></span></summary><p>Use a strong, unique password and keep your email account secure. Never share your password, OTP, or recovery codes. Contact support immediately if you notice an unfamiliar login or activity on your account.</p></details>
+      </div>
+    </section>
+
+    <section class="support-section support-contact-section">
+      <div class="support-section-heading"><div><span class="support-kicker">CONTACT US</span><h2>Send a Message</h2><p>Tell us what happened. Our support team will review your message.</p></div></div>
+      <form id="supportMessageForm" class="support-form">
+        <div class="support-form-grid">
+          <label>Your Name<input id="supportName" name="name" type="text" autocomplete="name" required maxlength="100" placeholder="Enter your name"></label>
+          <label>Your Email<input id="supportEmail" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="Enter your email address"></label>
+        </div>
+        <label>Subject<input id="supportSubject" name="subject" type="text" required maxlength="150" placeholder="What do you need help with?"></label>
+        <label>Message<textarea id="supportMessage" name="message" rows="6" required maxlength="5000" placeholder="Describe your issue in detail..."></textarea></label>
+        <div class="support-form-footer"><p>Your message will be sent to the TaskBridge support team.</p><button id="supportSendButton" type="submit"><span>Send Message</span><span aria-hidden="true">→</span></button></div>
+        <p id="supportFormStatus" class="support-form-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </div>
+                </section>
+
+</main>
 
 
 
@@ -1850,6 +2065,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Dashboard JavaScript -->
     <script src="./dashboard.js?v=20261111-dashboard-recent-posted"></script>
+    <script src="./profile.js?v=20261112-account-sections"></script>
+    <script src="./settings.js?v=20261112-account-sections"></script>
+    <script src="./support.js?v=20261112-account-sections"></script>
 
 </body>
 
