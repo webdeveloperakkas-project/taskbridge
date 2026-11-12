@@ -1099,8 +1099,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function currencyForWithdrawMethod(method) {
         return ({
             "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
-            "Bank Transfer": "BDT", "Wise": "USD", "WebMoney": "USD",
-            "USDT - BEP20": "USDT", "USDT - TRC20": "USDT"
+            "Bank Transfer": "BDT", "Wise": "USD"
         })[method] || "";
     }
 
@@ -1375,8 +1374,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedDepositMethod = "";
     const depositCurrencyByMethod = {
         "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
-        "Bank Transfer": "BDT", "Wise (manual transfer)": "USD",
-        "WebMoney": "USD", "Visa": "USD", "Mastercard": "USD"
+        "Bank Transfer": "BDT", "Wise (manual transfer)": "USD"
     };
 
     // Public WMZ purse ID only; configure this after verifying the official TaskBridge account.
