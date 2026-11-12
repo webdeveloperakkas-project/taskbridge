@@ -5733,3 +5733,17 @@ body.footer-info-open { overflow: hidden; }
     .statistics-heading h1 { font-size:22px; }
     .statistics-history-card { padding:14px; }
 }
+
+
+/* Sidebar Back to Dashboard action above Help & Support. */
+.sidebar-navigation .sidebar-back-dashboard {
+    margin: 0 0 9px; padding: 10px 13px; border: 1px solid var(--border);
+    border-radius: 9px; background: var(--white); color: var(--primary-dark); font-weight: 750;
+}
+.sidebar-navigation .sidebar-back-dashboard .icon { width: 16px; height: 16px; }
+.sidebar-navigation .sidebar-back-dashboard:hover { background: var(--primary-light); border-color: var(--primary); }
+
+/* Keep the account dropdown above header content and reliably clickable. */
+.top-header .profile-dropdown { position: relative; z-index: 1250; }
+.top-header #profileMenuToggle { position: relative; z-index: 1251; pointer-events: auto; cursor: pointer; }
+.top-header #headerProfileMenu { position: absolute; z-index: 1252; pointer-events: auto; }
