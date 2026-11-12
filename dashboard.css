@@ -6417,3 +6417,12 @@ body.footer-info-open { overflow: hidden; }
         font-size: 11px !important;
     }
 }
+
+
+/* Mobile footer: increase equal outer spacing on both sides to 16px. */
+@media (max-width: 600px) {
+    .dashboard-footer {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}
