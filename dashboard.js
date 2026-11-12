@@ -16,9 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let publicJobs = [];
     let walletChannel = null;
     let walletCurrency = "USD";
+    let walletPaymentMethod = "";
+    let activeWalletId = "";
     let walletAvailableBalance = 0;
     let walletRows = [];
-    let walletsByCurrency = new Map();
+    let walletsById = new Map();
     let walletsByMethod = new Map();
     let selectedWithdrawCurrency = "";
     let activeWorkerJob = null;
@@ -741,7 +743,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const platformFee = Math.round((jobBudget * platformFeeRateForPreview / 100 + Number.EPSILON) * 100) / 100;
         const colorFee = cardColorFees[getSelectedCardColor()] ?? 0;
         const total = Math.round((jobBudget + platformFee + colorFee + Number.EPSILON) * 100) / 100;
-        const money = value => "$" + value.toFixed(2);
+        const money = value => formatWalletMoney(value, walletCurrency);
 
         jobBudgetNode.textContent = money(jobBudget);
         platformFeeNode.textContent = money(platformFee);
@@ -1056,18 +1058,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const funded = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
         headerWalletMenu.innerHTML = funded.map(wallet => {
             const currency = String(wallet.currency || "").toUpperCase();
-            const selected = currency === walletCurrency;
+            const method = String(wallet.payment_method || "Wallet");
+            const selected = wallet.id === activeWalletId;
             return '<button type="button" class="wallet-currency-option' +
-                (selected ? ' active' : '') + '" data-wallet-currency="' +
-                escapeFinanceText(currency) + '">' +
+                (selected ? ' active' : '') + '" data-wallet-id="' +
+                escapeFinanceText(wallet.id) + '">' +
                 '<span class="wallet-currency-option-icon">' + escapeFinanceText(currencyWalletIcon(currency)) + '</span>' +
-                '<span class="wallet-currency-option-name">' + escapeFinanceText(currency) + '</span>' +
+                '<span class="wallet-currency-option-name">' + escapeFinanceText(method + " · " + currency) + '</span>' +
                 '<strong>' + escapeFinanceText(formatWalletMoney(wallet.available_balance, currency)) + '</strong>' +
                 '</button>';
         }).join("");
-        headerWalletMenu.querySelectorAll("[data-wallet-currency]").forEach(option => {
+        headerWalletMenu.querySelectorAll("[data-wallet-id]").forEach(option => {
             option.addEventListener("click", () => {
-                const wallet = walletsByCurrency.get(option.dataset.walletCurrency);
+                const wallet = walletsById.get(option.dataset.walletId);
                 if (!wallet || Number(wallet.available_balance) <= 0) return;
                 renderWalletBalance(wallet);
                 if (headerWalletMenu) headerWalletMenu.classList.remove("show");
@@ -1077,7 +1080,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderWalletBalance(wallet) {
+        activeWalletId = wallet?.id || "";
         walletCurrency = wallet?.currency || "USD";
+        walletPaymentMethod = wallet?.payment_method || "";
         walletAvailableBalance = Math.max(0, Number(wallet?.available_balance ?? 0) || 0);
         const formatted = formatWalletMoney(walletAvailableBalance, walletCurrency);
         ["availableBalanceHeader", "availableBalanceOverview",
@@ -1086,7 +1091,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (node) node.textContent = formatted;
         });
         const selector = document.getElementById("walletCurrencySelector");
-        if (selector && wallet && Number(wallet.available_balance) > 0) selector.value = walletCurrency;
+        if (selector && wallet && Number(wallet.available_balance) > 0) selector.value = wallet.id;
         const withdrawAmount = document.getElementById("withdrawAmount");
         if (withdrawAmount) withdrawAmount.max = String(walletAvailableBalance);
         const withdrawLabel = document.querySelector('label[for="withdrawAmount"]');
@@ -1378,7 +1383,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         walletRows = data || [];
-        walletsByCurrency = new Map(walletRows.map(wallet => [wallet.currency, wallet]));
+        walletsById = new Map(walletRows.map(wallet => [wallet.id, wallet]));
         walletsByMethod = new Map(walletRows.filter(wallet => wallet.payment_method).map(wallet => [wallet.payment_method, wallet]));
         updateDepositMethodCards();
         const fundedWallets = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
@@ -1392,11 +1397,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             selector.disabled = false;
-            fundedWallets.forEach(wallet => selector.add(new Option(wallet.currency, wallet.currency)));
-            const selected = fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0];
+            fundedWallets.forEach(wallet => {
+                const method = wallet.payment_method || "Wallet";
+                selector.add(new Option(method + " · " + wallet.currency, wallet.id));
+            });
+            const selected = fundedWallets.find(wallet => wallet.id === activeWalletId) ||
+                fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0];
             renderWalletBalance(selected);
         } else {
-            renderWalletBalance(fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0] || null);
+            renderWalletBalance(fundedWallets.find(wallet => wallet.id === activeWalletId) ||
+                fundedWallets.find(wallet => wallet.currency === walletCurrency) || fundedWallets[0] || null);
         }
         renderHeaderWalletOptions();
     }
@@ -1449,7 +1459,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedWithdrawMethod = "";
     const walletCurrencySelector = document.getElementById("walletCurrencySelector");
     if (walletCurrencySelector) walletCurrencySelector.addEventListener("change", () => {
-        const wallet = walletsByCurrency.get(walletCurrencySelector.value);
+        const wallet = walletsById.get(walletCurrencySelector.value);
         if (wallet && Number(wallet.available_balance) > 0) renderWalletBalance(wallet);
     });
 
@@ -3042,6 +3052,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         const proofRequirements = "Proof type: " + proofType +
             (proofDetails ? "\n" + proofDetails : "");
+        const fundingWallet = walletsById.get(activeWalletId);
+        if (!fundingWallet || Number(fundingWallet.available_balance) <= 0) {
+            showJobFormMessage("Select a funded wallet from the dashboard header before posting a job.", "error");
+            return;
+        }
         const submit = postJobForm?.querySelector('button[type="submit"]');
         if (submit) { submit.disabled = true; submit.textContent = "Submitting..."; }
         try {
@@ -3059,7 +3074,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 p_duration_minutes: duration,
                 p_card_color: getSelectedCardColor(),
                 p_target_country: targetCountry,
-                p_buyer_payment_days: buyerPaymentDays
+                p_buyer_payment_days: buyerPaymentDays,
+                p_funding_wallet_id: fundingWallet.id
             });
             if (error) throw error;
             showJobFormMessage("Job submitted. It is pending admin review. Reference: " + data, "success");
