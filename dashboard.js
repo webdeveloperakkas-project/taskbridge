@@ -1897,21 +1897,15 @@ document.addEventListener("DOMContentLoaded", function () {
             if (existingError) throw existingError;
             const existing = existingRows?.[0] || null;
             if (existing?.status === "in_progress") {
-                if (new Date(existing.expires_at).getTime() <= Date.now()) {
-                    activeWorkerSubmission = existing;
-                    activeWorkerJob = job;
-                    await expireCurrentWorkerSubmission();
+                if (new Date(existing.expires_at).getTime() > Date.now()) {
+                    openJobDetails(jobId, existing);
                     return;
                 }
-                openJobDetails(jobId, existing);
-                return;
+                const { error: expiryError } = await supabaseClient.rpc("expire_submissions");
+                if (expiryError) throw expiryError;
             }
             if (existing && ["submitted", "approved", "completed", "rejected", "revision", "revision_required", "needs_revision"].includes(String(existing.status).toLowerCase())) {
                 window.alert("You already submitted this task. Please check My Submitted Jobs for its status.");
-                return;
-            }
-            if (existing?.status === "expired") {
-                window.alert("This job attempt has expired and cannot be restarted.");
                 return;
             }
 
@@ -2683,8 +2677,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function loadMySubmissions() {
+        // Mark overdue attempts expired before rendering the worker task list.
+        const { error: expiryError } = await supabaseClient.rpc("expire_submissions");
+        if (expiryError) console.warn("Could not expire overdue worker attempts:", expiryError);
         const { data, error } = await supabaseClient.from("job_submissions")
-            .select("id,job_id,worker_id,status,proof_text,proof_file_url,started_at,submitted_at,review_note,created_at")
+            .select("id,job_id,worker_id,status,proof_text,proof_file_url,started_at,expires_at,submitted_at,review_note,created_at")
             .eq("worker_id", currentUser.id)
             .order("submitted_at", { ascending: false, nullsFirst: false });
         if (error) {
@@ -2696,12 +2693,14 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // My Submitted Jobs is a history of work actually submitted.
-        // Active attempts and expired, unsubmitted attempts stay out of this list.
+        // Keep live attempts visible so workers can reopen tasks they have already started.
+        // Expired, unsubmitted attempts stay hidden and can be restarted from Find a Job.
         const finalSubmissionStatuses = ["submitted","approved","completed","rejected","revision","revision_required","needs_revision"];
-        const submissions = (data || []).filter(item =>
-            finalSubmissionStatuses.includes(String(item.status || "").toLowerCase())
-        );
+        const submissions = (data || []).filter(item => {
+            const status = String(item.status || "").toLowerCase();
+            if (status === "in_progress") return new Date(item.expires_at).getTime() > Date.now();
+            return finalSubmissionStatuses.includes(status);
+        });
         const statuses = submissions.map(item => String(item.status || "").toLowerCase());
         const pending = statuses.filter(status => status === "submitted").length;
         const approved = statuses.filter(status => ["approved","completed"].includes(status)).length;
@@ -2750,7 +2749,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const isRejected = status === "rejected";
             const isPending = status === "submitted";
             const isRevision = ["revision","revision_required","needs_revision"].includes(status);
-            const filterStatus = isPending ? "pending" : isPaid ? "approved" :
+            const isInProgress = status === "in_progress";
+            const filterStatus = isInProgress ? "in_progress" : isPending ? "pending" : isPaid ? "approved" :
                 isRevision ? "revision" : status;
 
             const card = document.createElement("article");
@@ -2779,7 +2779,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const badge = document.createElement("span");
             badge.className = "worker-submission-history-status " +
                 (isPending ? "pending" : isPaid ? "approved" : isRejected ? "rejected" : isRevision ? "revision" : "other");
-            badge.textContent = isPending ? "Pending Review" : isPaid ? "Paid · Completed" :
+            badge.textContent = isInProgress ? "In Progress" : isPending ? "Pending Review" : isPaid ? "Paid · Completed" :
                 isRejected ? "Rejected" : isRevision ? "Revision Required" : status.replaceAll("_"," ");
             statusCell.appendChild(badge);
 
@@ -2787,7 +2787,10 @@ document.addEventListener("DOMContentLoaded", function () {
             timingCell.className = "worker-history-cell worker-history-timing";
             timingCell.dataset.label = "Payment Time";
             const timing = document.createElement("strong");
-            if (isPaid) {
+            if (isInProgress) {
+                const remaining = Math.max(0, new Date(submission.expires_at).getTime() - Date.now());
+                timing.textContent = remaining > 0 ? "Time left: " + formatWorkerCountdown(remaining) : "Expired";
+            } else if (isPaid) {
                 timing.textContent = "Paid";
             } else if (isRejected) {
                 timing.textContent = "Not payable";
@@ -2813,7 +2816,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const viewButton = document.createElement("button");
             viewButton.type = "button";
             viewButton.className = "worker-submission-view-button";
-            viewButton.textContent = "View";
+            viewButton.textContent = isInProgress ? "Open Task" : "View";
             viewButton.setAttribute("aria-expanded", "false");
             viewCell.appendChild(viewButton);
 
@@ -2855,6 +2858,17 @@ document.addEventListener("DOMContentLoaded", function () {
             addDetail("Submitted At", submission.submitted_at ? new Date(submission.submitted_at).toLocaleString() : "—");
             addDetail("Payment / Review Note", submission.review_note, isRejected ? "rejected-note" : "");
             viewButton.addEventListener("click", () => {
+                if (isInProgress) {
+                    const activeJob = jobsById[submission.job_id];
+                    if (!activeJob) {
+                        window.alert("Could not load this active task. Please refresh and try again.");
+                        return;
+                    }
+                    activeWorkerJob = activeJob;
+                    activeWorkerSubmission = submission;
+                    openJobDetails(activeJob.id, submission);
+                    return;
+                }
                 const opening = details.hidden;
                 details.hidden = !opening;
                 viewButton.textContent = opening ? "Close" : "View";
