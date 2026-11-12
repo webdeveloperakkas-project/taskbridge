@@ -2925,10 +2925,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (profileDetailsError) {
             console.warn("Could not load profile display name:", profileDetailsError);
         }
-        const name = document.querySelector("#profileToggle .profile-info strong");
-        const avatar = document.querySelector("#profileToggle .profile-avatar");
-        if (name) name.textContent = displayName;
-        if (avatar) avatar.textContent = displayName.trim().charAt(0).toUpperCase() || "U";
+        // Keep the Dashboard account identity and SVG avatar consistent across pages.
 
         await loadJobCategories();
         await Promise.all([loadMyPostedJobs(), loadFindJobs(), loadMySubmissions(), loadMyTotalEarnings()]);
