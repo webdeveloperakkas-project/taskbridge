@@ -5653,3 +5653,7 @@ body.footer-info-open { overflow: hidden; }
         overflow-wrap: anywhere !important;
     }
 }
+
+/* Header account marker is not a second navigation menu. */
+.top-header .profile-toggle{cursor:default;pointer-events:none}
+.top-header .profile-toggle>.icon{display:none}
