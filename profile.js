@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
   }
 
-  initializeAccountMenu();
+  if (!document.querySelector(".dashboard-layout")) initializeAccountMenu();
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: { storage: authStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
   });
@@ -203,6 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("emailAddress").value=user.email||"";
     const initialName=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
     
+    if (!document.querySelector(".dashboard-layout")) {
     try {
       const walletToggle=$("walletBalanceToggle"),walletMenu=$("headerWalletMenu"),balanceNode=$("availableBalanceHeader");
       let walletRows=[],selectedCurrency="USD";
@@ -223,6 +224,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.addEventListener("click",event=>{if(!event.target.closest(".wallet-balance-dropdown")){walletMenu?.classList.remove("show");walletToggle?.setAttribute("aria-expanded","false")}});
       client.channel("profile-header-wallet-"+user.id).on("postgres_changes",{event:"*",schema:"public",table:"wallets",filter:"user_id=eq."+user.id},()=>refreshWallet().catch(error=>console.error("Wallet refresh failed:",error))).subscribe();
     } catch(walletError) { console.warn("Could not load profile header wallet:",walletError); const balanceNode=$("availableBalanceHeader");if(balanceNode)balanceNode.textContent="—"; }
+    }
+
 
     const [{data:profile,error:profileError},{data:rows,error:rowsError}]=await Promise.all([
       client.from("user_profile_details").select("*").eq("user_id",user.id).maybeSingle(),
