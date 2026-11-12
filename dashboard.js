@@ -146,8 +146,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const walletBalanceToggle = document.getElementById("walletBalanceToggle");
     const headerWalletMenu = document.getElementById("headerWalletMenu");
 
-    const profileToggle = document.getElementById("profileToggle");
-    const profileMenu = document.getElementById("profileMenu");
 
     const headerTitle = document.querySelector(".header-welcome h2");
     const headerSubtitle = document.querySelector(".header-welcome p");
@@ -234,17 +232,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (walletBalanceToggle) {
             walletBalanceToggle.setAttribute("aria-expanded", "false");
         }
-        if (profileMenu) {
-            profileMenu.classList.remove("show");
-        }
 
         if (notificationToggle) {
             notificationToggle.setAttribute("aria-expanded", "false");
         }
 
-        if (profileToggle) {
-            profileToggle.setAttribute("aria-expanded", "false");
-        }
 
     }
 
@@ -314,22 +306,12 @@ document.addEventListener("DOMContentLoaded", function () {
             notificationToggle &&
             notificationToggle.contains(event.target);
 
-        const clickedProfile =
-            profileMenu &&
-            profileMenu.contains(event.target);
-
-        const clickedProfileButton =
-            profileToggle &&
-            profileToggle.contains(event.target);
-
 
         if (
             !clickedWalletMenu &&
             !clickedWalletButton &&
             !clickedNotification &&
             !clickedNotificationButton &&
-            !clickedProfile &&
-            !clickedProfileButton
         ) {
 
             closeAllDropdowns();
