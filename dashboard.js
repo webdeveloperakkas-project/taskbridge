@@ -145,6 +145,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const notificationMenu = document.getElementById("notificationMenu");
     const walletBalanceToggle = document.getElementById("walletBalanceToggle");
     const headerWalletMenu = document.getElementById("headerWalletMenu");
+    const profileMenuToggle = document.getElementById("profileMenuToggle");
+    const headerProfileMenu = document.getElementById("headerProfileMenu");
 
 
     const headerTitle = document.querySelector(".header-welcome h2");
@@ -228,6 +230,8 @@ document.addEventListener("DOMContentLoaded", function () {
         if (headerWalletMenu) {
             headerWalletMenu.classList.remove("show");
         }
+        if (headerProfileMenu) headerProfileMenu.classList.remove("show");
+        if (profileMenuToggle) profileMenuToggle.setAttribute("aria-expanded", "false");
 
         if (walletBalanceToggle) {
             walletBalanceToggle.setAttribute("aria-expanded", "false");
@@ -240,6 +244,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+    if (profileMenuToggle && headerProfileMenu) {
+        profileMenuToggle.addEventListener("click", function (event) {
+            event.stopPropagation();
+            const opening = !headerProfileMenu.classList.contains("show");
+            closeAllDropdowns();
+            if (opening) {
+                headerProfileMenu.classList.add("show");
+                profileMenuToggle.setAttribute("aria-expanded", "true");
+            }
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") closeAllDropdowns();
+        });
+    }
 
     /* =====================================
        HEADER WALLET CURRENCY DROPDOWN
@@ -305,13 +324,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const clickedNotificationButton =
             notificationToggle &&
             notificationToggle.contains(event.target);
+        const clickedProfileMenu = headerProfileMenu && headerProfileMenu.contains(event.target);
+        const clickedProfileButton = profileMenuToggle && profileMenuToggle.contains(event.target);
 
 
         if (
             !clickedWalletMenu &&
             !clickedWalletButton &&
             !clickedNotification &&
-            !clickedNotificationButton
+            !clickedNotificationButton &&
+            !clickedProfileMenu &&
+            !clickedProfileButton
         ) {
 
             closeAllDropdowns();
@@ -336,7 +359,11 @@ document.addEventListener("DOMContentLoaded", function () {
         "depositSection",
         "withdrawSection",
         "transactionsSection",
-        "jobDetailsSection"
+        "jobDetailsSection",
+        "profileSection",
+        "myStatisticsSection",
+        "settingsSection",
+        "supportSection"
 
     ];
 
@@ -391,6 +418,22 @@ document.addEventListener("DOMContentLoaded", function () {
         jobDetailsSection: {
             title: "Job Details",
             subtitle: "Review the complete task information before starting."
+        },
+        profileSection: {
+            title: "Profile",
+            subtitle: "Manage your personal details and verification."
+        },
+        myStatisticsSection: {
+            title: "My Statistics",
+            subtitle: "Review your work and job-posting history."
+        },
+        settingsSection: {
+            title: "Settings",
+            subtitle: "Manage your account and security preferences."
+        },
+        supportSection: {
+            title: "Help & Support",
+            subtitle: "Get help from the TaskBridge support team."
         }
 
     };
@@ -537,6 +580,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         closeAllDropdowns();
 
+
+        if (sectionId === "myStatisticsSection" && currentUser) {
+            loadMyStatistics().catch(error => console.error("Could not load account statistics:", error));
+        }
 
         // Scroll to top
 
@@ -1473,6 +1520,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 if (error) throw error;
                 await Promise.all([loadHeaderNotifications(), loadTransactionHistory()]);
+        if (window.location.hash === "#myStatisticsSection") loadMyStatistics().catch(error => console.error("Could not load account statistics:", error));
                 if (depositSubmitButton) depositSubmitButton.textContent = "Request Submitted";
                 await new Promise(resolve => setTimeout(resolve, 1200));
                 depositForm.reset();
@@ -2597,6 +2645,83 @@ document.addEventListener("DOMContentLoaded", function () {
             list.appendChild(row);
         });
         empty.hidden = rows.length > 0;
+    }
+
+    async function loadMyStatistics() {
+        const statusNode = document.getElementById("statisticsStatus");
+        if (!supabaseClient || !currentUser) return;
+        if (statusNode) statusNode.textContent = "Loading your statistics...";
+        const escapeText = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+        }[char]));
+        const dateText = value => {
+            if (!value) return "Date unavailable";
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? "Date unavailable" : date.toLocaleDateString();
+        };
+        const statusText = value => ({
+            approved: "Approved", completed: "Completed", submitted: "Pending Review",
+            in_progress: "In Progress", rejected: "Rejected", revision: "Revision Required",
+            revision_required: "Revision Required", needs_revision: "Revision Required", expired: "Expired"
+        }[String(value || "").toLowerCase()] || String(value || "Unknown").replace(/_/g, " "));
+        try {
+            const [postedResult, workerResult] = await Promise.all([
+                supabaseClient.from("jobs").select("id,title,status,created_at,reward_per_worker,currency")
+                    .eq("advertiser_id", currentUser.id).order("created_at", { ascending: false }),
+                supabaseClient.from("job_submissions").select("id,job_id,status,submitted_at,created_at,started_at")
+                    .eq("worker_id", currentUser.id).order("created_at", { ascending: false })
+            ]);
+            if (postedResult.error) throw postedResult.error;
+            if (workerResult.error) throw workerResult.error;
+            const posted = postedResult.data || [];
+            const work = workerResult.data || [];
+            const statuses = work.map(row => String(row.status || "").toLowerCase());
+            const completed = statuses.filter(status => status === "approved" || status === "completed").length;
+            const submitted = statuses.filter(status => !["in_progress", "expired"].includes(status)).length;
+            const pending = statuses.filter(status => status === "submitted").length;
+            const active = statuses.filter(status => status === "in_progress").length;
+            const rejected = statuses.filter(status => status === "rejected").length;
+            const setCount = (id, value) => { const node = document.getElementById(id); if (node) node.textContent = String(value); };
+            setCount("statJobsPosted", posted.length);
+            setCount("statTasksCompleted", completed);
+            setCount("statSubmissions", submitted);
+            setCount("statPending", pending);
+            setCount("statInProgress", active);
+            setCount("statRejected", rejected);
+
+            const jobIds = [...new Set(work.map(row => row.job_id).filter(Boolean))];
+            let jobsById = {};
+            if (jobIds.length) {
+                const { data: linkedJobs, error: linkedError } = await supabaseClient.from("jobs")
+                    .select("id,title").in("id", jobIds);
+                if (linkedError) throw linkedError;
+                jobsById = Object.fromEntries((linkedJobs || []).map(job => [job.id, job]));
+            }
+            const postedNode = document.getElementById("statisticsPostedJobs");
+            const workNode = document.getElementById("statisticsWorkerHistory");
+            if (postedNode) postedNode.innerHTML = posted.length ? posted.slice(0, 10).map(job =>
+                '<div class="statistics-history-row"><div><strong>' + escapeText(job.title || "Untitled job") +
+                '</strong><small>' + escapeText(dateText(job.created_at)) + '</small></div><span class="statistics-status-pill">' +
+                escapeText(statusText(job.status)) + '</span></div>'
+            ).join("") : '<p class="statistics-empty">You have not posted any jobs yet.</p>';
+            if (workNode) workNode.innerHTML = work.length ? work.slice(0, 10).map(row => {
+                const job = jobsById[row.job_id];
+                return '<div class="statistics-history-row"><div><strong>' +
+                    escapeText(job?.title || "Task submission") + '</strong><small>' +
+                    escapeText(dateText(row.submitted_at || row.created_at || row.started_at)) +
+                    '</small></div><span class="statistics-status-pill" data-status="' +
+                    escapeText(String(row.status || "").toLowerCase()) + '">' +
+                    escapeText(statusText(row.status)) + '</span></div>';
+            }).join("") : '<p class="statistics-empty">You have no work history yet.</p>';
+            if (statusNode) statusNode.textContent = "Statistics updated from your TaskBridge account.";
+        } catch (error) {
+            console.error("My Statistics load failed:", error);
+            if (statusNode) statusNode.textContent = error.message || "Could not load your account statistics.";
+            ["statisticsPostedJobs", "statisticsWorkerHistory"].forEach(id => {
+                const node = document.getElementById(id);
+                if (node) node.innerHTML = '<p class="statistics-empty">History could not be loaded. Please try again.</p>';
+            });
+        }
     }
 
     async function loadMyPostedJobs() {
