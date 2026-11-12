@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let walletAvailableBalance = 0;
     let walletRows = [];
     let walletsByCurrency = new Map();
+    let walletsByMethod = new Map();
     let selectedWithdrawCurrency = "";
     let activeWorkerJob = null;
     let activeWorkerSubmission = null;
@@ -1099,7 +1100,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function currencyForWithdrawMethod(method) {
         return ({
             "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
-            "Bank Transfer": "BDT", "Wise": "USD"
+            "Bank Transfer": "BDT", "Wise": "USD", "WebMoney": "USD",
+            "Visa": "USD", "Mastercard": "USD"
         })[method] || "";
     }
 
@@ -1107,10 +1109,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".withdraw-method-card").forEach(card => {
             const method = card.dataset.withdrawMethod || "";
             const currency = currencyForWithdrawMethod(method);
-            const wallet = walletsByCurrency.get(currency);
+            const wallet = walletsByMethod.get(method);
             const balance = Math.max(0, Number(wallet?.available_balance || 0));
-            const methodEligible = method !== "WebMoney" || hasApprovedWebMoneyDeposit;
-            card.hidden = !methodEligible || !wallet || balance <= 0;
+            const eligible = method !== "WebMoney" || hasApprovedWebMoneyDeposit;
+            card.hidden = false;
+            card.disabled = !wallet || balance <= 0 || !eligible;
+            card.setAttribute("aria-disabled", card.disabled ? "true" : "false");
             let topline = card.querySelector(".withdraw-card-topline");
             if (!topline) {
                 topline = document.createElement("span");
@@ -1319,11 +1323,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function loadMyWallet() {
-        const { data, error } = await supabaseClient.from("wallets")
-            .select("id,user_id,currency,available_balance,held_balance,updated_at")
+        let walletQuery = await supabaseClient.from("wallets")
+            .select("id,user_id,currency,payment_method,available_balance,held_balance,updated_at")
             .eq("user_id", currentUser.id)
             .order("currency", { ascending: true });
-        if (error) throw error;
+        // Backward-compatible read while the payment_method migration is being applied.
+        if (walletQuery.error && /payment_method|column/i.test(walletQuery.error.message || "")) {
+            walletQuery = await supabaseClient.from("wallets")
+                .select("id,user_id,currency,available_balance,held_balance,updated_at")
+                .eq("user_id", currentUser.id)
+                .order("currency", { ascending: true });
+        }
+        if (walletQuery.error) throw walletQuery.error;
+        const { data, error } = walletQuery;
 
         // WebMoney withdrawals are unlocked only after an admin-approved WebMoney deposit.
         const webMoneyDeposit = await supabaseClient.from("deposits")
@@ -1340,6 +1352,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         walletRows = data || [];
         walletsByCurrency = new Map(walletRows.map(wallet => [wallet.currency, wallet]));
+        walletsByMethod = new Map(walletRows.filter(wallet => wallet.payment_method).map(wallet => [wallet.payment_method, wallet]));
         const fundedWallets = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
         const selector = document.getElementById("walletCurrencySelector");
         if (selector) {
@@ -1553,6 +1566,9 @@ document.addEventListener("DOMContentLoaded", function () {
         "Rocket": { label: "Rocket Account Number", placeholder: "01XXXXXXXXXX", hint: "Enter the Rocket number registered to receive your payout." },
         "Bank Transfer": { label: "Bank Account Details", placeholder: "Bank name, account name, account number, branch and routing number", hint: "Provide the bank details needed to identify your receiving account." },
         "Wise": { label: "Wise Account Details", placeholder: "Wise email or recipient account details", hint: "Enter the recipient details for your Wise account." },
+        "WebMoney": { label: "WebMoney WMZ Purse", placeholder: "Enter your WMZ purse", hint: "Enter the WebMoney purse registered to receive your payout." },
+        "Visa": { label: "Cardholder / payout details", placeholder: "Enter the verified card payout details", hint: "Card payouts require a configured, PCI-compliant payment provider. Never enter a card PIN or CVV." },
+        "Mastercard": { label: "Cardholder / payout details", placeholder: "Enter the verified card payout details", hint: "Card payouts require a configured, PCI-compliant payment provider. Never enter a card PIN or CVV." },
         "WebMoney": { label: "WebMoney WMZ Purse", placeholder: "Enter your WMZ purse (for example: Z...)", hint: "Enter the WebMoney WMZ purse where you want to receive your USD payout. Withdrawals are available only after an approved WebMoney deposit." },
         "USDT - BEP20": { label: "USDT BEP20 Wallet Address", placeholder: "Enter your BNB Smart Chain (BEP20) wallet address", hint: "Only provide a wallet address that supports USDT on BEP20." },
         "USDT - TRC20": { label: "USDT TRC20 Wallet Address", placeholder: "Enter your TRON (TRC20) wallet address", hint: "Only provide a wallet address that supports USDT on TRC20." }
@@ -1564,8 +1580,11 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".withdraw-method-card").forEach(item => item.classList.toggle("active", item === card));
             const meta = withdrawMethodMeta[selectedWithdrawMethod];
             selectedWithdrawCurrency = currencyForWithdrawMethod(selectedWithdrawMethod);
-            const selectedWallet = walletsByCurrency.get(selectedWithdrawCurrency);
-            if (!meta || !selectedWallet || Number(selectedWallet.available_balance) <= 0) return;
+            const selectedWallet = walletsByMethod.get(selectedWithdrawMethod);
+            if (!meta || !selectedWallet || Number(selectedWallet.available_balance) <= 0) {
+                if (withdrawMessage) withdrawMessage.textContent = "This payment method has no available balance. Deposit into this same wallet before withdrawing.";
+                return;
+            }
             setModalBrand(card, withdrawModalMark, withdrawModalTitle, selectedWithdrawMethod + " withdrawal");
             if (withdrawAccountLabel) withdrawAccountLabel.textContent = meta.label;
             if (withdrawAccountInput) withdrawAccountInput.placeholder = meta.placeholder;
@@ -1589,7 +1608,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!withdrawForm.reportValidity()) return;
             const amount = Number(withdrawAmountInput?.value);
             const paymentAccount = withdrawAccountInput?.value.trim() || "";
-            const selectedWallet = walletsByCurrency.get(selectedWithdrawCurrency);
+            const selectedWallet = walletsByMethod.get(selectedWithdrawMethod);
             const available = Math.max(0, Number(selectedWallet?.available_balance || 0));
             if (!selectedWithdrawMethod) { if (withdrawMessage) withdrawMessage.textContent = "Please select a withdrawal method."; return; }
             if (!Number.isFinite(amount) || amount <= 0 || amount > available || !paymentAccount) {
