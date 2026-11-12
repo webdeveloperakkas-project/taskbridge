@@ -2699,12 +2699,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const postedNode = document.getElementById("statisticsPostedJobs");
             const workNode = document.getElementById("statisticsWorkerHistory");
-            if (postedNode) postedNode.innerHTML = posted.length ? posted.slice(0, 10).map(job =>
+            if (postedNode) postedNode.innerHTML = posted.length ? posted.map(job =>
                 '<div class="statistics-history-row"><div><strong>' + escapeText(job.title || "Untitled job") +
                 '</strong><small>' + escapeText(dateText(job.created_at)) + '</small></div><span class="statistics-status-pill">' +
                 escapeText(statusText(job.status)) + '</span></div>'
             ).join("") : '<p class="statistics-empty">You have not posted any jobs yet.</p>';
-            if (workNode) workNode.innerHTML = work.length ? work.slice(0, 10).map(row => {
+            if (workNode) workNode.innerHTML = work.length ? work.map(row => {
                 const job = jobsById[row.job_id];
                 return '<div class="statistics-history-row"><div><strong>' +
                     escapeText(job?.title || "Task submission") + '</strong><small>' +
