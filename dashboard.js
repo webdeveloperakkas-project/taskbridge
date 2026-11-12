@@ -1050,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function walletPaymentLogo(method) {
-        const key = String(method || "").toLowerCase().replace(/[\\s_-]+/g, "");
+        const key = String(method || "").toLowerCase().replace(/[\s_-]+/g, "");
         const logos = {
             bkash: { mark: "b", className: "bkash", label: "bKash" },
             nagad: { mark: "N", className: "nagad", label: "Nagad" },
