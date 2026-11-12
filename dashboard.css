@@ -6293,3 +6293,53 @@ body.footer-info-open { overflow: hidden; }
         overflow-wrap: anywhere !important;
     }
 }
+
+
+/* Mobile footer alignment correction: center Policies links under its heading
+   and push the Support column closer to the right edge. */
+@media (max-width: 600px) {
+    .dashboard-footer {
+        padding-left: 8px !important;
+        padding-right: 2px !important;
+    }
+    .dashboard-footer-main {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
+        column-gap: 6px !important;
+    }
+    .dashboard-footer-group:nth-child(3) {
+        justify-self: center !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+    .dashboard-footer-group:nth-child(3) .dashboard-footer-group-links {
+        width: max-content !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        justify-items: start !important;
+        justify-content: start !important;
+    }
+    .dashboard-footer-group:nth-child(3) .dashboard-footer-group-links a {
+        width: auto !important;
+        text-align: left !important;
+    }
+    .dashboard-footer-group:nth-child(4) {
+        justify-self: end !important;
+        width: max-content !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        text-align: left !important;
+    }
+    .dashboard-footer-group:nth-child(4) .dashboard-footer-group-links {
+        width: max-content !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        justify-items: start !important;
+    }
+    .dashboard-footer-group:nth-child(4) .dashboard-footer-group-links a {
+        width: auto !important;
+        text-align: left !important;
+    }
+}
