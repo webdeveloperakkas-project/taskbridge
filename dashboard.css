@@ -2445,6 +2445,8 @@ body.finance-modal-open{overflow:hidden}
 .wallet-balance-heading label{display:flex;flex-direction:column;gap:6px;color:#64748b;font-size:12px;font-weight:700}
 #walletCurrencySelector{min-width:130px;padding:10px 34px 10px 12px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#0f172a;font:inherit;font-weight:700}
 .withdraw-card-topline{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px}
+.deposit-card-topline{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px}
+.deposit-card-balance{color:#0f766e;font-size:10px;font-weight:800;white-space:nowrap}
 .withdraw-card-balance{color:#0f766e;font-size:10px;font-weight:800;white-space:nowrap}
 .withdraw-method-card[hidden]{display:none!important}
 
