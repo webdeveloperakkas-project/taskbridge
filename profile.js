@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   if (!document.querySelector(".dashboard-layout")) initializeAccountMenu();
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  const client = window.taskBridgeSupabaseClient || (window.taskBridgeSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: { storage: authStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
-  });
+  }));
   const BUCKET = "private-kyc-documents";
   const MAX_BYTES = 2 * 1024 * 1024;
   let user = null, identityRow = null, addressRow = null, cameraStream = null, cameraTarget = null;
