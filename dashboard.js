@@ -1049,8 +1049,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function currencyWalletIcon(currency) {
-        return ({ BDT: "৳", USD: "$", USDT: "₮" })[currency] || currency;
+    function walletPaymentLogo(method) {
+        const key = String(method || "").toLowerCase().replace(/[\\s_-]+/g, "");
+        const logos = {
+            bkash: { mark: "b", className: "bkash", label: "bKash" },
+            nagad: { mark: "N", className: "nagad", label: "Nagad" },
+            rocket: { mark: "R", className: "rocket", label: "Rocket" },
+            banktransfer: { mark: "B", className: "bank", label: "Bank Transfer" },
+            wise: { mark: "W", className: "wise", label: "Wise" },
+            webmoney: { mark: "WM", className: "webmoney", label: "WebMoney" },
+            visa: { mark: "V", className: "visa", label: "Visa" },
+            mastercard: { mark: "M", className: "mastercard", label: "Mastercard" }
+        };
+        const logo = logos[key] || { mark: "W", className: "default", label: method || "Wallet" };
+        return '<span class="wallet-currency-option-icon wallet-payment-logo wallet-payment-logo-' +
+            logo.className + '" role="img" aria-label="' + escapeFinanceText(logo.label) +
+            '" title="' + escapeFinanceText(logo.label) + '">' + escapeFinanceText(logo.mark) + '</span>';
     }
 
     function renderHeaderWalletOptions() {
@@ -1060,12 +1074,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const currency = String(wallet.currency || "").toUpperCase();
             const method = String(wallet.payment_method || "Wallet");
             const selected = wallet.id === activeWalletId;
+            const amount = formatWalletMoney(wallet.available_balance, currency);
             return '<button type="button" class="wallet-currency-option' +
                 (selected ? ' active' : '') + '" data-wallet-id="' +
-                escapeFinanceText(wallet.id) + '">' +
-                '<span class="wallet-currency-option-icon">' + escapeFinanceText(currencyWalletIcon(currency)) + '</span>' +
-                '<span class="wallet-currency-option-name">' + escapeFinanceText(method + " · " + currency) + '</span>' +
-                '<strong>' + escapeFinanceText(formatWalletMoney(wallet.available_balance, currency)) + '</strong>' +
+                escapeFinanceText(wallet.id) + '" aria-label="' +
+                escapeFinanceText(method + " wallet, " + amount) + '">' +
+                walletPaymentLogo(method) +
+                '<strong class="wallet-currency-option-amount">' +
+                escapeFinanceText(amount) + '</strong>' +
                 '</button>';
         }).join("");
         headerWalletMenu.querySelectorAll("[data-wallet-id]").forEach(option => {
