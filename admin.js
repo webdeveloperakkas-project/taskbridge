@@ -2391,6 +2391,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         const statusFilter = $("#administrationFeeStatusFilter")?.value || "all";
         const search = ($("#administrationFeeSearch")?.value || "").trim().toLowerCase();
         const amount = value => Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const summaryAmount = (value, currency) => Number(value || 0).toLocaleString(
+            currency === "BDT" ? "bn-BD" : "en-US",
+            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        );
 
         const groupedTotal = (rows, selector) => {
             const totals = {};
@@ -2399,7 +2403,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 totals[currency] = (totals[currency] || 0) + Number(selector(row) || 0);
             });
             return Object.keys(totals).length
-                ? Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([currency, value]) => currency + " " + amount(value)).join(" · ")
+                ? Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([currency, value]) => currency + " " + summaryAmount(value, currency)).join(" · ")
                 : "0.00";
         };
 
