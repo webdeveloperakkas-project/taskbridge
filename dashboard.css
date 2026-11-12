@@ -5941,3 +5941,37 @@ body.footer-info-open { overflow: hidden; }
         flex-basis: 44px !important;
     }
 }
+
+
+/* MOBILE HEADER MICRO-ADJUSTMENTS: wallet slightly right, compact profile, bell slightly left. */
+@media (max-width: 600px) {
+    .top-header .wallet-balance-dropdown {
+        transform: translateX(7px) !important;
+    }
+    .top-header .notification-dropdown {
+        transform: translateX(-6px) !important;
+    }
+    .top-header .profile-avatar {
+        width: 42px !important;
+        height: 42px !important;
+        flex-basis: 42px !important;
+    }
+    .top-header .profile-avatar svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .wallet-balance-dropdown {
+        transform: translateX(6px) !important;
+    }
+    .top-header .profile-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        flex-basis: 40px !important;
+    }
+    .top-header .profile-avatar svg {
+        width: 21px !important;
+        height: 21px !important;
+    }
+}
