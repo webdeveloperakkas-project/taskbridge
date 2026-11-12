@@ -30,7 +30,15 @@
     </div>
     <div class="topbar-actions">
       <a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a>
-      <span class="topbar-avatar" id="topbarAvatar">U</span>
+      <div class="topbar-profile-dropdown">
+        <button type="button" class="topbar-avatar" id="topbarAvatar" aria-label="Open account menu" aria-expanded="false" aria-controls="topbarProfileMenu">U</button>
+        <nav class="topbar-profile-menu" id="topbarProfileMenu" aria-label="Account menu" hidden>
+          <a href="./profile.html">My Profile</a>
+          <a href="./settings.html">Settings</a>
+          <a href="./support.html">Help &amp; Support</a>
+          <a href="./dashboard.html">Dashboard</a>
+        </nav>
+      </div>
     </div>
   </header>
 
@@ -146,6 +154,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./header-menu.js?v=20261112"></script>
   <script src="./profile.js?v=20261110-profile-kyc"></script>
 </body>
 </html>
