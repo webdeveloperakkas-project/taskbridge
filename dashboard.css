@@ -6426,3 +6426,20 @@ body.footer-info-open { overflow: hidden; }
         padding-right: 16px !important;
     }
 }
+
+
+/* Mobile footer: increase equal outer spacing to 20px and text to 12px. */
+@media (max-width: 600px) {
+    .dashboard-footer {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+    .dashboard-footer-group h3 {
+        font-size: 12px !important;
+    }
+    .dashboard-footer-group-links a,
+    .dashboard-footer-group:nth-child(3) .dashboard-footer-group-links a,
+    .dashboard-footer-group:nth-child(4) .dashboard-footer-group-links a {
+        font-size: 12px !important;
+    }
+}
