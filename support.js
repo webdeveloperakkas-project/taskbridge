@@ -1,5 +1,47 @@
 
 document.addEventListener("DOMContentLoaded",async()=>{
+  function initializeAccountMenu() {
+    const toggle = document.getElementById("topbarAvatar");
+    const menu = document.getElementById("topbarProfileMenu");
+    if (!toggle || !menu || toggle.dataset.menuReady === "true") return;
+
+    const closeMenu = () => {
+      menu.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+    };
+
+    toggle.addEventListener("click", event => {
+      event.stopPropagation();
+      const opening = menu.hidden;
+      menu.hidden = !opening;
+      toggle.setAttribute("aria-expanded", String(opening));
+    });
+
+    menu.addEventListener("click", event => {
+      if (event.target.closest("a")) closeMenu();
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".topbar-profile-dropdown")) closeMenu();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+
+    const currentPage = window.location.pathname.split("/").pop() || "profile.html";
+    menu.querySelectorAll("a").forEach(link => {
+      const targetPage = new URL(link.href, window.location.href).pathname.split("/").pop();
+      if (targetPage === currentPage) link.setAttribute("aria-current", "page");
+    });
+
+    toggle.dataset.menuReady = "true";
+  }
+
+  initializeAccountMenu();
   const SUPABASE_URL="https://eboagroxkgpplccufpuk.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY="sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
   const storage={getItem:key=>localStorage.getItem(key)??sessionStorage.getItem(key),setItem:(key,value)=>{if(localStorage.getItem(key)!==null)localStorage.setItem(key,value);else sessionStorage.setItem(key,value)},removeItem:key=>{localStorage.removeItem(key);sessionStorage.removeItem(key)}};
