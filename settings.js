@@ -1,24 +1,11 @@
 document.addEventListener("DOMContentLoaded", async () => {
   function initializeAccountMenu() {
-    const profileToggle = document.getElementById("profileToggle");
-    const profileMenu = document.getElementById("profileMenu");
     const notificationToggle = document.getElementById("notificationToggle");
     const notificationMenu = document.getElementById("notificationMenu");
     const closeMenus = () => {
-      profileMenu?.classList.remove("show");
       notificationMenu?.classList.remove("show");
-      profileToggle?.setAttribute("aria-expanded", "false");
       notificationToggle?.setAttribute("aria-expanded", "false");
     };
-    profileToggle?.addEventListener("click", event => {
-      event.stopPropagation();
-      const opening = !profileMenu.classList.contains("show");
-      closeMenus();
-      if (opening) {
-        profileMenu.classList.add("show");
-        profileToggle.setAttribute("aria-expanded", "true");
-      }
-    });
     notificationToggle?.addEventListener("click", event => {
       event.stopPropagation();
       const opening = !notificationMenu.classList.contains("show");
@@ -29,13 +16,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
     document.addEventListener("click", event => {
-      if (!event.target.closest(".profile-dropdown") && !event.target.closest(".notification-dropdown")) closeMenus();
+      if (!event.target.closest(".notification-dropdown")) closeMenus();
     });
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
-    const currentPage = window.location.pathname.split("/").pop();
-    profileMenu?.querySelectorAll("a").forEach(link => {
-      if (new URL(link.href, window.location.href).pathname.split("/").pop() === currentPage) link.setAttribute("aria-current", "page");
-    });
   }
 
   initializeAccountMenu();
@@ -54,23 +37,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function loadSharedHeader(){
     const {data:sessionData,error:sessionError}=await client.auth.getSession();
     if(sessionError||!sessionData.session){window.location.replace("./login.html");return}
-    const user=sessionData.session.user;
-    const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
-    
+    const activeUser=sessionData.session.user;
     const toggle=document.getElementById("walletBalanceToggle"),menu=document.getElementById("headerWalletMenu"),balance=document.getElementById("availableBalanceHeader");
-    if(!toggle||!menu||!balance){console.warn("Shared header wallet elements are missing on this page.");return;}
-    try{
-      const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
-      if(error)throw error;
-      const rows=wallets||[],funded=rows.filter(row=>Number(row.available_balance)>0);
-      let selected=funded.find(row=>row.currency==="USD")||funded[0]||rows.find(row=>row.currency==="USD")||rows[0]||{currency:"USD",available_balance:0};
-      const money=(amount,currency)=>{try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency||"USD"}).format(Number(amount)||0)}catch{return (currency||"USD")+" "+(Number(amount)||0).toFixed(2)}};
-      const symbols={BDT:"৳",USD:"$",USDT:"₮"};
-      const render=()=>{balance.textContent=money(selected.available_balance,selected.currency);menu.innerHTML=funded.length?funded.map(row=>'<button type="button" class="wallet-currency-option'+(row.currency===selected.currency?' active':'')+'" data-currency="'+String(row.currency).replace(/[^A-Z0-9]/gi,'')+'"><span class="wallet-currency-option-icon">'+(symbols[row.currency]||row.currency)+'</span><span class="wallet-currency-option-name">'+row.currency+'</span><strong>'+money(row.available_balance,row.currency)+'</strong></button>').join(""):'<p class="profile-wallet-empty">No funded wallets available</p>';menu.querySelectorAll("[data-currency]").forEach(button=>button.addEventListener("click",()=>{selected=funded.find(row=>String(row.currency).replace(/[^A-Z0-9]/gi,'')===button.dataset.currency)||selected;render();menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}))};
-      toggle.addEventListener("click",event=>{event.stopPropagation();const open=menu.classList.contains("show");menu.classList.toggle("show",!open);toggle.setAttribute("aria-expanded",String(!open))});
-      document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
-      render();
-    }catch(error){console.warn("Header wallet could not load:",error);if(balance)balance.textContent="—"}
+    if(!toggle||!menu||!balance){console.warn("Shared header wallet markup is incomplete.");return}
+    let walletRows=[],selectedCurrency="USD";
+    const money=(amount,currency)=>{try{return new Intl.NumberFormat(undefined,{style:"currency",currency:currency||"USD"}).format(Number(amount)||0)}catch{return (currency||"USD")+" "+(Number(amount)||0).toFixed(2)}};
+    const symbols={BDT:"৳",USD:"$",USDT:"₮"};
+    const render=()=>{const funded=walletRows.filter(row=>Number(row.available_balance)>0);const selected=walletRows.find(row=>row.currency===selectedCurrency)||funded[0]||walletRows.find(row=>row.currency==="USD")||{currency:"USD",available_balance:0};selectedCurrency=selected.currency||"USD";balance.textContent=money(selected.available_balance,selectedCurrency);menu.innerHTML=funded.length?funded.map(row=>'<button type="button" class="wallet-currency-option'+(row.currency===selectedCurrency?' active':'')+'" data-currency="'+String(row.currency).replace(/[^A-Z0-9]/gi,'')+'"><span class="wallet-currency-option-icon">'+(symbols[row.currency]||row.currency)+'</span><span class="wallet-currency-option-name">'+row.currency+'</span><strong>'+money(row.available_balance,row.currency)+'</strong></button>').join(""):'<p class="profile-wallet-empty">No funded wallets available</p>';menu.querySelectorAll("[data-currency]").forEach(button=>button.addEventListener("click",()=>{const row=funded.find(item=>String(item.currency).replace(/[^A-Z0-9]/gi,'')===button.dataset.currency);if(row){selectedCurrency=row.currency;render()}menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}))};
+    const refresh=async()=>{const {data,error}=await client.from("wallets").select("id,user_id,currency,available_balance,held_balance,updated_at").eq("user_id",activeUser.id).order("currency",{ascending:true});if(error)throw error;walletRows=data||[];if(!walletRows.some(row=>row.currency===selectedCurrency))selectedCurrency=walletRows.find(row=>Number(row.available_balance)>0)?.currency||"USD";render()};
+    try{await refresh()}catch(error){console.error("Shared header wallet load failed:",error);balance.textContent="—"}
+    toggle.addEventListener("click",event=>{event.stopPropagation();const open=menu.classList.contains("show");menu.classList.toggle("show",!open);toggle.setAttribute("aria-expanded",String(!open))});
+    document.addEventListener("click",event=>{if(!event.target.closest(".wallet-balance-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
+    client.channel("account-header-wallet-"+activeUser.id).on("postgres_changes",{event:"*",schema:"public",table:"wallets",filter:"user_id=eq."+activeUser.id},()=>refresh().catch(error=>console.error("Wallet refresh failed:",error))).subscribe();
   }
   await loadSharedHeader();
 
