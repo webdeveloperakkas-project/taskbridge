@@ -5791,3 +5791,78 @@ body.footer-info-open { overflow: hidden; }
 .account-page-section .statistics-heading h1,
 .account-page-section .statistics-heading p { width:100%; margin-left:auto; margin-right:auto; }
 @media(max-width:600px) { .account-page-section .statistics-heading { padding:18px 14px; } }
+
+/* HEADER ALIGNMENT: center the wallet on desktop and mobile. */
+.top-header {
+    position: relative;
+}
+.top-header .header-right {
+    margin-left: auto;
+}
+.top-header .wallet-balance-dropdown {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: max-content;
+    max-width: 42%;
+    margin: 0 !important;
+    z-index: 1300;
+}
+.top-header .profile-avatar {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+}
+.top-header .profile-avatar svg {
+    width: 23px;
+    height: 23px;
+}
+
+@media (max-width: 600px) {
+    .top-header .header-right {
+        display: flex !important;
+        grid-template-columns: none !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        margin-left: auto !important;
+        margin-right: 8px !important;
+        padding-right: 0 !important;
+        gap: 8px !important;
+        justify-content: flex-end !important;
+    }
+    .top-header .wallet-balance-dropdown {
+        left: 50% !important;
+        top: 50% !important;
+        right: auto !important;
+        position: absolute !important;
+        transform: translate(-50%, -50%) !important;
+        width: max-content !important;
+        max-width: 42% !important;
+        z-index: 1300 !important;
+    }
+    .top-header .notification-dropdown,
+    .top-header .profile-dropdown {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+    }
+    .top-header .profile-avatar {
+        width: 46px !important;
+        height: 46px !important;
+        flex-basis: 46px !important;
+    }
+    .top-header .profile-avatar svg {
+        width: 25px !important;
+        height: 25px !important;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .header-right {
+        margin-right: 5px !important;
+        gap: 6px !important;
+    }
+    .top-header .wallet-balance-dropdown {
+        max-width: 39% !important;
+    }
+}
