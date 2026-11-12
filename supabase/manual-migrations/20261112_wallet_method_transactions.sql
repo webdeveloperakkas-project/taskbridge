@@ -55,7 +55,7 @@ BEGIN
             ELSE NULL
         END;
 
-        IF v_method IS NULL OR upper(trim(v_deposit.currency)) <> v_currency THEN
+        IF v_method IS NULL OR COALESCE(upper(trim(v_deposit.currency)), '') <> v_currency THEN
             RAISE EXCEPTION 'Unsupported deposit method or currency mismatch';
         END IF;
 
@@ -150,7 +150,7 @@ BEGIN
         ELSE NULL
     END;
 
-    IF v_currency IS NULL OR upper(trim(p_currency)) <> v_currency THEN
+    IF v_currency IS NULL OR COALESCE(upper(trim(p_currency)), '') <> v_currency THEN
         RAISE EXCEPTION 'Unsupported payment method or currency mismatch';
     END IF;
 
