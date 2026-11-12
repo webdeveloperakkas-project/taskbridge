@@ -1111,7 +1111,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const currency = currencyForWithdrawMethod(method);
             const wallet = walletsByMethod.get(method);
             const balance = Math.max(0, Number(wallet?.available_balance || 0));
-            const eligible = method !== "WebMoney" || hasApprovedWebMoneyDeposit;
+            const eligible = true;
             card.hidden = false;
             card.disabled = !wallet || balance <= 0 || !eligible;
             card.setAttribute("aria-disabled", card.disabled ? "true" : "false");
@@ -1387,7 +1387,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedDepositMethod = "";
     const depositCurrencyByMethod = {
         "bKash": "BDT", "Nagad": "BDT", "Rocket": "BDT",
-        "Bank Transfer": "BDT", "Wise (manual transfer)": "USD"
+        "Bank Transfer": "BDT", "Wise (manual transfer)": "USD",
+        "WebMoney": "USD", "Visa": "USD", "Mastercard": "USD"
     };
 
     // Public WMZ purse ID only; configure this after verifying the official TaskBridge account.
