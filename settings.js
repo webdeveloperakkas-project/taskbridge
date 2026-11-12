@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
   }
 
-  initializeAccountMenu();
+  if (!document.querySelector(".dashboard-layout")) initializeAccountMenu();
   const SUPABASE_URL = "https://eboagroxkgpplccufpuk.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
   const authStorage = {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener("click",event=>{if(!event.target.closest(".wallet-balance-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
     client.channel("account-header-wallet-"+activeUser.id).on("postgres_changes",{event:"*",schema:"public",table:"wallets",filter:"user_id=eq."+activeUser.id},()=>refresh().catch(error=>console.error("Wallet refresh failed:",error))).subscribe();
   }
-  await loadSharedHeader();
+  if (!document.querySelector(".dashboard-layout")) await loadSharedHeader();
 
   const accountMessage=document.getElementById("accountMessage");
   const securityMessage=document.getElementById("securityMessage");
