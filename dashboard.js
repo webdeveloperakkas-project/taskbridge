@@ -245,20 +245,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    if (profileMenuToggle && headerProfileMenu) {
-        profileMenuToggle.addEventListener("click", function (event) {
-            event.stopPropagation();
-            const opening = !headerProfileMenu.classList.contains("show");
-            closeAllDropdowns();
-            if (opening) {
-                headerProfileMenu.classList.add("show");
-                profileMenuToggle.setAttribute("aria-expanded", "true");
-            }
-        });
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape") closeAllDropdowns();
-        });
-    }
+    document.addEventListener("click", function (event) {
+        const toggle = event.target.closest("#profileMenuToggle");
+        if (!toggle || !headerProfileMenu) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const opening = !headerProfileMenu.classList.contains("show");
+        closeAllDropdowns();
+        if (opening) {
+            headerProfileMenu.classList.add("show");
+            toggle.setAttribute("aria-expanded", "true");
+        }
+    }, true);
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") closeAllDropdowns();
+    });
 
     /* =====================================
        HEADER WALLET CURRENCY DROPDOWN
@@ -632,6 +633,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const sectionId = this.dataset.openSection;
 
             showPageSection(sectionId);
+            closeAllDropdowns();
 
         });
 
@@ -3029,9 +3031,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function initializeSupabaseDashboard() {
         if (!window.supabase?.createClient) throw new Error("Supabase library did not load.");
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        supabaseClient = window.taskBridgeSupabaseClient || (window.taskBridgeSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
             auth: { storage: authStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
-        });
+        }));
         const { data, error } = await supabaseClient.auth.getSession();
         if (error) throw error;
         currentUser = data?.session?.user || null;
