@@ -1588,6 +1588,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             const matchesSearch = [job.title, job.id, job.advertiser_id]
                 .some(value => String(value || "").toLowerCase().includes(search));
             return matchesSearch && (status === "all" || job.status === status);
+        }).sort(function (a, b) {
+            return new Date(b.created_at || 0).getTime() -
+                new Date(a.created_at || 0).getTime();
         });
 
         if (!filtered.length) {
