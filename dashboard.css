@@ -5735,13 +5735,41 @@ body.footer-info-open { overflow: hidden; }
 }
 
 
-/* Sidebar Back to Dashboard action above Help & Support. */
-.sidebar-navigation .sidebar-back-dashboard {
-    margin: 0 0 9px; padding: 10px 13px; border: 1px solid var(--border);
-    border-radius: 9px; background: var(--white); color: var(--primary-dark); font-weight: 750;
+/* Back to Dashboard stays inside the active page's header background. */
+.account-page-section .has-section-back-button { position:relative; }
+.account-page-section .section-back-button {
+    position:absolute; top:14px; left:16px; z-index:2;
+    display:inline-flex; align-items:center; gap:7px;
+    min-height:32px; padding:6px 10px;
+    border:1px solid rgba(71,101,80,.22); border-radius:8px;
+    background:rgba(255,255,255,.82); color:#315b42;
+    font:inherit; font-size:11px; font-weight:800; line-height:1;
+    cursor:pointer; transition:background .18s ease,border-color .18s ease,transform .18s ease;
 }
-.sidebar-navigation .sidebar-back-dashboard .icon { width: 16px; height: 16px; }
-.sidebar-navigation .sidebar-back-dashboard:hover { background: var(--primary-light); border-color: var(--primary); }
+.account-page-section .section-back-button span:first-child { font-size:17px; line-height:10px; }
+.account-page-section .section-back-button:hover {
+    background:#fff; border-color:#82b99a; transform:translateX(-2px);
+}
+.account-page-section .section-back-button:focus-visible {
+    outline:2px solid #32935c; outline-offset:2px;
+}
+
+/* Center the full Profile header panel and its status marker. */
+.account-page-section .profile-intro {
+    position:relative; min-height:150px; padding:25px 20px 20px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px; border:1px solid #e2ece5; border-radius:14px;
+    background:linear-gradient(112deg,#e6f7ed 0%,#fff8d9 58%,#f0ebff 100%);
+    text-align:center;
+}
+.account-page-section .profile-intro-copy { width:100%; flex:0 1 auto; text-align:center; }
+.account-page-section .profile-intro-copy p { max-width:570px; margin:0 auto; }
+.account-page-section .profile-intro .overall-status { margin:0 auto; }
+
+@media(max-width:600px) {
+    .account-page-section .section-back-button { top:10px; left:10px; min-height:29px; padding:5px 8px; font-size:10px; }
+    .account-page-section .profile-intro { min-height:160px; padding:45px 13px 16px; }
+}
 
 /* Keep the account dropdown above header content and reliably clickable. */
 .top-header .profile-dropdown { position: relative; z-index: 1250; }
