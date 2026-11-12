@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
   }
 
-  initializeAccountMenu();
+  if (!document.querySelector(".dashboard-layout")) initializeAccountMenu();
   const SUPABASE_URL="https://eboagroxkgpplccufpuk.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY="sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
   const storage={getItem:key=>localStorage.getItem(key)??sessionStorage.getItem(key),setItem:(key,value)=>{if(localStorage.getItem(key)!==null)localStorage.setItem(key,value);else sessionStorage.setItem(key,value)},removeItem:key=>{localStorage.removeItem(key);sessionStorage.removeItem(key)}};
@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const nameInput=document.getElementById("supportName"),emailInput=document.getElementById("supportEmail");
   nameInput.value=user.user_metadata?.full_name||user.user_metadata?.name||"";
   emailInput.value=user.email||"";
+  if(!document.querySelector(".dashboard-layout")){
   const toggle=document.getElementById("walletBalanceToggle"),menu=document.getElementById("headerWalletMenu"),balance=document.getElementById("availableBalanceHeader");
   if(toggle&&menu&&balance){
     let walletRows=[],selectedCurrency="USD";
@@ -45,6 +46,8 @@ document.addEventListener("DOMContentLoaded",async()=>{
     document.addEventListener("click",event=>{if(!event.target.closest(".wallet-balance-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
     client.channel("support-header-wallet-"+user.id).on("postgres_changes",{event:"*",schema:"public",table:"wallets",filter:"user_id=eq."+user.id},()=>refresh().catch(err=>console.error("Wallet refresh failed:",err))).subscribe();
   }else{console.warn("Shared header wallet markup is incomplete.");}
+  }
+
 
 
   const form=document.getElementById("supportMessageForm"),send=document.getElementById("supportSendButton"),status=document.getElementById("supportFormStatus");
