@@ -1,43 +1,41 @@
 document.addEventListener("DOMContentLoaded", async () => {
   function initializeAccountMenu() {
-    const toggle = document.getElementById("topbarAvatar");
-    const menu = document.getElementById("topbarProfileMenu");
-    if (!toggle || !menu || toggle.dataset.menuReady === "true") return;
-
-    const closeMenu = () => {
-      menu.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
+    const profileToggle = document.getElementById("profileToggle");
+    const profileMenu = document.getElementById("profileMenu");
+    const notificationToggle = document.getElementById("notificationToggle");
+    const notificationMenu = document.getElementById("notificationMenu");
+    const closeMenus = () => {
+      profileMenu?.classList.remove("show");
+      notificationMenu?.classList.remove("show");
+      profileToggle?.setAttribute("aria-expanded", "false");
+      notificationToggle?.setAttribute("aria-expanded", "false");
     };
-
-    toggle.addEventListener("click", event => {
+    profileToggle?.addEventListener("click", event => {
       event.stopPropagation();
-      const opening = menu.hidden;
-      menu.hidden = !opening;
-      toggle.setAttribute("aria-expanded", String(opening));
-    });
-
-    menu.addEventListener("click", event => {
-      if (event.target.closest("a")) closeMenu();
-    });
-
-    document.addEventListener("click", event => {
-      if (!event.target.closest(".topbar-profile-dropdown")) closeMenu();
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        closeMenu();
-        toggle.focus();
+      const opening = !profileMenu.classList.contains("show");
+      closeMenus();
+      if (opening) {
+        profileMenu.classList.add("show");
+        profileToggle.setAttribute("aria-expanded", "true");
       }
     });
-
-    const currentPage = window.location.pathname.split("/").pop() || "profile.html";
-    menu.querySelectorAll("a").forEach(link => {
-      const targetPage = new URL(link.href, window.location.href).pathname.split("/").pop();
-      if (targetPage === currentPage) link.setAttribute("aria-current", "page");
+    notificationToggle?.addEventListener("click", event => {
+      event.stopPropagation();
+      const opening = !notificationMenu.classList.contains("show");
+      closeMenus();
+      if (opening) {
+        notificationMenu.classList.add("show");
+        notificationToggle.setAttribute("aria-expanded", "true");
+      }
     });
-
-    toggle.dataset.menuReady = "true";
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".profile-dropdown") && !event.target.closest(".notification-dropdown")) closeMenus();
+    });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
+    const currentPage = window.location.pathname.split("/").pop();
+    profileMenu?.querySelectorAll("a").forEach(link => {
+      if (new URL(link.href, window.location.href).pathname.split("/").pop() === currentPage) link.setAttribute("aria-current", "page");
+    });
   }
 
   initializeAccountMenu();
@@ -58,8 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if(sessionError||!sessionData.session){window.location.replace("./login.html");return}
     const user=sessionData.session.user;
     const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
-    document.getElementById("topbarAvatar").textContent=name.trim().charAt(0).toUpperCase()||"U";
-    const toggle=document.getElementById("profileWalletToggle"),menu=document.getElementById("profileWalletMenu"),balance=document.getElementById("profileAvailableBalance");
+    
+    const toggle=document.getElementById("walletBalanceToggle"),menu=document.getElementById("headerWalletMenu"),balance=document.getElementById("availableBalanceHeader");
     try{
       const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
       if(error)throw error;
