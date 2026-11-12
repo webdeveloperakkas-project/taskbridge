@@ -5975,3 +5975,30 @@ body.footer-info-open { overflow: hidden; }
         height: 21px !important;
     }
 }
+
+/* MOBILE HEADER FINAL TUNING: notification position/icon and wallet outline/size. */
+@media (max-width: 600px) {
+    .top-header .notification-dropdown {
+        transform: translateX(-10px) !important;
+    }
+    .top-header .notification-toggle svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    .top-header .wallet-balance-dropdown .header-balance {
+        min-height: 48px !important;
+        padding: 9px 12px !important;
+        border: 1.5px solid #000000 !important;
+        box-sizing: border-box !important;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .wallet-balance-dropdown .header-balance {
+        min-height: 46px !important;
+        padding: 8px 10px !important;
+    }
+    .top-header .notification-toggle svg {
+        width: 23px !important;
+        height: 23px !important;
+    }
+}
