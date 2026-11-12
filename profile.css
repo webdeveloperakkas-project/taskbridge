@@ -344,3 +344,10 @@ button.topbar-avatar:focus-visible{outline:3px solid #93b4f5;outline-offset:3px}
 .topbar-profile-menu[hidden]{display:none!important}
 .topbar-profile-menu a{display:block;padding:10px 12px;border-radius:8px;color:#334155;font-size:13px;font-weight:650;text-decoration:none}
 .topbar-profile-menu a:hover,.topbar-profile-menu a[aria-current="page"]{background:#eff6ff;color:#2457b6}
+
+/* Clear person icon inside the shared Dashboard profile avatar. */
+.account-shared-header .profile-avatar{display:grid;place-items:center;overflow:hidden}
+.account-shared-header .profile-avatar svg{display:block;width:20px;height:20px;color:#108653}
+.account-shared-header .profile-toggle{appearance:none;padding:0}
+.account-shared-header .profile-toggle:focus-visible{outline:2px solid #16a36a;outline-offset:3px;border-radius:8px}
+.account-shared-header .profile-menu a[aria-current="page"]{background:#e9f8f0;color:#108653}
