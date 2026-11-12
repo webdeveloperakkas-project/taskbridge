@@ -293,33 +293,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /* =====================================
-       PROFILE DROPDOWN
-    ====================================== */
-
-    if (profileToggle && profileMenu) {
-
-        profileToggle.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            const isOpen = profileMenu.classList.contains("show");
-
-            closeAllDropdowns();
-
-            if (!isOpen) {
-
-                profileMenu.classList.add("show");
-
-                profileToggle.setAttribute("aria-expanded", "true");
-
-            }
-
-        });
-
-    }
-
-
-    /* =====================================
        CLOSE DROPDOWNS ON OUTSIDE CLICK
     ====================================== */
 
