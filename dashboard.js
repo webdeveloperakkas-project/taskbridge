@@ -2366,12 +2366,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 approve.type = "button";
                 approve.className = "posted-submission-approve";
                 approve.textContent = "Approve & Pay";
-                approve.addEventListener("click", () => reviewPostedSubmission(submission.id, "approve"));
+                approve.addEventListener("click", event => reviewPostedSubmission(submission.id, "approve", event.currentTarget));
                 const reject = document.createElement("button");
                 reject.type = "button";
                 reject.className = "posted-submission-reject";
                 reject.textContent = "Reject";
-                reject.addEventListener("click", () => reviewPostedSubmission(submission.id, "reject"));
+                reject.addEventListener("click", event => reviewPostedSubmission(submission.id, "reject", event.currentTarget));
                 actions.append(approve, reject);
                 card.appendChild(actions);
             }
@@ -2380,39 +2380,53 @@ document.addEventListener("DOMContentLoaded", function () {
         return panel;
     }
 
-    async function reviewPostedSubmission(submissionId, decision) {
-        const isApprove = decision === "approve";
-        const confirmation = isApprove
-            ? "Approve this worker's submission and release the full reward from the job's held balance?"
-            : "Reject this worker's submission?";
-        if (!window.confirm(confirmation)) return;
+    const reviewingSubmissionIds = new Set();
 
-        let reviewNote = null;
-        if (!isApprove) {
-            reviewNote = window.prompt("Optional rejection reason for the worker:", "The submitted proof does not meet the job requirements.");
-            if (reviewNote === null) return;
-            reviewNote = reviewNote.trim() || "The submitted proof does not meet the job requirements.";
+    async function reviewPostedSubmission(submissionId, decision, clickedButton) {
+        // Ignore rapid or duplicate clicks while this submission is being reviewed.
+        if (reviewingSubmissionIds.has(submissionId)) return;
+        reviewingSubmissionIds.add(submissionId);
+
+        const actionButtons = clickedButton?.parentElement?.querySelectorAll("button");
+        if (actionButtons) actionButtons.forEach(button => { button.disabled = true; });
+
+        try {
+            const isApprove = decision === "approve";
+            const confirmation = isApprove
+                ? "Approve this worker's submission and release the full reward from the job's held balance?"
+                : "Reject this worker's submission?";
+            if (!window.confirm(confirmation)) return;
+
+            let reviewNote = null;
+            if (!isApprove) {
+                reviewNote = window.prompt("Optional rejection reason for the worker:", "The submitted proof does not meet the job requirements.");
+                if (reviewNote === null) return;
+                reviewNote = reviewNote.trim() || "The submitted proof does not meet the job requirements.";
+            }
+
+            const rpcName = isApprove ? "approve_submission" : "reject_submission";
+            const { error } = await supabaseClient.rpc(rpcName, {
+                p_submission_id: submissionId,
+                p_review_note: reviewNote
+            });
+            if (error) {
+                console.error("Submission review failed:", error);
+                window.alert(error.message || "Could not review this submission. Please try again.");
+                return;
+            }
+
+            await Promise.all([
+                loadMyPostedJobs(),
+                loadMyWallet(),
+                loadMyTotalEarnings()
+            ]);
+            window.alert(isApprove
+                ? "Submission approved. The worker's full reward has been credited."
+                : "Submission rejected. The worker has been notified through the submission status.");
+        } finally {
+            reviewingSubmissionIds.delete(submissionId);
+            if (actionButtons) actionButtons.forEach(button => { button.disabled = false; });
         }
-
-        const rpcName = isApprove ? "approve_submission" : "reject_submission";
-        const { error } = await supabaseClient.rpc(rpcName, {
-            p_submission_id: submissionId,
-            p_review_note: reviewNote
-        });
-        if (error) {
-            console.error("Submission review failed:", error);
-            window.alert(error.message || "Could not review this submission. Please try again.");
-            return;
-        }
-
-        await Promise.all([
-            loadMyPostedJobs(),
-            loadMyWallet(),
-            loadMyTotalEarnings()
-        ]);
-        window.alert(isApprove
-            ? "Submission approved. The worker's full reward has been credited."
-            : "Submission rejected. The worker has been notified through the submission status.");
     }
 
     function renderPostedJobs(jobs) {
