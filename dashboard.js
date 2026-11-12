@@ -1149,6 +1149,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const brand = card.querySelector(".deposit-brand-mark");
                 const balanceNode = document.createElement("small");
                 balanceNode.className = "withdraw-card-balance";
+                balanceNode.setAttribute("aria-label", "Available balance");
                 topline.append(balanceNode);
                 if (brand) topline.append(brand);
                 card.insertBefore(topline, card.firstChild);
@@ -1180,7 +1181,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const balanceNode = topline.querySelector(".deposit-card-balance");
             if (balanceNode) {
-                balanceNode.textContent = "Available: " + formatWalletMoney(balance, currency);
+                balanceNode.textContent = formatWalletMoney(balance, currency);
             }
         });
     }
