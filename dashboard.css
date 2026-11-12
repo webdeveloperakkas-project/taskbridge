@@ -6379,3 +6379,24 @@ body.footer-info-open { overflow: hidden; }
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+
+/* Mobile wallet: replace the harsh black outline with a subtle deep-green border
+   and reduce the wallet control height without changing desktop. */
+@media (max-width: 600px) {
+    .top-header .wallet-balance-dropdown .header-balance {
+        min-height: 42px !important;
+        height: 42px !important;
+        padding: 6px 10px !important;
+        border: 1.5px solid #166534 !important;
+        border-radius: 9px !important;
+        box-sizing: border-box !important;
+    }
+}
+@media (max-width: 380px) {
+    .top-header .wallet-balance-dropdown .header-balance {
+        min-height: 40px !important;
+        height: 40px !important;
+        padding: 5px 8px !important;
+    }
+}
