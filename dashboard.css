@@ -5775,3 +5775,59 @@ body.footer-info-open { overflow: hidden; }
 .top-header .profile-dropdown { position: relative; z-index: 1250; }
 .top-header #profileMenuToggle { position: relative; z-index: 1251; pointer-events: auto; cursor: pointer; }
 .top-header #headerProfileMenu { position: absolute; z-index: 1252; pointer-events: auto; }
+
+
+/* My Statistics header alignment and animated gradient Back button. */
+.account-page-section .statistics-heading {
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:58px 20px 22px;
+    text-align:center;
+}
+.account-page-section .statistics-heading > * {
+    text-align:center;
+}
+.account-page-section .statistics-heading h1,
+.account-page-section .statistics-heading p {
+    width:100%;
+    margin-left:auto;
+    margin-right:auto;
+}
+.account-page-section .statistics-heading .section-back-button {
+    top:14px;
+    left:16px;
+    border:1px solid rgba(255,255,255,.42);
+    color:#fff;
+    background:linear-gradient(115deg,#12865b 0%,#287bba 30%,#7650c9 62%,#d39a26 82%,#12865b 100%);
+    background-size:260% 260%;
+    box-shadow:0 5px 16px rgba(52,93,125,.22),inset 0 1px 0 rgba(255,255,255,.24);
+    animation:statisticsBackGradient 6s ease-in-out infinite;
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.account-page-section .statistics-heading .section-back-button:hover {
+    color:#fff;
+    border-color:rgba(255,255,255,.72);
+    background:linear-gradient(115deg,#12865b 0%,#287bba 30%,#7650c9 62%,#d39a26 82%,#12865b 100%);
+    background-size:260% 260%;
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(52,93,125,.3),inset 0 1px 0 rgba(255,255,255,.3);
+    filter:saturate(1.12);
+}
+.account-page-section .statistics-heading .section-back-button:focus-visible {
+    outline:2px solid #7650c9;
+    outline-offset:3px;
+}
+@keyframes statisticsBackGradient {
+    0%,100% { background-position:0% 50%; }
+    50% { background-position:100% 50%; }
+}
+@media(max-width:600px) {
+    .account-page-section .statistics-heading { padding:54px 14px 18px; }
+    .account-page-section .statistics-heading .section-back-button { top:10px; left:10px; }
+}
+@media(prefers-reduced-motion:reduce) {
+    .account-page-section .statistics-heading .section-back-button { animation:none; }
+}
