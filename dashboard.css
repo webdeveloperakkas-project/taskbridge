@@ -6443,3 +6443,33 @@ body.footer-info-open { overflow: hidden; }
         font-size: 12px !important;
     }
 }
+
+
+/* Mobile footer: align Policies links with the left edge of the Policies heading. */
+@media (max-width: 600px) {
+    .dashboard-footer-group:nth-child(3) {
+        justify-self: stretch !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+    .dashboard-footer-group:nth-child(3) h3 {
+        text-align: left !important;
+    }
+    .dashboard-footer-group:nth-child(3) .dashboard-footer-group-links {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        justify-content: start !important;
+        justify-items: start !important;
+        align-items: start !important;
+    }
+    .dashboard-footer-group:nth-child(3) .dashboard-footer-group-links a {
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+}
