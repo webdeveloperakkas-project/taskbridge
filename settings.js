@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setItem(key,value){if(localStorage.getItem(key)!==null)localStorage.setItem(key,value);else sessionStorage.setItem(key,value)},
     removeItem(key){localStorage.removeItem(key);sessionStorage.removeItem(key)}
   };
-  const client = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storage:authStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+  const client = window.taskBridgeSupabaseClient || (window.taskBridgeSupabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storage:authStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}}));
   const {data,error}=await client.auth.getSession();
   if(error||!data.session){window.location.replace("./login.html");return}
   let user=data.session.user;
