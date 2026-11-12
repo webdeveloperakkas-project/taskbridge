@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   nameInput.value=user.user_metadata?.full_name||user.user_metadata?.name||"";
   emailInput.value=user.email||"";
   const toggle=document.getElementById("walletBalanceToggle"),menu=document.getElementById("headerWalletMenu"),balance=document.getElementById("availableBalanceHeader");
+  if(!toggle||!menu||!balance){console.warn("Shared header wallet elements are missing on this page.");return;}
   try{
     const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});if(error)throw error;
     const rows=wallets||[],funded=rows.filter(row=>Number(row.available_balance)>0);let selected=funded.find(row=>row.currency==="USD")||funded[0]||rows.find(row=>row.currency==="USD")||rows[0]||{currency:"USD",available_balance:0};
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
     toggle.addEventListener("click",event=>{event.stopPropagation();const open=menu.classList.contains("show");menu.classList.toggle("show",!open);toggle.setAttribute("aria-expanded",String(!open))});
     document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
     render();
-  }catch(err){console.warn("Header wallet could not load:",err);balance.textContent="—"}
+  }catch(err){console.warn("Header wallet could not load:",err);if(balance)balance.textContent="—"}
 
   const form=document.getElementById("supportMessageForm"),send=document.getElementById("supportSendButton"),status=document.getElementById("supportFormStatus");
   form.addEventListener("submit",async event=>{
