@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded",async()=>{
   const SUPABASE_URL="https://eboagroxkgpplccufpuk.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY="sb_publishable_UKOjnMUUrbVK3a0fruk55Q_Anjk04RA";
   const storage={getItem:key=>localStorage.getItem(key)??sessionStorage.getItem(key),setItem:(key,value)=>{if(localStorage.getItem(key)!==null)localStorage.setItem(key,value);else sessionStorage.setItem(key,value)},removeItem:key=>{localStorage.removeItem(key);sessionStorage.removeItem(key)}};
-  const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+  const client=window.taskBridgeSupabaseClient || (window.taskBridgeSupabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{storage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}}));
   const {data,error}=await client.auth.getSession();
   if(error||!data.session){window.location.replace("./login.html");return}
   const user=data.session.user,name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
