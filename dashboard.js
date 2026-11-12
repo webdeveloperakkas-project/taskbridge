@@ -1131,6 +1131,33 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function updateDepositMethodCards() {
+        const methodForDepositCard = method =>
+            method === "Wise (manual transfer)" ? "Wise" : method;
+        document.querySelectorAll(".deposit-method-card").forEach(card => {
+            const displayMethod = card.dataset.method || "";
+            const walletMethod = methodForDepositCard(displayMethod);
+            const currency = currencyForWithdrawMethod(walletMethod);
+            const wallet = walletsByMethod.get(walletMethod);
+            const balance = Math.max(0, Number(wallet?.available_balance || 0));
+            let topline = card.querySelector(".deposit-card-topline");
+            if (!topline) {
+                topline = document.createElement("span");
+                topline.className = "deposit-card-topline";
+                const balanceNode = document.createElement("small");
+                balanceNode.className = "deposit-card-balance";
+                topline.append(balanceNode);
+                const brand = card.querySelector(".deposit-brand-mark");
+                if (brand) topline.append(brand);
+                card.insertBefore(topline, card.firstChild);
+            }
+            const balanceNode = topline.querySelector(".deposit-card-balance");
+            if (balanceNode) {
+                balanceNode.textContent = "Available: " + formatWalletMoney(balance, currency);
+            }
+        });
+    }
+
     function escapeFinanceText(value) {
         return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
     }
@@ -1353,6 +1380,7 @@ document.addEventListener("DOMContentLoaded", function () {
         walletRows = data || [];
         walletsByCurrency = new Map(walletRows.map(wallet => [wallet.currency, wallet]));
         walletsByMethod = new Map(walletRows.filter(wallet => wallet.payment_method).map(wallet => [wallet.payment_method, wallet]));
+        updateDepositMethodCards();
         const fundedWallets = walletRows.filter(wallet => Number(wallet.available_balance) > 0);
         const selector = document.getElementById("walletCurrencySelector");
         if (selector) {
