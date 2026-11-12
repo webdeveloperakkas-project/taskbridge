@@ -2403,7 +2403,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 totals[currency] = (totals[currency] || 0) + Number(selector(row) || 0);
             });
             return Object.keys(totals).length
-                ? Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([currency, value]) => currency + " " + summaryAmount(value, currency)).join(" · ")
+                ? Object.entries(totals).sort(([a], [b]) => a.localeCompare(b)).map(([currency, value]) => currency + " " + summaryAmount(value, currency)).join(" ")
                 : "0.00";
         };
 
