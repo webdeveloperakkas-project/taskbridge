@@ -444,28 +444,28 @@ document.addEventListener("DOMContentLoaded", function () {
         ".sidebar-navigation .nav-link[data-section]"
     );
 
-    // Keep an in-dashboard navigation trail for the section Back buttons.
-    let sectionNavigationStack = [];
-
+    // Add Back to Dashboard inside each account/support page header background.
     function addSectionBackButtons() {
-        pageSections.forEach(function (sectionId) {
-            if (sectionId === "dashboardSection") return;
+        const headingBySection = {
+            supportSection: ".shared-page-intro",
+            profileSection: ".profile-intro",
+            myStatisticsSection: ".statistics-heading",
+            settingsSection: ".settings-heading"
+        };
 
+        Object.entries(headingBySection).forEach(function ([sectionId, selector]) {
             const section = document.getElementById(sectionId);
-            const heading = section?.querySelector(".section-heading");
+            const heading = section?.querySelector(selector);
             if (!heading || heading.querySelector(".section-back-button")) return;
 
+            heading.classList.add("has-section-back-button");
             const backButton = document.createElement("button");
             backButton.type = "button";
             backButton.className = "section-back-button";
-            backButton.setAttribute("aria-label", "Go back to the previous page");
-            backButton.innerHTML = '<span aria-hidden="true">←</span><span>Back</span>';
+            backButton.setAttribute("aria-label", "Back to Dashboard");
+            backButton.innerHTML = '<span aria-hidden="true">←</span><span>Back to Dashboard</span>';
             backButton.addEventListener("click", function () {
-                if (sectionNavigationStack.length > 1) {
-                    window.history.back();
-                } else {
-                    showPageSection("dashboardSection");
-                }
+                showPageSection("dashboardSection");
             });
             heading.insertBefore(backButton, heading.firstChild);
         });
