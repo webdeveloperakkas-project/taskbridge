@@ -19,7 +19,15 @@
       </button>
       <div class="profile-wallet-menu" id="profileWalletMenu" aria-label="Available currency wallets"></div>
     </div>
-    <div class="topbar-actions"><a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a><span class="topbar-avatar" id="topbarAvatar">U</span></div>
+    <div class="topbar-actions"><a class="topbar-notification" href="./dashboard.html" aria-label="Notifications">🔔</a><div class="topbar-profile-dropdown">
+        <button type="button" class="topbar-avatar" id="topbarAvatar" aria-label="Open account menu" aria-expanded="false" aria-controls="topbarProfileMenu">U</button>
+        <nav class="topbar-profile-menu" id="topbarProfileMenu" aria-label="Account menu" hidden>
+          <a href="./profile.html">My Profile</a>
+          <a href="./settings.html">Settings</a>
+          <a href="./support.html">Help &amp; Support</a>
+          <a href="./dashboard.html">Dashboard</a>
+        </nav>
+      </div></div>
   </header>
   <main class="shared-page-shell">
     <a class="profile-back-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span> Back to Dashboard</a>
@@ -51,6 +59,7 @@
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./header-menu.js?v=20261112"></script>
   <script src="./support.js"></script>
 </body>
 </html>
