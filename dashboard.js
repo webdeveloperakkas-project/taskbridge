@@ -311,7 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
             !clickedWalletMenu &&
             !clickedWalletButton &&
             !clickedNotification &&
-            !clickedNotificationButton &&
+            !clickedNotificationButton
         ) {
 
             closeAllDropdowns();
