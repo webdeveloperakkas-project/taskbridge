@@ -9,44 +9,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   const $ = id => document.getElementById(id);
   function initializeAccountMenu() {
-    const toggle = document.getElementById("topbarAvatar");
-    const menu = document.getElementById("topbarProfileMenu");
-    if (!toggle || !menu || toggle.dataset.menuReady === "true") return;
-
-    const closeMenu = () => {
-      menu.hidden = true;
-      toggle.setAttribute("aria-expanded", "false");
+    const profileToggle = document.getElementById("profileToggle");
+    const profileMenu = document.getElementById("profileMenu");
+    const notificationToggle = document.getElementById("notificationToggle");
+    const notificationMenu = document.getElementById("notificationMenu");
+    const closeMenus = () => {
+      profileMenu?.classList.remove("show");
+      notificationMenu?.classList.remove("show");
+      profileToggle?.setAttribute("aria-expanded", "false");
+      notificationToggle?.setAttribute("aria-expanded", "false");
     };
-
-    toggle.addEventListener("click", event => {
+    profileToggle?.addEventListener("click", event => {
       event.stopPropagation();
-      const opening = menu.hidden;
-      menu.hidden = !opening;
-      toggle.setAttribute("aria-expanded", String(opening));
-    });
-
-    menu.addEventListener("click", event => {
-      if (event.target.closest("a")) closeMenu();
-    });
-
-    document.addEventListener("click", event => {
-      if (!event.target.closest(".topbar-profile-dropdown")) closeMenu();
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        closeMenu();
-        toggle.focus();
+      const opening = !profileMenu.classList.contains("show");
+      closeMenus();
+      if (opening) {
+        profileMenu.classList.add("show");
+        profileToggle.setAttribute("aria-expanded", "true");
       }
     });
-
-    const currentPage = window.location.pathname.split("/").pop() || "profile.html";
-    menu.querySelectorAll("a").forEach(link => {
-      const targetPage = new URL(link.href, window.location.href).pathname.split("/").pop();
-      if (targetPage === currentPage) link.setAttribute("aria-current", "page");
+    notificationToggle?.addEventListener("click", event => {
+      event.stopPropagation();
+      const opening = !notificationMenu.classList.contains("show");
+      closeMenus();
+      if (opening) {
+        notificationMenu.classList.add("show");
+        notificationToggle.setAttribute("aria-expanded", "true");
+      }
     });
-
-    toggle.dataset.menuReady = "true";
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".profile-dropdown") && !event.target.closest(".notification-dropdown")) closeMenus();
+    });
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenus(); });
+    const currentPage = window.location.pathname.split("/").pop();
+    profileMenu?.querySelectorAll("a").forEach(link => {
+      if (new URL(link.href, window.location.href).pathname.split("/").pop() === currentPage) link.setAttribute("aria-current", "page");
+    });
   }
 
   initializeAccountMenu();
@@ -187,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const {error}=await client.from("user_profile_details").upsert(payload,{onConflict:"user_id"});if(error)throw error;
       const {error:metadataError}=await client.auth.updateUser({data:{full_name:payload.full_name}});
       if(metadataError)console.warn("Could not update account display name metadata:",metadataError);
-      $("topbarAvatar").textContent=payload.full_name.charAt(0).toUpperCase()||"U";
+      
       feedback("personalFeedback","Your personal details have been saved.","success");
     }
     catch(error){console.error(error);feedback("personalFeedback",error.message||"Could not save personal details.","error");}
@@ -221,7 +219,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     user=sessionData?.session?.user;if(!user){window.location.replace("./login.html");return;}
     $("emailAddress").value=user.email||"";
     const initialName=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
-    $("topbarAvatar").textContent=initialName.trim().charAt(0).toUpperCase()||"U";
+    
     try {
       const {data:wallets,error:walletError}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
       if(walletError)throw walletError;
@@ -255,7 +253,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     $("phoneNumber").value=details.phone_number||"";
     $("gender").value=details.gender||"";
     $("personalCountry").value=details.country||"";
-    if(details.full_name)$("topbarAvatar").textContent=details.full_name.trim().charAt(0).toUpperCase()||"U";
+    
     identityRow=rows?.find(row=>row.verification_type==="identity")||null;
     addressRow=rows?.find(row=>row.verification_type==="address")||null;
     if(identityRow){$("idDocumentType").value=identityRow.document_type||"";$("idCountry").value=identityRow.country||"";}
