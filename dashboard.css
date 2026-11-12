@@ -5735,24 +5735,29 @@ body.footer-info-open { overflow: hidden; }
 }
 
 
-/* Back to Dashboard stays inside the active page's header background. */
-.account-page-section .has-section-back-button { position:relative; }
-.account-page-section .section-back-button {
-    position:absolute; top:14px; left:16px; z-index:2;
-    display:inline-flex; align-items:center; gap:7px;
-    min-height:32px; padding:6px 10px;
-    border:1px solid rgba(71,101,80,.22); border-radius:8px;
-    background:rgba(255,255,255,.82); color:#315b42;
-    font:inherit; font-size:11px; font-weight:800; line-height:1;
-    cursor:pointer; transition:background .18s ease,border-color .18s ease,transform .18s ease;
+/* Consistent animated Back to Dashboard control, outside every page header. */
+.page-section-back-area { display:flex; align-items:center; justify-content:flex-start; width:100%; margin:0 0 12px; }
+.page-section-back-area .section-back-button {
+    position:relative; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:36px; padding:8px 14px; border:1px solid rgba(255,255,255,.48); border-radius:10px;
+    color:#fff; background:linear-gradient(115deg,#12865b 0%,#287bba 30%,#7650c9 62%,#d39a26 82%,#12865b 100%);
+    background-size:260% 260%; box-shadow:0 5px 16px rgba(52,93,125,.22),inset 0 1px 0 rgba(255,255,255,.24);
+    font:inherit; font-size:12px; font-weight:800; line-height:1; cursor:pointer;
+    animation:statisticsBackGradient 6s ease-in-out infinite;
+    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
 }
-.account-page-section .section-back-button span:first-child { font-size:17px; line-height:10px; }
-.account-page-section .section-back-button:hover {
-    background:#fff; border-color:#82b99a; transform:translateX(-2px);
+.page-section-back-area .section-back-button span:first-child { font-size:18px; line-height:10px; }
+.page-section-back-area .section-back-button:hover {
+    color:#fff; border-color:rgba(255,255,255,.76); transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(52,93,125,.3),inset 0 1px 0 rgba(255,255,255,.3); filter:saturate(1.12);
 }
-.account-page-section .section-back-button:focus-visible {
-    outline:2px solid #32935c; outline-offset:2px;
+.page-section-back-area .section-back-button:focus-visible { outline:2px solid #7650c9; outline-offset:3px; }
+@keyframes statisticsBackGradient { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+@media(max-width:600px) {
+    .page-section-back-area { margin-bottom:10px; }
+    .page-section-back-area .section-back-button { min-height:33px; padding:7px 11px; font-size:11px; }
 }
+@media(prefers-reduced-motion:reduce) { .page-section-back-area .section-back-button { animation:none; } }
 
 /* Center the full Profile header panel and its status marker. */
 .account-page-section .profile-intro {
@@ -5777,57 +5782,12 @@ body.footer-info-open { overflow: hidden; }
 .top-header #headerProfileMenu { position: absolute; z-index: 1252; pointer-events: auto; }
 
 
-/* My Statistics header alignment and animated gradient Back button. */
+/* My Statistics heading stays centered; its Back button sits above and outside it. */
 .account-page-section .statistics-heading {
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:58px 20px 22px;
-    text-align:center;
+    position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:22px 20px; text-align:center;
 }
-.account-page-section .statistics-heading > * {
-    text-align:center;
-}
+.account-page-section .statistics-heading > * { text-align:center; }
 .account-page-section .statistics-heading h1,
-.account-page-section .statistics-heading p {
-    width:100%;
-    margin-left:auto;
-    margin-right:auto;
-}
-.account-page-section .statistics-heading .section-back-button {
-    top:14px;
-    left:16px;
-    border:1px solid rgba(255,255,255,.42);
-    color:#fff;
-    background:linear-gradient(115deg,#12865b 0%,#287bba 30%,#7650c9 62%,#d39a26 82%,#12865b 100%);
-    background-size:260% 260%;
-    box-shadow:0 5px 16px rgba(52,93,125,.22),inset 0 1px 0 rgba(255,255,255,.24);
-    animation:statisticsBackGradient 6s ease-in-out infinite;
-    transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
-}
-.account-page-section .statistics-heading .section-back-button:hover {
-    color:#fff;
-    border-color:rgba(255,255,255,.72);
-    background:linear-gradient(115deg,#12865b 0%,#287bba 30%,#7650c9 62%,#d39a26 82%,#12865b 100%);
-    background-size:260% 260%;
-    transform:translateY(-2px);
-    box-shadow:0 8px 20px rgba(52,93,125,.3),inset 0 1px 0 rgba(255,255,255,.3);
-    filter:saturate(1.12);
-}
-.account-page-section .statistics-heading .section-back-button:focus-visible {
-    outline:2px solid #7650c9;
-    outline-offset:3px;
-}
-@keyframes statisticsBackGradient {
-    0%,100% { background-position:0% 50%; }
-    50% { background-position:100% 50%; }
-}
-@media(max-width:600px) {
-    .account-page-section .statistics-heading { padding:54px 14px 18px; }
-    .account-page-section .statistics-heading .section-back-button { top:10px; left:10px; }
-}
-@media(prefers-reduced-motion:reduce) {
-    .account-page-section .statistics-heading .section-back-button { animation:none; }
-}
+.account-page-section .statistics-heading p { width:100%; margin-left:auto; margin-right:auto; }
+@media(max-width:600px) { .account-page-section .statistics-heading { padding:18px 14px; } }
