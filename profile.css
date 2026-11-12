@@ -334,3 +334,13 @@ button.profile-header-balance{
   background:#f1f5f9;
   color:#64748b;
 }
+
+
+/* Shared account-page header profile dropdown */
+.topbar-profile-dropdown{position:relative;display:flex;align-items:center}
+button.topbar-avatar{border:0;cursor:pointer;font:inherit}
+button.topbar-avatar:focus-visible{outline:3px solid #93b4f5;outline-offset:3px}
+.topbar-profile-menu{position:absolute;top:calc(100% + 12px);right:0;z-index:120;display:grid;gap:3px;min-width:180px;padding:7px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;box-shadow:0 14px 35px rgba(15,23,42,.15)}
+.topbar-profile-menu[hidden]{display:none!important}
+.topbar-profile-menu a{display:block;padding:10px 12px;border-radius:8px;color:#334155;font-size:13px;font-weight:650;text-decoration:none}
+.topbar-profile-menu a:hover,.topbar-profile-menu a[aria-current="page"]{background:#eff6ff;color:#2457b6}
