@@ -6312,3 +6312,40 @@ body.footer-info-open { overflow: hidden; }
         line-height: 1.45 !important;
     }
 }
+
+
+/* Footer: use the available width so Company and Support have equal,
+   compact outer margins instead of unused space after Support. */
+.dashboard-footer-main {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    column-gap: 0 !important;
+}
+.dashboard-footer-group:nth-child(2),
+.dashboard-footer-group:nth-child(3),
+.dashboard-footer-group:nth-child(4) {
+    justify-self: stretch !important;
+    min-width: 0 !important;
+}
+.dashboard-footer-group:nth-child(3) h3 {
+    text-align: center !important;
+}
+.dashboard-footer-group:nth-child(3) .dashboard-footer-group-links {
+    justify-items: start !important;
+    justify-content: start !important;
+}
+@media (max-width: 600px) {
+    .dashboard-footer-main {
+        width: 100% !important;
+        max-width: none !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        column-gap: 10px !important;
+    }
+}
