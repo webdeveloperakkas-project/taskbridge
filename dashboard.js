@@ -729,6 +729,21 @@ document.addEventListener("DOMContentLoaded", function () {
         return document.querySelector('input[name="cardColor"]:checked')?.value || "white";
     }
 
+    // Use the saved job card color consistently in every dashboard job list.
+    function getJobCardBackground(job) {
+        const backgrounds = {
+            white: "#ffffff",
+            blue: "#dbeafe",
+            green: "#dcfce7",
+            yellow: "#fef3c7",
+            orange: "#ffedd5",
+            purple: "#ede9fe",
+            pink: "#fce7f3"
+        };
+        const selectedColor = String(job?.card_color || "white").toLowerCase();
+        return backgrounds[selectedColor] || backgrounds.white;
+    }
+
     function calculateJobBudget() {
         const jobBudgetNode = document.getElementById("jobBudgetAmount");
         const platformFeeNode = document.getElementById("platformFeeAmount");
@@ -2110,7 +2125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let job = publicJobs.find(item => item.id === submission.job_id);
         if (!job) {
             const { data: jobData, error: jobError } = await supabaseClient.from("jobs")
-                .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country")
+                .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country,card_color")
                 .eq("id", submission.job_id)
                 .maybeSingle();
             if (jobError) {
@@ -2140,7 +2155,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = document.createElement("article");
             row.className = "job-table-row job-list-item dashboard-recent-job-row";
             row.dataset.jobId = job.id;
-            row.style.setProperty("--job-card-background", "#ffffff");
+            row.style.setProperty("--job-card-background", getJobCardBackground(job));
 
             const nameCell = document.createElement("div");
             nameCell.className = "job-table-cell job-name-cell";
@@ -2176,7 +2191,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function loadFindJobs() {
         const { data, error } = await supabaseClient.from("jobs")
-            .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country")
+            .select("id,advertiser_id,category_id,title,description,instructions,target_url,proof_requirements,extra_instructions,reward_per_worker,total_slots,duration_minutes,currency,status,created_at,remaining_budget,target_country,card_color")
             .eq("status", "active")
             .gt("remaining_budget", 0)
             .order("created_at", { ascending: false });
@@ -2199,7 +2214,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.dataset.category = normalizeJobCategory(category?.slug || category?.name);
             row.dataset.reward = String(Number(job.reward_per_worker) || 0);
             row.dataset.date = job.created_at || "";
-            row.style.setProperty("--job-card-background", "#ffffff");
+            row.style.setProperty("--job-card-background", getJobCardBackground(job));
 
             const nameCell = document.createElement("div");
             nameCell.className = "job-table-cell job-name-cell";
@@ -2411,7 +2426,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = document.createElement("article");
             row.className = "job-table-row posted-job-table-row job-list-item";
             row.dataset.status = uiStatus(job.status);
-            row.style.setProperty("--job-card-background", "#ffffff");
+            row.style.setProperty("--job-card-background", getJobCardBackground(job));
 
             const jobSubmissions = postedSubmissionsCache.filter(item => item.job_id === job.id);
             const approvedCount = jobSubmissions.filter(item => item.status === "approved").length;
@@ -2704,7 +2719,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const category = getJobCategory(job);
             const row = document.createElement("article");
             row.className = "job-table-row dashboard-my-posted-job-row";
-            row.style.setProperty("--job-card-background", "#ffffff");
+            row.style.setProperty("--job-card-background", getJobCardBackground(job));
 
             const title = document.createElement("span");
             title.className = "job-table-cell job-name-cell";
