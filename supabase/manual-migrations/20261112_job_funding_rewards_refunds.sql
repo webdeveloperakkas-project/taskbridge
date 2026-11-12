@@ -4,7 +4,7 @@
 BEGIN;
 
 -- Remove legacy RPC overloads that did not require a funding wallet.
-DROP FUNCTION IF EXISTS public.create_job_with_funding(uuid,text,text,text,text,text,text,numeric,integer,integer,text,integer,text,integer);
+DROP FUNCTION IF EXISTS public.create_job_with_funding(uuid,text,text,text,text,text,text,numeric,integer,integer,text,text,integer);
 DROP FUNCTION IF EXISTS public.create_job_with_funding(uuid,text,text,text,text,text,text,numeric,integer,integer,text,text);
 DROP FUNCTION IF EXISTS public.create_job_with_funding(uuid,text,text,text,text,text,text,numeric,integer,integer,text,integer);
 DROP FUNCTION IF EXISTS public.create_job_with_funding(uuid,text,text,text,text,text,text,numeric,integer,integer,text);
