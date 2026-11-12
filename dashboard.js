@@ -444,21 +444,23 @@ document.addEventListener("DOMContentLoaded", function () {
         ".sidebar-navigation .nav-link[data-section]"
     );
 
-    // Add Back to Dashboard inside each account/support page header background.
+    // Place a consistent Back to Dashboard control outside each page header.
     function addSectionBackButtons() {
-        const headingBySection = {
-            supportSection: ".shared-page-intro",
-            profileSection: ".profile-intro",
-            myStatisticsSection: ".statistics-heading",
-            settingsSection: ".settings-heading"
-        };
+        const sectionIds = new Set(
+            Array.from(document.querySelectorAll(".sidebar-navigation .nav-link[data-section]"))
+                .map(function (link) { return link.dataset.section; })
+                .filter(function (id) { return id && id !== "dashboardSection"; })
+        );
+        ["profileSection", "myStatisticsSection", "settingsSection"].forEach(function (id) {
+            sectionIds.add(id);
+        });
 
-        Object.entries(headingBySection).forEach(function ([sectionId, selector]) {
+        sectionIds.forEach(function (sectionId) {
             const section = document.getElementById(sectionId);
-            const heading = section?.querySelector(selector);
-            if (!heading || heading.querySelector(".section-back-button")) return;
+            if (!section || section.querySelector(":scope > .page-section-back-area")) return;
 
-            heading.classList.add("has-section-back-button");
+            const backArea = document.createElement("div");
+            backArea.className = "page-section-back-area";
             const backButton = document.createElement("button");
             backButton.type = "button";
             backButton.className = "section-back-button";
@@ -467,14 +469,15 @@ document.addEventListener("DOMContentLoaded", function () {
             backButton.addEventListener("click", function () {
                 showPageSection("dashboardSection");
             });
-            heading.insertBefore(backButton, heading.firstChild);
+            backArea.appendChild(backButton);
+            section.insertBefore(backArea, section.firstChild);
         });
     }
 
     addSectionBackButtons();
 
 
-    /* =====================================
+        /* =====================================
        SHOW SELECTED SECTION
     ====================================== */
 
