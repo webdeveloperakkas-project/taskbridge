@@ -58,6 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const name=user.user_metadata?.full_name||user.user_metadata?.name||user.email||"U";
     
     const toggle=document.getElementById("walletBalanceToggle"),menu=document.getElementById("headerWalletMenu"),balance=document.getElementById("availableBalanceHeader");
+    if(!toggle||!menu||!balance){console.warn("Shared header wallet elements are missing on this page.");return;}
     try{
       const {data:wallets,error}=await client.from("wallets").select("currency,available_balance").eq("user_id",user.id).order("currency",{ascending:true});
       if(error)throw error;
@@ -69,7 +70,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       toggle.addEventListener("click",event=>{event.stopPropagation();const open=menu.classList.contains("show");menu.classList.toggle("show",!open);toggle.setAttribute("aria-expanded",String(!open))});
       document.addEventListener("click",event=>{if(!event.target.closest(".profile-header-wallet-dropdown")){menu.classList.remove("show");toggle.setAttribute("aria-expanded","false")}});
       render();
-    }catch(error){console.warn("Header wallet could not load:",error);balance.textContent="—"}
+    }catch(error){console.warn("Header wallet could not load:",error);if(balance)balance.textContent="—"}
   }
   await loadSharedHeader();
 
